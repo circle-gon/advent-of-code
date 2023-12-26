@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>AOC Stuff</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/script.js" type="module" defer></script>
+  </head>
+  <body>
+    <input type="file" id="input-file" style="display: none" />
+    <div>
+      <label for="data">Input problem data:</label>
+      <textarea id="data"></textarea> or
+      <button id="file-upload">Upload as File</button>
+    </div>
+    <div>
+      <label for="day">Select problem:</label>
+      <select id="year"></select>
+      <select id="day"></select>
+      <select id="part"></select>
+    </div>
+    <div>
+      <button id="run">Run!</button>
+    </div>
+    <div>
+      Result: <span id="result">???</span> <span id="update"></span>
+    </div>
+    <div>
+      Took <span id="time">???</span>
+    </div>
+    <div id="error"></div>
+  </body>
+</html>
