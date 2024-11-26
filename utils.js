@@ -41,5 +41,4 @@ export function format(num) {
 export const AOC = {
   days: 25,
   parts: 2,
-  none: "No solution created"
 }

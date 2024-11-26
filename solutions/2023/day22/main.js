@@ -34,12 +34,12 @@ function run(input, u, create) {
   return create(blocks, 0, update);
 }
 
-const spawn1 = spawnWorkerFor("solutions/2023/day22/w1.js");
+const spawn1 = spawnWorkerFor(import.meta.resolve("./w1.js"));
 function part1(input, u) {
   return run(input, u, spawn1);
 }
 
-const spawn2 = spawnWorkerFor("solutions/2023/day22/w2.js");
+const spawn2 = spawnWorkerFor(import.meta.resolve("./w2.js"));
 function part2(input, u) {
   return run(input, u, spawn2);
 }

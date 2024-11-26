@@ -85,7 +85,7 @@ function forDay() {
   return toSave.yearData[toSave.year].dayData[getDay()];
 }
 
-async function getSolution(input, update) {
+async function getSolution() {
   try {
     const effDay = getDay() + 1;
     const module = (
@@ -96,11 +96,11 @@ async function getSolution(input, update) {
       )
     ).default;
     const sol = module[forDay().part];
-    if (!sol) return AOC.none;
-    return await sol(input, update);
+    if (!sol) return false;
+    return sol;
   } catch (e) {
-    // File doesn't exist
-    return AOC.none;
+    console.error(e)
+    return false;
   }
 }
 
@@ -143,9 +143,12 @@ function main() {
       const start = performance.now();
 
       try {
-        solution = await getSolution(forDay().input, (value) => {
-          updateSpan.innerText = value;
-        });
+        const solver = await getSolution();
+        if (solver)
+          solution = await solver(forDay().input, (value) => {
+            updateSpan.innerText = value;
+          });
+        else solution = "No solution created";
       } catch (e) {
         solution = "Failed to get a result";
         console.error(e);

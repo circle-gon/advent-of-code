@@ -33,7 +33,7 @@ function part1(input) {
   return lowestLoc;
 }
 
-const spawnWorker = spawnWorkerFor("solutions/2023/day5/worker.js");
+const spawnWorker = spawnWorkerFor(import.meta.resolve("./worker.js"));
 
 async function part2(input, update) {
   const lines = input.split("\n");
