@@ -99,6 +99,7 @@ async function getSolution() {
     if (!sol) return false;
     return sol;
   } catch (e) {
+    // It's not possible to differentiate between non-existant module and syntax error, so log it just in case
     console.error(e)
     return false;
   }
@@ -145,7 +146,7 @@ function main() {
       try {
         const solver = await getSolution();
         if (solver)
-          solution = await solver(forDay().input, (value) => {
+          solution = await solver(forDay().input.trim(), (value) => {
             updateSpan.innerText = value;
           });
         else solution = "No solution created";
