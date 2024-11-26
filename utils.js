@@ -37,3 +37,9 @@ export function spawnWorkerFor(type) {
 export function format(num) {
   return num.toLocaleString("en-US");
 }
+
+export const AOC = {
+  days: 25,
+  parts: 2,
+  none: "No solution created"
+}

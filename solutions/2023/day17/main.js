@@ -1,6 +1,6 @@
 import { spawnWorkerFor, format } from "/utils.js";
 
-const spawnWorker = spawnWorkerFor("solutions/sol17/worker.js");
+const spawnWorker = spawnWorkerFor("solutions/2023/day17/worker.js");
 
 function parse(input) {
   const map = [];

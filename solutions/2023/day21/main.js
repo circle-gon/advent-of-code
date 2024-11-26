@@ -18,7 +18,7 @@ function part1(input) {
   return gridSteps(parse(input), 64);
 }
 
-const spawnWorker = spawnWorkerFor("solutions/sol21/worker.js");
+const spawnWorker = spawnWorkerFor("solutions/2023/day21/worker.js");
 
 function part2(input, u) {
   let i = 0;

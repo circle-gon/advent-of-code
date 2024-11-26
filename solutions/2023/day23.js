@@ -117,11 +117,7 @@ function part1(input) {
       v = map[cur.p[1]][cur.p[0]];
 
     if (D[v] !== undefined) moves.push(addVect(cur.p, DS[D[v]]));
-    else {
-      for (const d of DS) {
-        moves.push(addVect(cur.p, d));
-      }
-    }
+    else DS.forEach((d) => moves.push(addVect(cur.p, d)));
 
     return moves.filter(
       (p) => validPos(map, p) && cur.seen[key(p)] === undefined
@@ -196,4 +192,4 @@ function part2(input) {
   return maxSteps;
 }
 
-export default [part1, part2];
+export default [part1, part2]
