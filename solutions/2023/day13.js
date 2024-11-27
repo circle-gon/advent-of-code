@@ -73,11 +73,11 @@ function parse(pattern) {
     table.push(r);
   }
 
-  return pattern;
+  return table; 
 }
 
 function part1(input) {
-  return input.split("\n\n").map((pattern) => getSum(parse(pattern), -1));
+  return input.split("\n\n").map((pattern) => getSum(parse(pattern), -1)).reduce((a, b) => a + b);
 }
 
 function part2(input) {

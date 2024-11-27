@@ -29,7 +29,7 @@ function parse(input) {
   for (const line of input.split("\n")) {
     const parts = line.split(" ");
 
-    steps.push([Number(parts[1]), parts[0]]);
+    steps.push([Number(parts[1]), parts[0], parts[2]]);
   }
 
   return steps;
@@ -44,9 +44,9 @@ function part2(input) {
 
   const points = [];
   for (const step of steps) {
-    const num = parseInt(step.slice(0, 5), 16);
+    const num = parseInt(step[2].slice(2, 7), 16);
     let dir;
-    switch (step[5]) {
+    switch (step[2][7]) {
       case "0":
         dir = "R";
         break;

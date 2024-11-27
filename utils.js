@@ -1,3 +1,5 @@
+/* global WabtModule */
+
 const WORKERS = {};
 function createWorkerFor(type, ind) {
   const w = WORKERS[type] ?? (WORKERS[type] = []);
@@ -41,4 +43,13 @@ export function format(num) {
 export const AOC = {
   days: 25,
   parts: 2,
+}
+
+let wabt
+export async function compile(wat, deps) {
+  // LAZY!!!!!
+  if (!wabt) wabt = await WabtModule()
+  
+  const buffer = wabt.parseWat("", wat).toBinary({}).buffer
+  return (await WebAssembly.instantiate(buffer, deps)).instance.exports
 }
