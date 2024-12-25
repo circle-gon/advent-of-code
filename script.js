@@ -244,7 +244,7 @@ function main() {
 
   runexBtn.addEventListener("click", async () => {
     errorDiv.innerText = "";
-    resultSpan.innerText = "Generating solution...";
+    resultSpan.innerText = "Checking...";
     resultSpan.className = "maybe";
     timeSpan.className = "maybe";
     timeSpan.innerText = "???";
