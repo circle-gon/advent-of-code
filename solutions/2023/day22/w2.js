@@ -1,6 +1,6 @@
 import { hash, fall } from "./shared.js"
 
-function solve(blocks) {
+function solve(echo, blocks) {
   fall(blocks);
 
   let total = 0;
@@ -21,17 +21,18 @@ function solve(blocks) {
     
     if (i % 10 === 9) {
       self.postMessage({
-        type: "msg"
+        type: "msg",
+        data: [echo]
       })
     }
   }
   
-  return total
+  return [echo, total]
 }
 
 self.addEventListener("message", e => {
   self.postMessage({
     type: "done",
-    data: solve(e.data)
+    data: solve(...e.data)
   })
 })

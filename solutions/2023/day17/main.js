@@ -15,8 +15,8 @@ function parse(input) {
   return map;
 }
 
-function spawn(input, min, max, update) {
-  return spawnWorker([parse(input), min, max], 0, update);
+function spawn(input, min, max, update, idx) {
+  return spawnWorker([parse(input), min, max], idx, update);
 }
 
 function createUpdater(update) {
@@ -30,11 +30,11 @@ function createUpdater(update) {
 }
 
 function part1(input, update) {
-  return spawn(input, 0, 3, createUpdater(update));
+  return spawn(input, 0, 3, createUpdater(update), 0);
 }
 
 function part2(input, update) {
-  return spawn(input, 4, 10, createUpdater(update));
+  return spawn(input, 4, 10, createUpdater(update), 1);
 }
 
 export default [part1, part2]

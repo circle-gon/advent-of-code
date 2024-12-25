@@ -22,7 +22,7 @@ function solve(a, b, c, d, e, f, g, h) {
   return [x, y];
 }
 
-function part1(input) {
+function part1(input, _, example) {
   const hailstones = parse(input);
 
   let intersects = 0;
@@ -47,7 +47,13 @@ function part1(input) {
 
       const newX = i1[0] + i1[3] * t0;
       const newY = i1[1] + i1[4] * t0;
-      if (newX < 2e14 || newX > 4e14 || newY < 2e14 || newY > 4e14) continue;
+
+      if (example && (newX < 7 || newX > 27 || newY < 7 || newY > 27)) continue;
+      if (
+        !example &&
+        (newX < 2e14 || newX > 4e14 || newY < 2e14 || newY > 4e14)
+      )
+        continue;
 
       intersects++;
     }
@@ -122,4 +128,4 @@ function part2(input) {
   return [...results.entries()].sort((a, b) => b[1] - a[1])[0][0];
 }
 
-export default [part1, part2]
+export default [part1, part2];

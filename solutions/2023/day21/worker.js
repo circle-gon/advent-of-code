@@ -46,7 +46,7 @@ function neville(points, x) {
 
 // Apparently the resulting value is quadratic with f(x)
 // f(x) = cells for 65 + 131*x
-function solve(cells) {
+function solve(echo, cells) {
   // expand it by 5 (big enough)
   expand(cells);
 
@@ -57,6 +57,7 @@ function solve(cells) {
     .map((_, i) => {
       self.postMessage({
         type: "msg",
+        data: [echo]
       });
       
       const v = [i, gridSteps(cells, i === 0 ? 65 : 131, set)];
@@ -64,12 +65,12 @@ function solve(cells) {
       return v;
     });
 
-  return neville(f, (26501365 - 65) / 131);
+  return [echo, neville(f, (26501365 - 65) / 131)];
 }
 
 self.addEventListener("message", (e) => {
   self.postMessage({
     type: "done",
-    data: solve(e.data),
+    data: solve(...e.data),
   });
 });

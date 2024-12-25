@@ -14,7 +14,7 @@ function hash(x, y, dir, dirSteps) {
   return `${x},${y},${dir},${dirSteps}`;
 }
 
-function shortestPath(map, minSteps, maxSteps) {
+function shortestPath(echo, map, minSteps, maxSteps) {
   const visited = new Map();
   const queue = [{ x: 0, y: 0, dir: "", dirSteps: minSteps, temp: -map[0][0] }];
   let min = Infinity;
@@ -26,7 +26,7 @@ function shortestPath(map, minSteps, maxSteps) {
 
     iters++;
 
-    if (iters % 10000 === 0) self.postMessage({ type: "msg" });
+    if (iters % 10000 === 0) self.postMessage({ type: "msg", data: [echo] });
 
     const [x, y] = nextXY(ox, oy, dir);
 
@@ -60,12 +60,12 @@ function shortestPath(map, minSteps, maxSteps) {
       queue.sort((a, b) => b.temp - a.temp);
     }
   }
-  return min;
+  return [echo, min];
 }
 
 self.addEventListener("message", (e) => {
   self.postMessage({
     type: "done",
-    data: shortestPath(...e.data),
+    data: shortestPath(e.data[0], ...e.data[1]),
   });
 });

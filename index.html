@@ -3,34 +3,103 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="title" content="Advent of Code Solver" />
+    <meta
+      name="description"
+      content="A free and open-source Advent of Code that runs in your browser."
+    />
+    <meta
+      name="keywords"
+      content="advent of code, advent of code solver, solver, aoc, aoc solver"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://delightful-honeysuckle-cactus.glitch.me/"
+    />
+    <meta property="og:title" content="Advent of Code solver" />
+    <meta
+      property="og:description"
+      content="A free and open-source Advent of Code that runs in your browser."
+    />
+    <meta
+      property="og:image"
+      content="https://cdn.glitch.global/afb7031d-ee3e-4986-8551-533d412c4c36/9ff55150-6cc2-4f5b-8850-bde85317b85a.Untitled.png?v=1734653870295"
+    />
 
-    <title>AOC Stuff</title>
+    <title>AOC Solver</title>
     <link rel="stylesheet" href="/style.css" />
-    <script src="https://webassembly.github.io/wabt/demo/libwabt.js"></script>
+    <link
+      rel="shortcut icon"
+      href="https://cdn.glitch.global/afb7031d-ee3e-4986-8551-533d412c4c36/9ff55150-6cc2-4f5b-8850-bde85317b85a.Untitled.png?v=1734653870295"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/wabt@1.0.36/index.js"></script>
     <script src="/script.js" type="module" defer></script>
   </head>
   <body>
-    <input type="file" id="input-file" style="display: none" />
-    <div>
-      <label for="data">Input problem data:</label>
-      <textarea id="data"></textarea> or
-      <button id="file-upload">Upload as File</button>
+    <div id="content">
+      <div>
+        <h1>Advent of Code Solver</h1>
+        <input type="file" id="input-file" style="display: none" />
+        <div>
+          <label for="data">Input problem data:</label> (or
+          <button id="file-upload">Upload from File</button>)
+        </div>
+        <textarea id="data" placeholder="Problem data..." rows="20" spellcheck="false"></textarea>
+        <div id="select">
+          <label for="day">Select problem:</label>
+          <select id="year"></select>
+          <select id="day"></select>
+          <select id="part"></select>
+        </div>
+        <div>
+          <button id="runex">Sanity check</button>
+          <button id="run">Run!</button>
+          <button id="runall">Run All</button>
+        </div>
+        <div>
+          Result: <span id="result">???</span> <span id="update" class="maybe"></span>
+        </div>
+        <div>Took <span id="time">???</span></div>
+        <div id="error" class="failed"></div>
+      </div>
+      <div>
+        <table id="multi">
+          <thead>
+            <tr>
+              <td colspan="18"><span  id="title"></span> Solutions</td>
+            </tr>
+            <tr>
+              <th scope="col">Day</th>
+              <th scope="col">Part</th>
+              <th scope="col">Status</th>
+              <th scope="col">Answer</th>
+              <th scope="col">Time</th>
+              <th scope="col">Part</th>
+              <th scope="col">Status</th>
+              <th scope="col">Answer</th>
+              <th scope="col">Time</th>
+              <th scope="col">Day</th>
+              <th scope="col">Part</th>
+              <th scope="col">Status</th>
+              <th scope="col">Answer</th>
+              <th scope="col">Time</th>
+              <th scope="col">Part</th>
+              <th scope="col">Status</th>
+              <th scope="col">Answer</th>
+              <th scope="col">Time</th>
+            </tr>
+          </thead>
+          <tbody id="stuff">
+          </tbody>
+        </table>
+      </div>
     </div>
-    <div>
-      <label for="day">Select problem:</label>
-      <select id="year"></select>
-      <select id="day"></select>
-      <select id="part"></select>
-    </div>
-    <div>
-      <button id="run">Run!</button>
-    </div>
-    <div>
-      Result: <span id="result">???</span> <span id="update"></span>
-    </div>
-    <div>
-      Took <span id="time">???</span>
-    </div>
-    <div id="error"></div>
+    <footer>
+      <a href="https://adventofcode.com/">Advent of Code </a> &bull;
+      <a href="https://glitch.com/edit/#!/delightful-honeysuckle-cactus"
+        >Source code</a
+      >
+    </footer>
   </body>
 </html>

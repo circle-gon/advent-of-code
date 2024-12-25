@@ -12,22 +12,25 @@ function createWorkerFor(type, ind) {
   return w[ind];
 }
 
+let buster = 0;
 export function spawnWorkerFor(type) {
   return (msg, ind, update) => {
     return new Promise((r) => {
       const f = createWorkerFor(type, ind);
-      f.postMessage(msg);
+      const echo = buster++;
+      f.postMessage([echo, msg]);
 
       // this is the RESULT!
       const fn = (e) => {
         const data = e.data;
+        if (data.data[0] !== echo) return;
         switch (data.type) {
           case "done":
             f.removeEventListener("message", fn);
-            r(data.data);
+            r(data.data[1]);
             break;
           case "msg":
-            update(data.data);
+            update(data.data[1]);
             break;
         }
       };
@@ -40,16 +43,47 @@ export function format(num) {
   return num.toLocaleString("en-US");
 }
 
+export function formatTime(offset) {
+  const duration = (performance.now() - offset) / 1000;
+  return duration >= 1
+    ? `${duration.toFixed(2)}s`
+    : `${(duration * 1000).toFixed(2)}ms`;
+}
+
 export const AOC = {
   days: 25,
   parts: 2,
+};
+
+const wabt = WabtModule();
+export async function compile(wat, deps) {
+  const buffer = (await wabt)
+    .parseWat("", wat, {
+      multi_memory: true,
+    })
+    .toBinary({}).buffer;
+  const memory = new WebAssembly.Memory({
+    initial: 1,
+  });
+  const depsFinal = {
+    js: {
+      raw: memory,
+      ...deps,
+    },
+  };
+
+  return {
+    module: (await WebAssembly.instantiate(buffer, depsFinal)).instance.exports,
+    memory,
+  };
 }
 
-let wabt
-export async function compile(wat, deps) {
-  // LAZY!!!!!
-  if (!wabt) wabt = await WabtModule()
-  
-  const buffer = wabt.parseWat("", wat).toBinary({}).buffer
-  return (await WebAssembly.instantiate(buffer, deps)).instance.exports
+export function memstr(str, mem) {
+  const zeroed = str + "\0"; // Add a 0x00 byte at the end for consistency
+  const out = new TextEncoder(str).encodeInto(
+    zeroed,
+    new Uint8Array(mem.buffer)
+  );
+  if (out.read < zeroed.length)
+    throw new TypeError("Bad string or buffer length needs to be increased");
 }

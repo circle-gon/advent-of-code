@@ -14,14 +14,16 @@ function computeSolution(low, count, headers) {
 
 
 self.addEventListener("message", (e) => {
-  const result = computeSolution(...e.data)
+  const [echo, data] = e.data
+  const result = computeSolution(...data)
   
   self.postMessage({
-    type: "msg"
+    type: "msg",
+    data: [echo]
   })
   
   self.postMessage({
     type: "done",
-    data: result,
+    data: [echo, result],
   });
 });

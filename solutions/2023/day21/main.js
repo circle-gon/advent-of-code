@@ -14,8 +14,8 @@ function parse(input) {
   return cells;
 }
 
-function part1(input) {
-  return gridSteps(parse(input), 64);
+function part1(input, _, example) {
+  return gridSteps(parse(input), example ? 6 : 64);
 }
 
 const spawnWorker = spawnWorkerFor(import.meta.resolve("./worker.js"));
@@ -29,4 +29,4 @@ function part2(input, u) {
   return spawnWorker(parse(input), 0, update);
 }
 
-export default [part1, part2]
+export default [part1, part2];
