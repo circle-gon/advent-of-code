@@ -11,6 +11,7 @@ const dataInput = document.getElementById("data");
 const runBtn = document.getElementById("run");
 const runexBtn = document.getElementById("runex");
 const runallBtn = document.getElementById("runall");
+const runexallBtn = document.getElementById("runexall");
 const resultSpan = document.getElementById("result");
 const timeSpan = document.getElementById("time");
 const updateSpan = document.getElementById("update");
@@ -49,8 +50,8 @@ function load() {
   const load = JSON.parse(localStorage.getItem("data"));
   if (load !== null) {
     // Don't assign directly because we need to make sure new years get filled in instead of replaced
-    toSave.year = load.year
-    Object.assign(toSave.yearData, load.yearData)
+    toSave.year = load.year;
+    Object.assign(toSave.yearData, load.yearData);
   }
 
   for (const option of yearSelector.options)
@@ -83,7 +84,7 @@ function getDay() {
 }
 
 function forDay() {
-  const data = toSave.yearData[toSave.year]
+  const data = toSave.yearData[toSave.year];
   return data.dayData[data.day];
 }
 
@@ -149,7 +150,7 @@ function main() {
     select.innerText = year;
     yearSelector.append(select);
   }
-  
+
   for (let i = 1; i <= AOC.parts; i++) {
     const select = document.createElement("option");
     select.innerText = `part ${i}`;
@@ -175,18 +176,141 @@ function main() {
     save();
   });
 
-  runallBtn.addEventListener("click", async () => {
+  runBtn.addEventListener("click", async () => {
+    if (dataInput.value !== "") {
+      errorDiv.innerText = "";
+      resultSpan.innerText = "Generating solution...";
+      resultSpan.className = "maybe";
+      timeSpan.className = "maybe";
+      timeSpan.innerText = "???";
+      runBtn.disabled = true;
+      runexBtn.disabled = true;
+      runallBtn.disabled = true;
+      runexallBtn.disabled = true;
+      multiTable.style.display = "none";
+      await wait();
+
+      let solution;
+      let name;
+      const start = performance.now();
+
+      try {
+        const solver = (await getSolution(getDay()))?.[forDay().part];
+        if (solver) {
+          solution = await solver(
+            forDay().input.trim(),
+            (value) => (updateSpan.innerText = value)
+          );
+          name = "success";
+        } else {
+          solution = "No solution created";
+          name = "skipped";
+        }
+      } catch (e) {
+        solution = "Failed to get a result";
+        name = "failed";
+        console.error(e);
+      }
+
+      const isNumber = typeof solution === "number";
+      const isNumberLike = isNumber || typeof solution === "bigint";
+
+      if (isNumber && solution > Number.MAX_SAFE_INTEGER) {
+        errorDiv.innerText =
+          "The answer is beyond the precision limit, so it is most likely wrong.";
+        name = "failed";
+      }
+
+      timeSpan.innerText = formatTime(start);
+      resultSpan.innerText = `${solution}${
+        isNumberLike && solution >= 1000 ? ` (${format(solution)})` : ""
+      }`;
+      resultSpan.className = name;
+      timeSpan.className = name;
+      updateSpan.innerText = "";
+      runBtn.disabled = false;
+      runexBtn.disabled = false;
+      runallBtn.disabled = false;
+      runexallBtn.disabled = false;
+    } else {
+      errorDiv.innerText = "No problem data.";
+      resultSpan.innerText = "???";
+      resultSpan.className = "skipped";
+      timeSpan.className = "skipped";
+      timeSpan.innerText = "???";
+      updateSpan.innerText = "";
+    }
+  });
+
+  runexBtn.addEventListener("click", async () => {
     errorDiv.innerText = "";
-    resultSpan.innerText = "Generating solutions...";
+    resultSpan.innerText = "Generating solution...";
     resultSpan.className = "maybe";
     timeSpan.className = "maybe";
     timeSpan.innerText = "???";
     runBtn.disabled = true;
     runexBtn.disabled = true;
     runallBtn.disabled = true;
+    runexallBtn.disabled = true;
+    multiTable.style.display = "none";
+    await wait();
+
+    let solution;
+    let name;
+    const start = performance.now();
+
+    try {
+      const solver = (await getSolution(getDay()))?.[forDay().part];
+      if (solver) {
+        const inputs = data[toSave.year][getDay()].examples[forDay().part];
+        for (const [input, expected] of inputs) {
+          const result = await solver(
+            input,
+            (value) => (updateSpan.innerText = value)
+          );
+          if (result !== expected) {
+            console.error("Example failed: got", result, "expected", expected, "for");
+            console.log(input);
+            name = "failed";
+            solution = "Examples failed";
+          }
+        }
+        if (name !== "failed") {
+          name = "success";
+          solution = "Examples passed";
+        }
+      } else {
+        solution = "No solution created";
+        name = "skipped";
+      }
+    } catch (e) {
+      solution = "Failed to test";
+      name = "failed";
+      console.error(e);
+    }
+
+    timeSpan.innerText = formatTime(start);
+    resultSpan.innerText = solution;
+    resultSpan.className = name;
+    timeSpan.className = name;
+    updateSpan.innerText = "";
+    runBtn.disabled = false;
+    runexBtn.disabled = false;
+    runallBtn.disabled = false;
+    runexallBtn.disabled = false;
+  });
+
+  runallBtn.addEventListener("click", async () => {
+    errorDiv.innerText = "";
+    resultSpan.innerText = "Checking...";
+    resultSpan.className = "maybe";
+    timeSpan.className = "maybe";
+    timeSpan.innerText = "???";
+    runBtn.disabled = true;
+    runexBtn.disabled = true;
+    runallBtn.disabled = true;
+    runexallBtn.disabled = true;
     multiTable.style.display = "block";
-    tableHeader.innerText = toSave.year;
-    clearTable();
     await wait();
 
     const globalStart = performance.now();
@@ -253,9 +377,10 @@ function main() {
     runBtn.disabled = false;
     runexBtn.disabled = false;
     runallBtn.disabled = false;
+    runexallBtn.disabled = false;
   });
 
-  runexBtn.addEventListener("click", async () => {
+  runexallBtn.addEventListener("click", async () => {
     async function update() {
       updateSpan.innerText =
         checking.length > 0
@@ -274,6 +399,7 @@ function main() {
     runBtn.disabled = true;
     runexBtn.disabled = true;
     runallBtn.disabled = true;
+    runexallBtn.disabled = true;
     multiTable.style.display = "none";
     await wait();
 
@@ -334,8 +460,8 @@ function main() {
     timeSpan.innerText = formatTime(start);
     resultSpan.innerText =
       failed.length === 0
-        ? "examples passed"
-        : `examples failed: ${failed
+        ? "Examples passed"
+        : `Examples failed: ${failed
             .map(([a, b]) => `day ${a + 1} part ${b + 1}`)
             .join(", ")}`;
     resultSpan.className = failed.length === 0 ? "success" : "failed";
@@ -343,69 +469,7 @@ function main() {
     runBtn.disabled = false;
     runexBtn.disabled = false;
     runallBtn.disabled = false;
-  });
-
-  runBtn.addEventListener("click", async () => {
-    if (dataInput.value !== "") {
-      errorDiv.innerText = "";
-      resultSpan.innerText = "Generating solution...";
-      resultSpan.className = "maybe";
-      timeSpan.className = "maybe";
-      timeSpan.innerText = "???";
-      runBtn.disabled = true;
-      runexBtn.disabled = true;
-      runallBtn.disabled = true;
-      multiTable.style.display = "none";
-      await wait();
-
-      let solution;
-      const start = performance.now();
-      let name = "";
-
-      try {
-        const solver = (await getSolution(getDay()))?.[forDay().part];
-        if (solver) {
-          solution = await solver(forDay().input.trim(), (value) => {
-            updateSpan.innerText = value;
-          });
-          name = "success";
-        } else {
-          solution = "No solution created";
-          name = "skipped";
-        }
-      } catch (e) {
-        solution = "Failed to get a result";
-        name = "failed";
-        console.error(e);
-      }
-
-      const isNumber = typeof solution === "number";
-      const isNumberLike = isNumber || typeof solution === "bigint";
-
-      if (isNumber && solution > Number.MAX_SAFE_INTEGER) {
-        errorDiv.innerText =
-          "The answer is beyond the precision limit, so it is most likely wrong.";
-        name = "failed";
-      }
-
-      timeSpan.innerText = formatTime(start);
-      resultSpan.innerText = `${solution}${
-        isNumberLike && solution >= 1000 ? ` (${format(solution)})` : ""
-      }`;
-      resultSpan.className = name;
-      timeSpan.className = name;
-      updateSpan.innerText = "";
-      runBtn.disabled = false;
-      runexBtn.disabled = false;
-      runallBtn.disabled = false;
-    } else {
-      errorDiv.innerText = "No problem data.";
-      resultSpan.innerText = "???";
-      resultSpan.className = "skipped";
-      timeSpan.className = "skipped";
-      timeSpan.innerText = "???";
-      updateSpan.innerText = "";
-    }
+    runexallBtn.disabled = false;
   });
 
   dataInput.addEventListener("change", () => {

@@ -3,12 +3,28 @@ export default {
     {
       name: "Not Quite Lisp",
       special: false,
-      examples: [[], []],
+      examples: [
+        [
+          ["(())", 0],
+          ["()()", 0],
+          ["(((", 3],
+          ["(()(()(", 3],
+          ["))(((((", 3],
+          ["())", -1],
+          ["))(", -1],
+          [")))", -3],
+          [")())())", -3],
+        ],
+        [
+          [")", 1],
+          ["()())", 5],
+        ],
+      ],
     },
     {
-      name: "N/A",
+      name: "I Was Told There Would Be No Math",
       special: false,
-      examples: [[], []],
+      examples: [[["2x3x4", 58], ["1x1x10", 43]], []],
     },
     {
       name: "N/A",

@@ -45,7 +45,12 @@
           <label for="data">Input problem data:</label> (or
           <button id="file-upload">Upload from File</button>)
         </div>
-        <textarea id="data" placeholder="Problem data..." rows="20" spellcheck="false"></textarea>
+        <textarea
+          id="data"
+          placeholder="Problem data..."
+          rows="20"
+          spellcheck="false"
+        ></textarea>
         <div id="select">
           <label for="day">Select problem:</label>
           <select id="year"></select>
@@ -53,12 +58,16 @@
           <select id="part"></select>
         </div>
         <div>
-          <button id="runex">Sanity check</button>
           <button id="run">Run!</button>
-          <button id="runall">Run All</button>
+          <button id="runex">Example check</button>
         </div>
         <div>
-          Result: <span id="result">???</span> <span id="update" class="maybe"></span>
+          <button id="runall">Run all!</button>
+          <button id="runexall">Example check all</button>
+        </div>
+        <div>
+          Result: <span id="result">???</span>
+          <span id="update" class="maybe"></span>
         </div>
         <div>Took <span id="time">???</span></div>
         <div id="error" class="failed"></div>
@@ -67,7 +76,7 @@
         <table id="multi">
           <thead>
             <tr>
-              <td colspan="18"><span  id="title"></span> Solutions</td>
+              <td colspan="18"><span id="title"></span> Solutions</td>
             </tr>
             <tr>
               <th scope="col">Day</th>
@@ -90,8 +99,7 @@
               <th scope="col">Time</th>
             </tr>
           </thead>
-          <tbody id="stuff">
-          </tbody>
+          <tbody id="stuff"></tbody>
         </table>
       </div>
     </div>
