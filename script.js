@@ -269,7 +269,13 @@ function main() {
             (value) => (updateSpan.innerText = value)
           );
           if (result !== expected) {
-            console.error("Example failed: got", result, "expected", expected, "for");
+            console.error(
+              "Example failed: got",
+              result,
+              "expected",
+              expected,
+              "for"
+            );
             console.log(input);
             name = "failed";
             solution = "Examples failed";
@@ -302,7 +308,7 @@ function main() {
 
   runallBtn.addEventListener("click", async () => {
     errorDiv.innerText = "";
-    resultSpan.innerText = "Checking...";
+    resultSpan.innerText = "Generating solutions...";
     resultSpan.className = "maybe";
     timeSpan.className = "maybe";
     timeSpan.innerText = "???";
@@ -311,6 +317,8 @@ function main() {
     runallBtn.disabled = true;
     runexallBtn.disabled = true;
     multiTable.style.display = "block";
+    tableHeader.innerText = toSave.year;
+    clearTable();
     await wait();
 
     const globalStart = performance.now();
