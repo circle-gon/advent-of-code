@@ -199,7 +199,8 @@ function main() {
         if (solver) {
           solution = await solver(
             forDay().input.trim(),
-            (value) => (updateSpan.innerText = value)
+            (value) => (updateSpan.innerText = value),
+            false
           );
           name = "success";
         } else {
@@ -265,8 +266,9 @@ function main() {
         const inputs = data[toSave.year][getDay()].examples[forDay().part];
         for (const [input, expected] of inputs) {
           const result = await solver(
-            input,
-            (value) => (updateSpan.innerText = value)
+            input.trim(),
+            (value) => (updateSpan.innerText = value),
+            true
           );
           if (result !== expected) {
             console.error(

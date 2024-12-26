@@ -24,47 +24,87 @@ export default {
     {
       name: "I Was Told There Would Be No Math",
       special: false,
-      examples: [[["2x3x4", 58], ["1x1x10", 43]], []],
+      examples: [
+        [
+          ["2x3x4", 58],
+          ["1x1x10", 43],
+        ],
+        [
+          ["2x3x4", 34],
+          ["1x1x10", 14],
+        ],
+      ],
     },
     {
-      name: "N/A",
+      name: "Perfectly Spherical Houses in a Vacuum",
+      special: false,
+      examples: [
+        [
+          [">", 2],
+          ["^>v<", 4],
+          ["^v^v^v^v^v", 2],
+        ],
+        [
+          ["^v", 3],
+          ["^>v<", 3],
+          ["^v^v^v^v^v", 11],
+        ],
+      ],
+    },
+    {
+      name: "The Ideal Stocking Stuffer",
+      special: false,
+      examples: [
+        [
+          ["abcdef", 609043],
+          ["pqrstuv", 1048970],
+        ],
+        [],
+      ],
+    },
+    {
+      name: "Doesn't He Have Intern-Elves For This?",
+      special: false,
+      examples: [
+        [
+          ["ugknbfddgicrmopn", 1],
+          ["aaa", 1],
+          ["jchzalrnumimnmhp", 0],
+          ["haegwjzuvuyypxyu", 0],
+          ["dvszwmarrgswjxmb", 0],
+        ],
+        [
+          ["qjhvhtzxzqqjkmpb", 1],
+          ["xxyxx", 1],
+          ["uurcxstgmygtbstg", 0],
+          ["ieodomkazucvgmuy", 0],
+        ],
+      ],
+    },
+    {
+      name: "Probably a Fire Hazard",
       special: false,
       examples: [[], []],
     },
     {
-      name: "N/A",
+      name: "Some Assembly Required",
       special: false,
       examples: [[], []],
     },
     {
-      name: "N/A",
+      name: "Matchsticks",
       special: false,
-      examples: [[], []],
+      examples: [[[`""\n"abc"\n"aaa\\"aaa"\n"\\x27"`, 12]], [[`""\n"abc"\n"aaa\\"aaa"\n"\\x27"`, 19]]],
     },
     {
-      name: "N/A",
+      name: "All in a Single Night",
       special: false,
-      examples: [[], []],
+      examples: [[["London to Dublin = 464\nLondon to Belfast = 518\nDublin to Belfast = 141", 605]], [["London to Dublin = 464\nLondon to Belfast = 518\nDublin to Belfast = 141", 982]]],
     },
     {
-      name: "N/A",
+      name: "Elves Look, Elves Say",
       special: false,
-      examples: [[], []],
-    },
-    {
-      name: "N/A",
-      special: false,
-      examples: [[], []],
-    },
-    {
-      name: "N/A",
-      special: false,
-      examples: [[], []],
-    },
-    {
-      name: "N/A",
-      special: false,
-      examples: [[], []],
+      examples: [[["1", 2], ["11", 2], ["21", 4], ["1211", 6], ["111221", 6]], []],
     },
     {
       name: "N/A",
@@ -629,7 +669,7 @@ export default {
     },
     {
       name: "Guard Gallivant",
-      special: true,
+      special: false,
       examples: [
         [
           [

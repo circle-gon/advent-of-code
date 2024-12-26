@@ -32,13 +32,11 @@ function calc(values, name) {
 
 function part1(input) {
   const values = parse(input);
-  for (const key of values.keys()) calc(values, key);
-
   let sum = 0;
-  for (const [key, val] of values.entries()) {
+  for (const key of values.keys()) {
     if (!key.startsWith("z")) continue;
     const count = Number(key.slice(1));
-    sum += 2 ** count * val;
+    sum += 2 ** count * calc(values, key);
   }
   return sum;
 }

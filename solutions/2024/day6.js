@@ -1,14 +1,15 @@
 // No idea what I was doing here
+// EDIT: turns out that I'm an idiot and forgot to change the memory.fill operation
 
 import { compile, memstr } from "/utils.js";
 
 const wat = `
 (import "js" "raw" (memory $raw 1))
-(import "js" "d" (func $d (param i32)))
 (global $row (mut i32) (i32.const 0))
 (global $col (mut i32) (i32.const 0))
-(memory $input (export "in") 1)
+(memory $input 1)
 (memory $visited 2)
+(memory $mpath (export "m") 1)
 
 (func $parse (result i32) (local $idx i32) (local $str i32) (local $out i32) (local $start i32)
   ;; Reset on each invocation so state isn't kept across solves
@@ -125,6 +126,7 @@ const wat = `
 
 (func $path 
   (param $start i32)
+  (param $make i32)
   (result i32)
   (local $idxX i32)
   (local $idxY i32)
@@ -133,6 +135,7 @@ const wat = `
   (local $idx i32)
   (local $count i32)
   (local $done i32)
+  (local $visitedIdx i32)
   
   ;; Decompose $start into $idxX and $idxY
   (local.set $idxX
@@ -179,7 +182,7 @@ const wat = `
     (memory $visited)
     (i32.const 0)
     (i32.const 0)
-    (i32.const 65536)
+    (i32.const 131072)
   )
         return
       )
@@ -364,10 +367,20 @@ const wat = `
         i32.or
         i32.or
         i32.or
-        local.get $count
-        i32.add
-        local.set $count
-  
+        (if
+          (then
+            (local.set $count
+              (i32.add (local.get $count) (i32.const 1))
+            )
+            local.get $make
+            (if
+              (then
+                (i32.store16 (memory $mpath) (local.get $visitedIdx) (i32.add (local.get $idx) (i32.const 1)))
+                (local.set $visitedIdx (i32.add (local.get $visitedIdx) (i32.const 2)))
+               )
+              )
+           )
+         )
     (local.set $idx
       (i32.add
         (local.get $idx)
@@ -388,7 +401,7 @@ const wat = `
     (memory $visited)
     (i32.const 0)
     (i32.const 0)
-    (i32.const 65536)
+    (i32.const 131072)
   )
   local.get $count
 )
@@ -397,9 +410,27 @@ const wat = `
   (param $start i32)
   (result i32)
   (local $idx i32)
+  (local $vIdx i32)
   (local $count i32)
   
+  (memory.fill
+    (memory $mpath)
+    (i32.const 0)
+    (i32.const 0)
+    (i32.const 65536)
+  )
+  (call $path (local.get $start) (i32.const 1))
+  drop
   (loop $loop
+    (local.set $idx
+    (i32.sub
+      (i32.load16_u
+        (memory $mpath)
+        (local.get $vIdx)
+      )
+      (i32.const 1)
+     )
+    )
     (i32.eq
       (i32.load8_u
         (memory $input)
@@ -418,13 +449,7 @@ const wat = `
         (local.set $count
           (i32.add
             (local.get $count)
-            (i32.eqz (call $path (local.get $start)))
-          )
-        )
-        (i32.eqz (call $path (local.get $start)))
-        (if
-          (then
-            (call $d (local.get $idx))
+            (i32.eqz (call $path (local.get $start) (i32.const 0)))
           )
         )
         ;; Replace it back to a .
@@ -436,18 +461,18 @@ const wat = `
       )
     )
   
-    (local.set $idx
+    (local.set $vIdx
       (i32.add
-        (local.get $idx)
-        (i32.const 1)
+        (local.get $vIdx)
+        (i32.const 2)
       )
     )
-    (i32.lt_u
-      (local.get $idx)
-      (i32.mul
-        (global.get $row)
-        (global.get $col)
+    (i32.ne
+      (i32.load16_u
+        (memory $mpath)
+        (local.get $vIdx)
       )
+      (i32.const 0)
     )
     br_if $loop
   )
@@ -457,6 +482,7 @@ const wat = `
 
 (func (export "part1") (result i32)
   call $parse
+  i32.const 0
   call $path
 )
 
@@ -466,20 +492,18 @@ const wat = `
 )
 `;
 
-const compilee = compile(wat, {
-  d: (i) => {
-    /* self.postMessage({
-      type: "msg"
-    })*/
-    console.log(i);
-  },
-});
+const compilee = compile(wat);
 
-self.addEventListener("message", async (e) => {
+async function part1(input) {
   const { module, memory } = await compilee;
-  memstr(e.data[0], memory);
-  self.postMessage({
-    type: "done",
-    data: module[e.data[1] ? "part2" : "part1"](),
-  });
-});
+  memstr(input, memory);
+  return module.part1();
+}
+
+async function part2(input) {
+  const { module, memory } = await compilee;
+  memstr(input, memory);
+  return module.part2();
+}
+
+export default [part1, part2]

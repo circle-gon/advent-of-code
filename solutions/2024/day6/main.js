@@ -1,3 +1,5 @@
+// Old JS version
+
 import { valid } from "./shared.js";
 import { spawnWorkerFor, format } from "/utils.js";
 
