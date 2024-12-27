@@ -1,4 +1,4 @@
-import { Heap } from "/structures.js"
+import { Heap } from "/externals.js"
 
 function parse(input) {
   const map = [];

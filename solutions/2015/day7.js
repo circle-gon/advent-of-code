@@ -25,7 +25,7 @@ function calc(values, name) {
   if (typeof val === "number") return val;
 
   let result;
-  if (typeof val === "string") result = calc(values, val)
+  if (typeof val === "string") result = calc(values, val);
   else if (val[0] === "NOT") result = negate(calc(values, val[1]), 16);
   else {
     const first = calc(values, val[1]);
@@ -42,9 +42,9 @@ function calc(values, name) {
         break;
       case "OR":
         result = first | second;
-        break
+        break;
       default:
-        throw new Error("what?")
+        throw new Error("what?");
     }
   }
   values.set(name, result);
@@ -59,8 +59,8 @@ function part1(input) {
 function part2(input) {
   const values = parse(input);
   const out = calc(new Map(values), "a");
-  values.set("b", out)
-  return calc(values, "a")
+  values.set("b", out);
+  return calc(values, "a");
 }
 
-export default [part1, part2]
+export default [part1, part2];

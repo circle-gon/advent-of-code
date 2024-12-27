@@ -9,7 +9,7 @@ const wat = `
 (global $col (mut i32) (i32.const 0))
 (memory $input 1)
 (memory $visited 2)
-(memory $mpath (export "m") 1)
+(memory $mpath 1)
 
 (func $parse (result i32) (local $idx i32) (local $str i32) (local $out i32) (local $start i32)
   ;; Reset on each invocation so state isn't kept across solves

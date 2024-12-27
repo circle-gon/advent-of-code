@@ -94,92 +94,197 @@ export default {
     {
       name: "Matchsticks",
       special: false,
-      examples: [[[`""\n"abc"\n"aaa\\"aaa"\n"\\x27"`, 12]], [[`""\n"abc"\n"aaa\\"aaa"\n"\\x27"`, 19]]],
+      examples: [
+        [[`""\n"abc"\n"aaa\\"aaa"\n"\\x27"`, 12]],
+        [[`""\n"abc"\n"aaa\\"aaa"\n"\\x27"`, 19]],
+      ],
     },
     {
       name: "All in a Single Night",
       special: false,
-      examples: [[["London to Dublin = 464\nLondon to Belfast = 518\nDublin to Belfast = 141", 605]], [["London to Dublin = 464\nLondon to Belfast = 518\nDublin to Belfast = 141", 982]]],
+      examples: [
+        [
+          [
+            "London to Dublin = 464\nLondon to Belfast = 518\nDublin to Belfast = 141",
+            605,
+          ],
+        ],
+        [
+          [
+            "London to Dublin = 464\nLondon to Belfast = 518\nDublin to Belfast = 141",
+            982,
+          ],
+        ],
+      ],
     },
     {
       name: "Elves Look, Elves Say",
       special: false,
-      examples: [[["1", 2], ["11", 2], ["21", 4], ["1211", 6], ["111221", 6]], []],
+      examples: [
+        [
+          ["1", 2],
+          ["11", 2],
+          ["21", 4],
+          ["1211", 6],
+          ["111221", 6],
+        ],
+        [],
+      ],
     },
     {
-      name: "N/A",
+      name: "Corporate Policy",
+      special: false,
+      examples: [
+        [
+          ["abcdefgh", "abcdffaa"],
+          ["ghijklmn", "ghjaabcc"],
+        ],
+        [],
+      ],
+    },
+    {
+      name: "JSAbacusFramework.io",
+      special: false,
+      examples: [
+        [
+          ["[1,2,3]", 6],
+          [`{"a":2,"b":4}`, 6],
+          ["[[[3]]]", 3],
+          [`{"a":{"b":4},"c":-1}`, 3],
+          [`{"a":[-1,1]}`, 0],
+          [`[-1,{"a":1}]`, 0],
+          ["[]", 0],
+          ["{}", 0],
+        ],
+        [
+          ["[1,2,3]", 6],
+          ['[1,{"c":"red","b":2},3]', 4],
+          ['{"d":"red","e":[1,2,3,4],"f":5}', 0],
+          ['[1,"red",5]', 6],
+        ],
+      ],
+    },
+    {
+      name: "Knights of the Dinner Table",
+      special: false,
+      examples: [
+        [
+          [
+            "Alice would gain 54 happiness units by sitting next to Bob.\nAlice would lose 79 happiness units by sitting next to Carol.\nAlice would lose 2 happiness units by sitting next to David.\nBob would gain 83 happiness units by sitting next to Alice.\nBob would lose 7 happiness units by sitting next to Carol.\nBob would lose 63 happiness units by sitting next to David.\nCarol would lose 62 happiness units by sitting next to Alice.\nCarol would gain 60 happiness units by sitting next to Bob.\nCarol would gain 55 happiness units by sitting next to David.\nDavid would gain 46 happiness units by sitting next to Alice.\nDavid would lose 7 happiness units by sitting next to Bob.\nDavid would gain 41 happiness units by sitting next to Carol.\n",
+            330,
+          ],
+        ],
+        [],
+      ],
+    },
+    {
+      name: "Reindeer Olympics",
+      special: false,
+      examples: [
+        [
+          [
+            "Comet can fly 14 km/s for 10 seconds, but then must rest for 127 seconds.\nDancer can fly 16 km/s for 11 seconds, but then must rest for 162 seconds.",
+            1120,
+          ],
+        ],
+        [
+          [
+            "Comet can fly 14 km/s for 10 seconds, but then must rest for 127 seconds.\nDancer can fly 16 km/s for 11 seconds, but then must rest for 162 seconds.",
+            689,
+          ],
+        ],
+      ],
+    },
+    {
+      name: "Science for Hungry People",
+      special: false,
+      examples: [
+        [
+          [
+            "Butterscotch: capacity -1, durability -2, flavor 6, texture 3, calories 8\nCinnamon: capacity 2, durability 3, flavor -2, texture -1, calories 3\n",
+            62842880,
+          ],
+        ],
+        [
+          [
+            "Butterscotch: capacity -1, durability -2, flavor 6, texture 3, calories 8\nCinnamon: capacity 2, durability 3, flavor -2, texture -1, calories 3\n",
+            57600000,
+          ],
+        ],
+      ],
+    },
+    {
+      name: "Aunt Sue",
       special: false,
       examples: [[], []],
     },
     {
-      name: "N/A",
+      name: "No Such Thing as Too Much",
+      special: false,
+      examples: [[["20\n15\n10\n5\n5", 4]], [["20\n15\n10\n5\n5", 3]]],
+    },
+    {
+      name: "Like a GIF For Your Yard",
+      special: false,
+      examples: [
+        [[".#.#.#\n...##.\n#....#\n..#...\n#.#..#\n####..", 4]],
+        [[".#.#.#\n...##.\n#....#\n..#...\n#.#..#\n####..", 17]],
+      ],
+    },
+    {
+      name: "Medicine for Rudolph",
+      special: false,
+      examples: [
+        [
+          ["H => HO\nH => OH\nO => HH\n\nHOH", 4],
+          ["H => HO\nH => OH\nO => HH\n\nHOHOHO", 7],
+        ],
+        [
+          ["e => H\ne => O\nH => HO\nH => OH\nO => HH\n\nHOH", 3],
+          ["e => H\ne => O\nH => HO\nH => OH\nO => HH\n\nHOHOHO", 6],
+        ],
+      ],
+    },
+    {
+      name: "Infinite Elves and Infinite Houses",
+      special: false,
+      examples: [[["100", 6]], []],
+    },
+    {
+      name: "RPG Simulator 20XX",
       special: false,
       examples: [[], []],
     },
     {
-      name: "N/A",
+      name: "Wizard Simulator 20XX",
       special: false,
       examples: [[], []],
     },
     {
-      name: "N/A",
+      name: "Opening the Turing Lock",
       special: false,
-      examples: [[], []],
+      examples: [[["inc a\njio a, +2\ntpl a\ninc a", 2]], []],
     },
     {
-      name: "N/A",
+      name: "It Hangs in the Balance",
       special: false,
-      examples: [[], []],
+      examples: [
+        [["1\n2\n3\n4\n5\n7\n8\n9\n10\n11\n", 99]],
+        [["1\n2\n3\n4\n5\n7\n8\n9\n10\n11\n", 44]],
+      ],
     },
     {
-      name: "N/A",
+      name: "Let It Snow",
       special: false,
-      examples: [[], []],
-    },
-    {
-      name: "N/A",
-      special: false,
-      examples: [[], []],
-    },
-    {
-      name: "N/A",
-      special: false,
-      examples: [[], []],
-    },
-    {
-      name: "N/A",
-      special: false,
-      examples: [[], []],
-    },
-    {
-      name: "N/A",
-      special: false,
-      examples: [[], []],
-    },
-    {
-      name: "N/A",
-      special: false,
-      examples: [[], []],
-    },
-    {
-      name: "N/A",
-      special: false,
-      examples: [[], []],
-    },
-    {
-      name: "N/A",
-      special: false,
-      examples: [[], []],
-    },
-    {
-      name: "N/A",
-      special: false,
-      examples: [[], []],
-    },
-    {
-      name: "N/A",
-      special: false,
-      examples: [[], []],
+      examples: [
+        [
+          [
+            "To continue, please consult the code grid in the manual.  Enter the code at row 6, column 2.",
+            6796745,
+          ],
+        ],
+        [],
+      ],
     },
   ],
   // Mark puzzles solved using special formats, so it can be loaded correctly

@@ -1,4 +1,4 @@
-import md5 from "/md5.js";
+import { md5 } from "/externals.js";
 
 function find(input, count) {
   const req = "0".repeat(count);

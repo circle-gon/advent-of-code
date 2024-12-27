@@ -49,7 +49,6 @@ function part2(input) {
   for (const str of strings) {
     const code = str.length;
     const enc = encode(str);
-    console.log(enc, code);
     diff += enc - code;
   }
   return diff;

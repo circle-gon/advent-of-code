@@ -23,30 +23,30 @@ function minPath(part2, costs, at, visited, cost) {
   const path = [...visited, at];
   let min = part2 ? 0 : Infinity;
   for (const [option, c] of costs.get(at).entries()) {
-    if (path.includes(option)) continue
-    const m = minPath(part2, costs, option, path, cost + c)
-    min = (part2 ? Math.max : Math.min)(m, min)
+    if (path.includes(option)) continue;
+    const m = minPath(part2, costs, option, path, cost + c);
+    min = (part2 ? Math.max : Math.min)(m, min);
   }
-  
-  return min
+
+  return min;
 }
 
 function answer(input, part2) {
-  const costs = parse(input)
-  let min = part2 ? 0 : Infinity
+  const costs = parse(input);
+  let min = part2 ? 0 : Infinity;
   for (const option of costs.keys()) {
-    const opt = minPath(part2, costs, option, [], 0)
-    min = (part2 ? Math.max : Math.min)(opt, min)
+    const opt = minPath(part2, costs, option, [], 0);
+    min = (part2 ? Math.max : Math.min)(opt, min);
   }
-  return min
+  return min;
 }
 
 function part1(input) {
-  return answer(input, false)
+  return answer(input, false);
 }
 
 function part2(input) {
-  return answer(input, true)
+  return answer(input, true);
 }
 
 export default [part1, part2];

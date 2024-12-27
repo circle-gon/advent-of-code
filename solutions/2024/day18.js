@@ -1,4 +1,4 @@
-import { Queue } from "/structures.js";
+import { Queue } from "/externals.js";
 
 function parse(input, example) {
   const falling = input
