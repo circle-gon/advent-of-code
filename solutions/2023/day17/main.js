@@ -22,7 +22,7 @@ function spawn(input, min, max, update, idx) {
 function createUpdater(update) {
   let i = 0;
   const newUpdate = () => {
-    update(`(${format(i++ * 10000)} iterations done)`);
+    update(`(${format(i++ * 1e5)} iterations done)`);
   };
   newUpdate();
 

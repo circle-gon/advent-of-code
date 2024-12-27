@@ -1,3 +1,5 @@
+import { Queue } from "/externals.js"
+
 function initialFor(prefix) {
   if (prefix === "") return {};
   if (prefix === "%") return { state: false };
@@ -39,7 +41,8 @@ function part1(input) {
     high = 0;
   for (let i = 0; i < 1000; i++) {
     // Array<pulseSent, low/high, whoSentIt>
-    const pulses = [["broadcaster", false, ""]];
+    const pulses = new Queue()
+    pulses.push(["broadcaster", false, ""]);
 
     // 1 because the one sent to the broadcaster matters
     low += 1;
@@ -49,8 +52,8 @@ function part1(input) {
       else low++;
     }
 
-    while (pulses.length > 0) {
-      const [name, type, sent] = pulses.shift();
+    while (pulses.size() > 0) {
+      const [name, type, sent] = pulses.pop();
       const module = modules.get(name);
 
       if (!module) continue;
@@ -125,10 +128,11 @@ function part2(input) {
   while (times.some((i) => i === 0)) {
     pushed++;
     // Array<pulseSent, low/high, whoSentIt>
-    const pulses = [["broadcaster", false, ""]];
+    const pulses = new Queue()
+    pulses.push(["broadcaster", false, ""]);
 
-    while (pulses.length > 0) {
-      const [name, type, sent] = pulses.shift();
+    while (pulses.size() > 0) {
+      const [name, type, sent] = pulses.pop();
       const module = modules.get(name);
 
       if (!module) continue;

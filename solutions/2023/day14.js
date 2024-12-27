@@ -37,7 +37,6 @@ function* getPoints(dir, fun) {
 function rotate(t, up, dir) {
   // the table goes down instead of up here
   const table = up ? makeClone(t) : mapToColumns(t);
-  //console.log(stringer(table))
   const increment = dir ? -1 : 1;
   for (const i of getPoints(dir, table.length)) {
     for (let j = 0; j < table[i].length; j++) {

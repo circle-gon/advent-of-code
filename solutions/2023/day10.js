@@ -1,3 +1,5 @@
+import { Queue } from "/externals.js"
+
 // [x offset, y offset]
 // [||||||||, <------>]
 // Top is (0, 0), going down increases x, going right increases y
@@ -82,11 +84,12 @@ function part1(input) {
 
   // stores the point and the distance
   const matched = new Map();
-  const queue = [[startX, startY]];
+  const queue = new Queue()
+  queue.push([startX, startY]);
 
-  while (queue.length > 0) {
+  while (queue.size() > 0) {
     // We need to explore all of the close points
-    const current = queue.shift();
+    const current = queue.pop();
     const point = board[current[0]][current[1]];
 
     // The starting point

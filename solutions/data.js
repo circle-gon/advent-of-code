@@ -679,7 +679,7 @@ export default {
     },
     {
       name: "Snowverload",
-      special: false,
+      special: true,
       examples: [
         [
           [

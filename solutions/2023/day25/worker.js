@@ -1,3 +1,5 @@
+import { Queue } from "/externals.js"
+
 function hash(x, y) {
   return `${x},${y}`;
 }
@@ -33,11 +35,12 @@ function findMostUsed(nodes) {
 
   for (const key of nodes.keys()) {
     const already = new Set();
-    const queue = [key];
+    const queue = new Queue();
     already.add(key)
+    queue.push(key)
 
-    while (queue.length > 0) {
-      const k = queue.shift();
+    while (queue.size() > 0) {
+      const k = queue.pop();
 
       for (const next of nodes.get(k)) {
         if (already.has(next)) continue;
@@ -54,15 +57,25 @@ function findMostUsed(nodes) {
   return unhash([...used.entries()].sort((a, b) => b[1] - a[1])[0][0]);
 }
 
-function part1(input) {
+function solve(echo, input) {
   const nodes = parse(input);
   for (let i = 0; i < 3; i++) {
+    self.postMessage({
+      type: "msg",
+      data: [echo]
+    })
+    
     const [one, two] = findMostUsed(nodes);
 
     // remove the link from each one
     nodes.set(one, nodes.get(one).filter(i => i !== two))
     nodes.set(two, nodes.get(two).filter(i => i !== one))
   }
+  
+  self.postMessage({
+    type: "msg",
+    data: [echo]
+  })
   
   // Then find all
   const found = new Set()
@@ -76,7 +89,12 @@ function part1(input) {
     queue.push(...nodes.get(now))
   }
   
-  return (nodes.size - found.size) * found.size
+  return [echo, (nodes.size - found.size) * found.size]
 }
 
-export default [part1]
+self.addEventListener("message", e => {
+  self.postMessage({
+    type: "done",
+    data: solve(...e.data)
+  })
+})
