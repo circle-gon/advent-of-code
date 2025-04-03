@@ -52,7 +52,7 @@ function part1(input) {
       else low++;
     }
 
-    while (pulses.size() > 0) {
+    while (pulses.length > 0) {
       const [name, type, sent] = pulses.pop();
       const module = modules.get(name);
 
@@ -131,7 +131,7 @@ function part2(input) {
     const pulses = new Queue()
     pulses.push(["broadcaster", false, ""]);
 
-    while (pulses.size() > 0) {
+    while (pulses.length > 0) {
       const [name, type, sent] = pulses.pop();
       const module = modules.get(name);
 

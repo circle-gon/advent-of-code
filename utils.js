@@ -12,12 +12,15 @@ function createWorkerFor(type, ind) {
   return w[ind];
 }
 
+export function getWorkerFor(type) {
+  return (ind) => [buster++, createWorkerFor(type, ind)];
+}
+
 let buster = 0;
 export function spawnWorkerFor(type) {
   return (msg, ind, update) => {
     return new Promise((r) => {
-      const f = createWorkerFor(type, ind);
-      const echo = buster++;
+      const [echo, f] = getWorkerFor(type)(ind);
       f.postMessage([echo, msg]);
 
       // this is the RESULT!
@@ -50,12 +53,12 @@ export function formatTime(offset) {
     : `${(duration * 1000).toFixed(2)}ms`;
 }
 
-export const AOC = {
+export const AOC = Object.freeze({
   days: 25,
   parts: 2,
-};
+});
 
-const wabt = WabtModule();
+export const wabt = WabtModule();
 export async function compile(wat, deps) {
   const buffer = (await wabt)
     .parseWat("", wat, {
@@ -80,10 +83,7 @@ export async function compile(wat, deps) {
 
 export function memstr(str, mem) {
   const zeroed = str + "\0"; // Add a 0x00 byte at the end for consistency
-  const out = new TextEncoder(str).encodeInto(
-    zeroed,
-    new Uint8Array(mem.buffer)
-  );
+  const out = new TextEncoder().encodeInto(zeroed, new Uint8Array(mem.buffer));
   if (out.read < zeroed.length)
     throw new TypeError("Bad string or buffer length needs to be increased");
 }

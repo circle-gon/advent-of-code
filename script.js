@@ -55,7 +55,7 @@ function load() {
   }
 
   for (const option of yearSelector.options)
-    if (option.innerText === toSave.year) option.selected = true;
+    if (option.textContent === toSave.year) option.selected = true;
 
   loadYear();
 }
@@ -65,7 +65,7 @@ function loadYear() {
   for (let i = 1; i <= AOC.days; i++) {
     const select = document.createElement("option");
     const d = data[toSave.year][i - 1];
-    select.innerText = `day ${i} (${d.name})${d.special ? " (slow)" : ""}`;
+    select.textContent = `day ${i} (${d.name})${d.special ? " (slow)" : ""}`;
     daySelector.append(select);
   }
 
@@ -120,12 +120,12 @@ function setupTable() {
     for (let l = 0; l < d; l++) {
       const ele = document.createElement("td");
       const day = SCALE * i + l;
-      ele.innerText = day + 1;
+      ele.textContent = day + 1;
       row.append(ele);
       for (let j = 0; j < AOC.parts; j++) {
         for (let k = 0; k < 4; k++) {
           const ele = document.createElement("td");
-          ele.innerText = k === 0 ? j + 1 : "";
+          ele.textContent = k === 0 ? j + 1 : "";
           row.append(ele);
           if (k > 0) tableElements[AOC.parts * day + j].push(ele);
         }
@@ -139,21 +139,39 @@ function clearTable() {
   for (let i = 0; i < AOC.days; i++) {
     for (let j = 0; j < AOC.parts; j++) {
       const thing = tableElements[i * AOC.parts + j];
-      for (const t of thing) t.innerText = "";
+      for (const t of thing) t.textContent = "";
     }
   }
+}
+
+function getType(solution) {
+  if (Array.isArray(solution) && solution.every(i => i instanceof Node)) {
+    return "dom"
+  }
+  return ""
+}
+
+function addNodes(ele, nodes) {
+  ele.textContent = ""
+  ele.append(...nodes)
+}
+
+function trimInput(input, year, day) {
+  // 2017 day 19 doesn't want trimmed whitespace
+  if (year === "2017" && day === 18) return input
+  return input.trim()
 }
 
 function main() {
   for (const year of keys) {
     const select = document.createElement("option");
-    select.innerText = year;
+    select.textContent = year;
     yearSelector.append(select);
   }
 
   for (let i = 1; i <= AOC.parts; i++) {
     const select = document.createElement("option");
-    select.innerText = `part ${i}`;
+    select.textContent = `part ${i}`;
     partSelector.append(select);
   }
 
@@ -161,14 +179,14 @@ function main() {
   inputFile.addEventListener("change", async () => {
     const file = inputFile.files[0];
     if (file) {
-      errorDiv.innerText = "";
+      errorDiv.textContent = "";
 
       const data = await file.text();
       forDay().input = data;
       dataInput.value = data;
 
       save();
-    } else errorDiv.innerText = "No file chosen!";
+    } else errorDiv.textContent = "No file chosen!";
   });
 
   dataInput.addEventListener("change", () => {
@@ -178,11 +196,11 @@ function main() {
 
   runBtn.addEventListener("click", async () => {
     if (dataInput.value !== "") {
-      errorDiv.innerText = "";
-      resultSpan.innerText = "Generating solution...";
+      errorDiv.textContent = "";
+      resultSpan.textContent = "Generating solution...";
       resultSpan.className = "maybe";
       timeSpan.className = "maybe";
-      timeSpan.innerText = "???";
+      timeSpan.textContent = "???";
       runBtn.disabled = true;
       runexBtn.disabled = true;
       runallBtn.disabled = true;
@@ -198,8 +216,8 @@ function main() {
         const solver = (await getSolution(getDay()))?.[forDay().part];
         if (solver) {
           solution = await solver(
-            forDay().input.trim(),
-            (value) => (updateSpan.innerText = value),
+            trimInput(forDay().input, toSave.year, getDay()),
+            (value) => (updateSpan.textContent = value),
             false
           );
           name = "success";
@@ -217,38 +235,40 @@ function main() {
       const isNumberLike = isNumber || typeof solution === "bigint";
 
       if (isNumber && solution > Number.MAX_SAFE_INTEGER) {
-        errorDiv.innerText =
+        errorDiv.textContent =
           "The answer is beyond the precision limit, so it is most likely wrong.";
         name = "failed";
       }
 
-      timeSpan.innerText = formatTime(start);
-      resultSpan.innerText = `${solution}${
+      const type = getType(solution);
+      if (type === "dom") addNodes(resultSpan, solution)
+      else resultSpan.textContent = `${solution}${
         isNumberLike && solution >= 1000 ? ` (${format(solution)})` : ""
       }`;
       resultSpan.className = name;
       timeSpan.className = name;
-      updateSpan.innerText = "";
+      timeSpan.textContent = formatTime(start);
+      updateSpan.textContent = "";
       runBtn.disabled = false;
       runexBtn.disabled = false;
       runallBtn.disabled = false;
       runexallBtn.disabled = false;
     } else {
-      errorDiv.innerText = "No problem data.";
-      resultSpan.innerText = "???";
+      errorDiv.textContent = "No problem data.";
+      resultSpan.textContent = "???";
       resultSpan.className = "skipped";
       timeSpan.className = "skipped";
-      timeSpan.innerText = "???";
-      updateSpan.innerText = "";
+      timeSpan.textContent = "???";
+      updateSpan.textContent = "";
     }
   });
 
   runexBtn.addEventListener("click", async () => {
-    errorDiv.innerText = "";
-    resultSpan.innerText = "Checking...";
+    errorDiv.textContent = "";
+    resultSpan.textContent = "Checking...";
     resultSpan.className = "maybe";
     timeSpan.className = "maybe";
-    timeSpan.innerText = "???";
+    timeSpan.textContent = "???";
     runBtn.disabled = true;
     runexBtn.disabled = true;
     runallBtn.disabled = true;
@@ -266,8 +286,8 @@ function main() {
         const inputs = data[toSave.year][getDay()].examples[forDay().part];
         for (const [input, expected] of inputs) {
           const result = await solver(
-            input.trim(),
-            (value) => (updateSpan.innerText = value),
+            trimInput(input, toSave.year, getDay()),
+            (value) => (updateSpan.textContent = value),
             true
           );
           if (result !== expected) {
@@ -297,11 +317,11 @@ function main() {
       console.error(e);
     }
 
-    timeSpan.innerText = formatTime(start);
-    resultSpan.innerText = solution;
+    timeSpan.textContent = formatTime(start);
+    resultSpan.textContent = solution;
     resultSpan.className = name;
     timeSpan.className = name;
-    updateSpan.innerText = "";
+    updateSpan.textContent = "";
     runBtn.disabled = false;
     runexBtn.disabled = false;
     runallBtn.disabled = false;
@@ -309,17 +329,17 @@ function main() {
   });
 
   runallBtn.addEventListener("click", async () => {
-    errorDiv.innerText = "";
-    resultSpan.innerText = "Generating solutions...";
+    errorDiv.textContent = "";
+    resultSpan.textContent = "Generating solutions...";
     resultSpan.className = "maybe";
     timeSpan.className = "maybe";
-    timeSpan.innerText = "???";
+    timeSpan.textContent = "???";
     runBtn.disabled = true;
     runexBtn.disabled = true;
     runallBtn.disabled = true;
     runexallBtn.disabled = true;
     multiTable.style.display = "block";
-    tableHeader.innerText = toSave.year;
+    tableHeader.textContent = toSave.year;
     clearTable();
     await wait();
 
@@ -333,17 +353,17 @@ function main() {
         const elements = tableElements[i * AOC.parts + j];
         const solver = sols[j];
         if (solver === undefined || input === "") {
-          elements[0].innerText = `no ${solver ? "input" : "solution"}`;
-          elements[1].innerText = "N/A";
-          elements[2].innerText = "N/A";
+          elements[0].textContent = `no ${solver ? "input" : "solution"}`;
+          elements[1].textContent = "N/A";
+          elements[2].textContent = "N/A";
           elements[0].className = "skipped";
           elements[1].className = "skipped";
           elements[2].className = "skipped";
           await wait();
         } else {
-          elements[0].innerText = "running";
-          elements[1].innerText = "...";
-          elements[2].innerText = "...";
+          elements[0].textContent = "running";
+          elements[1].textContent = "...";
+          elements[2].textContent = "...";
           elements[0].className = "maybe";
           elements[1].className = "maybe";
           elements[2].className = "maybe";
@@ -352,21 +372,31 @@ function main() {
           const start = performance.now();
           waiting.push(
             new Promise((r) =>
-              r(solver(input.trim(), (i) => (elements[1].innerText = i), false))
+              r(
+                solver(
+                  trimInput(input, toSave.year, i),
+                  (i) => (elements[1].textContent = i),
+                  false
+                )
+              )
             )
               .then(async (r) => {
-                elements[0].innerText = "done";
-                elements[1].innerText = r;
-                elements[2].innerText = formatTime(start);
+                elements[0].textContent = "done";
+                elements[2].textContent = formatTime(start);
                 elements[0].className = "success";
                 elements[1].className = "success";
                 elements[2].className = "success";
+
+                const type = getType(r);
+                if (type === "dom") addNodes(elements[1], r)
+                else elements[1].textContent = r;
+
                 await wait();
               })
               .catch(async (e) => {
-                elements[0].innerText = "failed";
-                elements[1].innerText = "N/A";
-                elements[2].innerText = formatTime(start);
+                elements[0].textContent = "failed";
+                elements[1].textContent = "N/A";
+                elements[2].textContent = formatTime(start);
                 elements[0].className = "failed";
                 elements[1].className = "failed";
                 elements[2].className = "failed";
@@ -380,8 +410,10 @@ function main() {
     }
     await Promise.allSettled(waiting);
 
-    timeSpan.innerText = formatTime(globalStart);
-    resultSpan.innerText = `All problems done${failed ? " (some failed)" : ""}`;
+    timeSpan.textContent = formatTime(globalStart);
+    resultSpan.textContent = `All problems done${
+      failed ? " (some failed)" : ""
+    }`;
     resultSpan.className = failed ? "failed" : "success";
     timeSpan.className = failed ? "failed" : "success";
     runBtn.disabled = false;
@@ -392,7 +424,7 @@ function main() {
 
   runexallBtn.addEventListener("click", async () => {
     async function update() {
-      updateSpan.innerText =
+      updateSpan.textContent =
         checking.length > 0
           ? `(${checking
               .map(([a, b]) => `day ${a + 1} part ${b + 1}`)
@@ -401,10 +433,10 @@ function main() {
       await wait();
     }
 
-    errorDiv.innerText = "";
-    resultSpan.innerText = "Checking...";
+    errorDiv.textContent = "";
+    resultSpan.textContent = "Checking...";
     resultSpan.className = "maybe";
-    timeSpan.innerText = "???";
+    timeSpan.textContent = "???";
     timeSpan.className = "maybe";
     runBtn.disabled = true;
     runexBtn.disabled = true;
@@ -431,7 +463,7 @@ function main() {
         }
         for (const [t, see] of test) {
           waiting.push(
-            new Promise((r) => r(solver(t.trim(), () => {}, true)))
+            new Promise((r) => r(solver(trimInput(t, toSave.year, i), () => {}, true)))
               .then((r) => {
                 if (r !== see) {
                   console.error(
@@ -467,8 +499,8 @@ function main() {
     }
     await Promise.allSettled(waiting);
 
-    timeSpan.innerText = formatTime(start);
-    resultSpan.innerText =
+    timeSpan.textContent = formatTime(start);
+    resultSpan.textContent =
       failed.length === 0
         ? "Examples passed"
         : `Examples failed: ${failed
@@ -488,21 +520,21 @@ function main() {
   });
 
   yearSelector.addEventListener("change", () => {
-    errorDiv.innerText = "";
+    errorDiv.textContent = "";
     toSave.year = keys[yearSelector.selectedIndex];
     loadYear();
     save();
   });
 
   daySelector.addEventListener("change", () => {
-    errorDiv.innerText = "";
+    errorDiv.textContent = "";
     toSave.yearData[toSave.year].day = daySelector.selectedIndex;
     loadDay();
     save();
   });
 
   partSelector.addEventListener("change", () => {
-    errorDiv.innerText = "";
+    errorDiv.textContent = "";
     forDay().part = partSelector.selectedIndex;
     save();
   });

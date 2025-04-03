@@ -87,7 +87,7 @@ function part1(input) {
   const queue = new Queue()
   queue.push([startX, startY]);
 
-  while (queue.size() > 0) {
+  while (queue.length > 0) {
     // We need to explore all of the close points
     const current = queue.pop();
     const point = board[current[0]][current[1]];

@@ -287,6 +287,689 @@ export default {
       ],
     },
   ],
+  2016: [
+    {
+      name: "No Time for a Taxicab",
+      special: false,
+      examples: [
+        [
+          ["R2, L3", 5],
+          ["R2, R2, R2", 2],
+          ["R5, L5, R5, R3", 12],
+        ],
+        [["R8, R4, R4, R8", 4]],
+      ],
+    },
+    {
+      name: "Bathroom Security",
+      special: false,
+      examples: [
+        [["ULL\nRRDDD\nLURDL\nUUUUD", "1985"]],
+        [["ULL\nRRDDD\nLURDL\nUUUUD", "5DB3"]],
+      ],
+    },
+    {
+      name: "Squares With Three Sides",
+      special: false,
+      examples: [[["5 10 25", 0]], []],
+    },
+    {
+      name: "Security Through Obscurity",
+      special: false,
+      examples: [
+        [
+          [
+            "aaaaa-bbb-z-y-x-123[abxyz]\na-b-c-d-e-f-g-h-987[abcde]\nnot-a-real-room-404[oarel]\ntotally-real-room-200[decoy]",
+            1514,
+          ],
+        ],
+        [],
+      ],
+    },
+    {
+      name: "How About a Nice Game of Chess?",
+      special: true,
+      examples: [[["abc", "18f47a30"]], [["abc", "05ace8e3"]]],
+    },
+    {
+      name: "Signals and Noise",
+      special: false,
+      examples: [
+        [
+          [
+            "eedadn\ndrvtee\neandsr\nraavrd\natevrs\ntsrnev\nsdttsa\nrasrtv\nnssdts\nntnada\nsvetve\ntesnvt\nvntsnd\nvrdear\ndvrsen\nenarar",
+            "easter",
+          ],
+        ],
+        [
+          [
+            "eedadn\ndrvtee\neandsr\nraavrd\natevrs\ntsrnev\nsdttsa\nrasrtv\nnssdts\nntnada\nsvetve\ntesnvt\nvntsnd\nvrdear\ndvrsen\nenarar",
+            "advent",
+          ],
+        ],
+      ],
+    },
+    {
+      name: "Internet Protocol Version 7",
+      special: false,
+      examples: [
+        [
+          [
+            "abba[mnop]qrst\nabcd[bddb]xyyx\naaaa[qwer]tyui\nioxxoj[asdfgh]zxcvbn",
+            2,
+          ],
+        ],
+        [["aba[bab]xyz\nxyx[xyx]xyx\naaa[kek]eke\nzazbz[bzb]cdb", 3]],
+      ],
+    },
+    {
+      name: "Two-Factor Authentication",
+      special: false,
+      examples: [
+        [
+          [
+            "rect 3x2\nrotate column x=1 by 1\nrotate row y=0 by 4\nrotate column x=1 by 1",
+            6,
+          ],
+        ],
+        [],
+      ],
+    },
+    {
+      name: "Explosives in Cyberspace",
+      special: false,
+      examples: [
+        [
+          ["ADVENT", 6],
+          ["A(1x5)BC", 7],
+          ["(3x3)XYZ", 9],
+          ["A(2x2)BCD(2x2)EFG", 11],
+          ["(6x1)(1x3)A", 6],
+          ["X(8x2)(3x3)ABCY", 18],
+        ],
+        [
+          ["(3x3)XYZ", 9],
+          ["X(8x2)(3x3)ABCY", 20],
+          ["(27x12)(20x12)(13x14)(7x10)(1x12)A", 241920],
+          ["(25x3)(3x3)ABC(2x3)XY(5x2)PQRSTX(18x9)(3x2)TWO(5x7)SEVEN", 445],
+        ],
+      ],
+    },
+    {
+      name: "Balance Bots",
+      special: false,
+      examples: [
+        [
+          [
+            "value 5 goes to bot 2\nbot 2 gives low to bot 1 and high to bot 0\nvalue 3 goes to bot 1\nbot 1 gives low to output 1 and high to bot 0\nbot 0 gives low to output 2 and high to output 0\nvalue 2 goes to bot 2",
+            2,
+          ],
+        ],
+        [],
+      ],
+    },
+    {
+      name: "Radioisotope Thermoelectric Generators",
+      special: false,
+      examples: [
+        [
+          [
+            "The first floor contains a hydrogen-compatible microchip and a lithium-compatible microchip.\nThe second floor contains a hydrogen generator.\nThe third floor contains a lithium generator.\nThe fourth floor contains nothing relevant.",
+            11,
+          ],
+        ],
+        [],
+      ],
+    },
+    {
+      name: "Leonardo's Monorail",
+      special: false,
+      examples: [[["cpy 41 a\ninc a\ninc a\ndec a\njnz a 2\ndec a", 42]], []],
+    },
+    {
+      name: "A Maze of Twisty Little Cubicles",
+      special: false,
+      examples: [[["10", 11]], []],
+    },
+    {
+      name: "One-Time Pad",
+      special: true,
+      examples: [[["abc", 22728]], [["abc", 22551]]],
+    },
+    {
+      name: "Timing is Everything",
+      special: false,
+      examples: [
+        [
+          [
+            "Disc #1 has 5 positions; at time=0, it is at position 4.\nDisc #2 has 2 positions; at time=0, it is at position 1.",
+            5,
+          ],
+        ],
+        [],
+      ],
+    },
+    {
+      name: "Dragon Checksum",
+      special: false,
+      examples: [[["10000", "01100"]], []],
+    },
+    {
+      name: "Two Steps Forward",
+      special: false,
+      examples: [
+        [
+          ["ihgpwlah", "DDRRRD"],
+          ["kglvqrro", "DDUDRLRRUDRD"],
+          ["ulqzkmiv", "DRURDRUDDLLDLUURRDULRLDUUDDDRR"],
+        ],
+        [
+          ["ihgpwlah", 370],
+          ["kglvqrro", 492],
+          ["ulqzkmiv", 830],
+        ],
+      ],
+    },
+    {
+      name: "Like a Rogue",
+      special: false,
+      examples: [[[".^^.^.^^^^", 38]], []],
+    },
+    {
+      name: "An Elephant Named Joseph",
+      special: false,
+      examples: [[["5", 3]], [["5", 2]]],
+    },
+    {
+      name: "Firewall Rules",
+      special: false,
+      examples: [[["5-8\n0-2\n4-7", 3]], [["5-8\n0-2\n4-7", 2]]],
+    },
+    {
+      name: "Scrambled Letters and Hash",
+      special: false,
+      examples: [
+        [
+          [
+            "swap position 4 with position 0\nswap letter d with letter b\nreverse positions 0 through 4\nrotate left 1 step\nmove position 1 to position 4\nmove position 3 to position 0\nrotate based on position of letter b\nrotate based on position of letter d\n",
+            "decab",
+          ],
+        ],
+        [
+          [
+            "swap position 4 with position 0\nswap letter d with letter b\nreverse positions 0 through 4\nrotate left 1 step\nmove position 1 to position 4\nmove position 3 to position 0\nrotate based on position of letter b\nrotate based on position of letter d\n",
+            "abcde",
+          ],
+        ],
+      ],
+    },
+    {
+      name: "Grid Computing",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "Safe Cracking",
+      special: false,
+      examples: [
+        [["cpy 2 a\ntgl a\ntgl a\ntgl a\ncpy 1 a\ndec a\ndec a", 3]],
+        [],
+      ],
+    },
+    {
+      name: "Air Duct Spelunking",
+      special: false,
+      examples: [
+        [
+          [
+            "###########\n#0.1.....2#\n#.#######.#\n#4.......3#\n###########",
+            14,
+          ],
+        ],
+        [],
+      ],
+    },
+    {
+      name: "Clock Signal",
+      special: false,
+      examples: [[], []],
+    },
+  ],
+  2017: [
+    {
+      name: "Inverse Captcha",
+      special: false,
+      examples: [
+        [
+          ["1122", 3],
+          ["1111", 4],
+          ["1234", 0],
+          ["91212129", 9],
+        ],
+        [
+          ["1212", 6],
+          ["1221", 0],
+          ["123425", 4],
+          ["123123", 12],
+          ["12131415", 4],
+        ],
+      ],
+    },
+    {
+      name: "Corruption Checksum",
+      special: false,
+      examples: [
+        [["5 1 9 5\n7 5 3\n2 4 6 8", 18]],
+        [["5 9 2 8\n9 4 7 3\n3 8 6 5", 9]],
+      ],
+    },
+    {
+      name: "Spiral Memory",
+      special: false,
+      examples: [
+        [
+          ["1", 0],
+          ["12", 3],
+          ["23", 2],
+          ["1024", 31],
+        ],
+        [],
+      ],
+    },
+    {
+      name: "High-Entropy Passphrases",
+      special: false,
+      examples: [
+        [["aa bb cc dd ee\naa bb cc dd aa\naa bb cc dd aaa", 2]],
+        [
+          [
+            "abcde fghij\nabcde xyz ecdab\na ab abc abd abf abj\niiii oiii ooii oooi oooo\noiii ioii iioi iiio",
+            3,
+          ],
+        ],
+      ],
+    },
+    {
+      name: "A Maze of Twisty Trampolines, All Alike",
+      special: false,
+      examples: [[["0\n3\n0\n1\n-3", 5]], [["0\n3\n0\n1\n-3", 10]]],
+    },
+    {
+      name: "Memory Reallocation",
+      special: false,
+      examples: [[["0 2 7 0", 5]], [["0 2 7 0", 4]]],
+    },
+    {
+      name: "Recursive Circus",
+      special: false,
+      examples: [
+        [
+          [
+            "pbga (66)\nxhth (57)\nebii (61)\nhavc (66)\nktlj (57)\nfwft (72) -> ktlj, cntj, xhth\nqoyq (66)\npadx (45) -> pbga, havc, qoyq\ntknk (41) -> ugml, padx, fwft\njptl (61)\nugml (68) -> gyxo, ebii, jptl\ngyxo (61)\ncntj (57)",
+            "tknk",
+          ],
+        ],
+        [
+          [
+            "pbga (66)\nxhth (57)\nebii (61)\nhavc (66)\nktlj (57)\nfwft (72) -> ktlj, cntj, xhth\nqoyq (66)\npadx (45) -> pbga, havc, qoyq\ntknk (41) -> ugml, padx, fwft\njptl (61)\nugml (68) -> gyxo, ebii, jptl\ngyxo (61)\ncntj (57)",
+            60,
+          ],
+        ],
+      ],
+    },
+    {
+      name: "I Heard You Like Registers",
+      special: false,
+      examples: [
+        [
+          [
+            "b inc 5 if a > 1\na inc 1 if b < 5\nc dec -10 if a >= 1\nc inc -20 if c == 10",
+            1,
+          ],
+        ],
+        [
+          [
+            "b inc 5 if a > 1\na inc 1 if b < 5\nc dec -10 if a >= 1\nc inc -20 if c == 10",
+            10,
+          ],
+        ],
+      ],
+    },
+    {
+      name: "Stream Processing",
+      special: false,
+      examples: [
+        [
+          [
+            "{}{{{}}}{{},{}}{{{},{},{{}}}}{<a>,<a>,<a>,<a>}{{<ab>},{<ab>},{<ab>},{<ab>}}{{<!!>},{<!!>},{<!!>},{<!!>}}{{<a!>},{<a!>},{<a!>},{<ab>}}",
+            50,
+          ],
+        ],
+        [['<><random characters><<<<><{!>}><!!><!!!>><{o"i!a,<{i<a>', 32]],
+      ],
+    },
+    {
+      name: "Knot Hash",
+      special: false,
+      examples: [
+        [["3,4,1,5", 12]],
+        [
+          ["", "a2582a3a0e66e6e86e3812dcb672a272"],
+          ["AoC 2017", "33efeb34ea91902bb2f59c9920caa6cd"],
+          ["1,2,3", "3efbe78a8d82f29979031a4aa0b16a9d"],
+          ["1,2,4", "63960835bcdc130f0b66d7ff4f6a5a8e"],
+        ],
+      ],
+    },
+    {
+      name: "Hex Ed",
+      special: false,
+      examples: [
+        [
+          ["ne,ne,ne", 3],
+          ["ne,ne,sw,sw", 0],
+          ["ne,ne,s,s", 2],
+          ["se,sw,se,sw,sw", 3],
+        ],
+        [],
+      ],
+    },
+    {
+      name: "Digital Plumber",
+      special: false,
+      examples: [
+        [
+          [
+            "0 <-> 2\n1 <-> 1\n2 <-> 0, 3, 4\n3 <-> 2, 4\n4 <-> 2, 3, 6\n5 <-> 6\n6 <-> 4, 5",
+            6,
+          ],
+        ],
+        [
+          [
+            "0 <-> 2\n1 <-> 1\n2 <-> 0, 3, 4\n3 <-> 2, 4\n4 <-> 2, 3, 6\n5 <-> 6\n6 <-> 4, 5",
+            2,
+          ],
+        ],
+      ],
+    },
+    {
+      name: "Packet Scanners",
+      special: false,
+      examples: [
+        [["0: 3\n1: 2\n4: 4\n6: 4", 24]],
+        [["0: 3\n1: 2\n4: 4\n6: 4", 10]],
+      ],
+    },
+    {
+      name: "Disk Defragmentation",
+      special: false,
+      examples: [[["flqrgnkx", 8108]], [["flqrgnkx", 1242]]],
+    },
+    {
+      name: "Dueling Generators",
+      special: false,
+      examples: [
+        [["Generator A starts with 65\nGenerator B starts with 8921", 588]],
+        [["Generator A starts with 65\nGenerator B starts with 8921", 309]],
+      ],
+    },
+    {
+      name: "Permutation Promenade",
+      special: false,
+      examples: [[["s1,x3/4,pe/b", "baedc"]], []],
+    },
+    {
+      name: "Spinlock",
+      special: false,
+      examples: [[["3", 638]], []],
+    },
+    {
+      name: "Duet",
+      special: false,
+      examples: [
+        [
+          [
+            "set a 1\nadd a 2\nmul a a\nmod a 5\nsnd a\nset a 0\nrcv a\njgz a -1\nset a 1\njgz a -2",
+            4,
+          ],
+        ],
+        [["snd 1\nsnd 2\nsnd p\nrcv a\nrcv b\nrcv c\nrcv d", 3]],
+      ],
+    },
+    {
+      name: "A Series of Tubes",
+      special: false,
+      examples: [
+        [
+          [
+            "     |          \n     |  +--+    \n     A  |  C    \n F---|----E|--+ \n     |  |  |  D \n     +B-+  +--+ \n",
+            "ABCDEF",
+          ],
+        ],
+        [
+          [
+            "     |          \n     |  +--+    \n     A  |  C    \n F---|----E|--+ \n     |  |  |  D \n     +B-+  +--+ \n",
+            38,
+          ],
+        ],
+      ],
+    },
+    {
+      name: "Particle Swarm",
+      special: false,
+      examples: [
+        [
+          [
+            "p=< 3,0,0>, v=< 2,0,0>, a=<-1,0,0>\np=< 4,0,0>, v=< 0,0,0>, a=<-2,0,0>",
+            0,
+          ],
+        ],
+        [
+          [
+            "p=<-6,0,0>, v=< 3,0,0>, a=< 0,0,0>\np=<-4,0,0>, v=< 2,0,0>, a=< 0,0,0>\np=<-2,0,0>, v=< 1,0,0>, a=< 0,0,0>\np=< 3,0,0>, v=<-1,0,0>, a=< 0,0,0>",
+            1,
+          ],
+        ],
+      ],
+    },
+    {
+      name: "Fractal Art",
+      special: false,
+      examples: [
+        [["../.# => ##./#../...\n.#./..#/### => #..#/..../..../#..#", 12]],
+        [],
+      ],
+    },
+    {
+      name: "Sporifica Virus",
+      special: false,
+      examples: [[["..#\n#..\n...", 5587]], [["..#\n#..\n...", 2511944]]],
+    },
+    {
+      name: "Coprocessor Conflagration",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "Electromagnetic Moat",
+      special: false,
+      examples: [
+        [["0/2\n2/2\n2/3\n3/4\n3/5\n0/1\n10/1\n9/10", 31]],
+        [["0/2\n2/2\n2/3\n3/4\n3/5\n0/1\n10/1\n9/10", 19]],
+      ],
+    },
+    {
+      name: "The Halting Problem",
+      special: false,
+      examples: [
+        [
+          [
+            "Begin in state A.\nPerform a diagnostic checksum after 6 steps.\n\nIn state A:\n  If the current value is 0:\n    - Write the value 1.\n    - Move one slot to the right.\n    - Continue with state B.\n  If the current value is 1:\n    - Write the value 0.\n    - Move one slot to the left.\n    - Continue with state B.\n\nIn state B:\n  If the current value is 0:\n    - Write the value 1.\n    - Move one slot to the left.\n    - Continue with state A.\n  If the current value is 1:\n    - Write the value 1.\n    - Move one slot to the right.\n    - Continue with state A.",
+            3,
+          ],
+        ],
+        [],
+      ],
+    },
+  ],
+  2018: [
+    {
+      name: "Chronal Calibration",
+      special: false,
+      examples: [
+        [
+          ["+1\n-2\n+3\n+1", 3],
+          ["+1\n+1\n+1", 3],
+          ["+1\n+1\n-2", 0],
+          ["-1\n-2\n-3", -6],
+        ],
+        [
+          ["+1\n-2\n+3\n+1", 2],
+          ["+1\n-1", 0],
+          ["+3\n+3\n+4\n-2\n-4", 10],
+          ["-6\n+3\n+8\n+5\n-6", 5],
+          ["+7\n+7\n-2\n-7\n-4", 14],
+        ],
+      ],
+    },
+    {
+      name: "Inventory Management System",
+      special: false,
+      examples: [
+        [["abcdef\nbababc\nabbcde\nabcccd\naabcdd\nabcdee\nababab", 12]],
+        [["abcde\nfghij\nklmno\npqrst\nfguij\naxcye\nwvxyz", "fgij"]],
+      ],
+    },
+    {
+      name: "No Matter How You Slice It",
+      special: false,
+      examples: [
+        [["#1 @ 1,3: 4x4\n#2 @ 3,1: 4x4\n#3 @ 5,5: 2x2", 4]],
+        [["#1 @ 1,3: 4x4\n#2 @ 3,1: 4x4\n#3 @ 5,5: 2x2", 3]],
+      ],
+    },
+    {
+      name: "Repose Record",
+      special: false,
+      examples: [
+        [
+          [
+            "[1518-11-01 00:00] Guard #10 begins shift\n[1518-11-01 00:05] falls asleep\n[1518-11-01 00:25] wakes up\n[1518-11-01 00:30] falls asleep\n[1518-11-01 00:55] wakes up\n[1518-11-01 23:58] Guard #99 begins shift\n[1518-11-02 00:40] falls asleep\n[1518-11-02 00:50] wakes up\n[1518-11-03 00:05] Guard #10 begins shift\n[1518-11-03 00:24] falls asleep\n[1518-11-03 00:29] wakes up\n[1518-11-04 00:02] Guard #99 begins shift\n[1518-11-04 00:36] falls asleep\n[1518-11-04 00:46] wakes up\n[1518-11-05 00:03] Guard #99 begins shift\n[1518-11-05 00:45] falls asleep\n[1518-11-05 00:55] wakes up",
+            240,
+          ],
+        ],
+        [[
+            "[1518-11-01 00:00] Guard #10 begins shift\n[1518-11-01 00:05] falls asleep\n[1518-11-01 00:25] wakes up\n[1518-11-01 00:30] falls asleep\n[1518-11-01 00:55] wakes up\n[1518-11-01 23:58] Guard #99 begins shift\n[1518-11-02 00:40] falls asleep\n[1518-11-02 00:50] wakes up\n[1518-11-03 00:05] Guard #10 begins shift\n[1518-11-03 00:24] falls asleep\n[1518-11-03 00:29] wakes up\n[1518-11-04 00:02] Guard #99 begins shift\n[1518-11-04 00:36] falls asleep\n[1518-11-04 00:46] wakes up\n[1518-11-05 00:03] Guard #99 begins shift\n[1518-11-05 00:45] falls asleep\n[1518-11-05 00:55] wakes up",
+            4455,
+          ],],
+      ],
+    },
+    {
+      name: "Alchemical Reduction",
+      special: false,
+      examples: [[["aA", 0], ['abBA', 0], ['abAB', 4], ['aabAAB', 6], ['dabAcCaCBAcCcaDA', 10]], [['dabAcCaCBAcCcaDA', 4]]],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+  ],
   // Mark puzzles solved using special formats, so it can be loaded correctly
   2023: [
     {

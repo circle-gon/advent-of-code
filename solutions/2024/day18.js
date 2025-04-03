@@ -47,7 +47,7 @@ function path(grid) {
 
   queue.push([0, 0, 0]);
 
-  while (queue.size() > 0) {
+  while (queue.length > 0) {
     const [x, y, score] = queue.pop();
     if (x === grid[0].length - 1 && y === grid.length - 1) return score;
 

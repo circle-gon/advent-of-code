@@ -39,7 +39,7 @@ function findMostUsed(nodes) {
     already.add(key)
     queue.push(key)
 
-    while (queue.size() > 0) {
+    while (queue.length > 0) {
       const k = queue.pop();
 
       for (const next of nodes.get(k)) {

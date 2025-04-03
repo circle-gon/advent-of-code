@@ -86,8 +86,7 @@ table {
 td,
 th {
   padding: 0.2rem 0.15rem;
-  max-width: 7rem;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   border: 0.1rem solid black;
   text-align: center;
 }
@@ -120,4 +119,10 @@ td:not(:only-child):is(:nth-child(1), :nth-child(10)) {
 
 .skipped {
   color: olive;
+}
+
+pre {
+  margin: 0.15rem;
+  display: inline-block;
+  vertical-align: middle;
 }
