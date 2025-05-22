@@ -1,2 +1,0 @@
-import{f as c,s as a}from"./index-Cj1OVREy.js";function u(n){return n.split(",").map(t=>Number(t))}function b(n){const t=[];for(const r of n.split(`
-`)){const[o,e]=r.split("~"),[s,i,f]=u(o),[l,m,w]=u(e);t.push([[s,l],[i,m],[f,w]])}return t}function p(n,t,r){const o=b(n);let e=0;const s=()=>{t(`(${c(10*e++)}/${c(o.length)} cubes done)`)};return s(),r(o,0,s)}const d=a(import.meta.resolve("./w1.js"));function k(n,t){return p(n,t,d)}const x=a(import.meta.resolve("./w2.js"));function y(n,t){return p(n,t,x)}const j=[k,y];export{j as default};

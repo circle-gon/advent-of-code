@@ -1,1 +1,0 @@
-import{s as n}from"./index-Cj1OVREy.js";const o=n(import.meta.resolve("./worker.js"));function s(t,r){let e=0;return o(t,0,()=>{e++,e<=3?r(`(Finding used edge ${e})`):r("Finding result...")})}const p=[s];export{p as default};

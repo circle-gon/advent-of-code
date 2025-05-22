@@ -1,4 +1,4 @@
-import{a,m as c}from"./index-Cj1OVREy.js";const e=`
+import{a,m as c}from"./index-CXErhknd.js";const e=`
 (import "js" "raw" (memory $raw 1))
 (global $row (mut i32) (i32.const 0))
 (global $col (mut i32) (i32.const 0))
