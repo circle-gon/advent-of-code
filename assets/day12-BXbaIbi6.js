@@ -1,0 +1,2 @@
+function c(s){const n=[];for(const t of s.split(`
+`)){const[,e]=t.split(" <-> "),o=e.split(", ").map(u=>Number(u));n.push(o)}return n}function r(s,n){const t=[n],e=new Set;for(;t.length>0;){const o=t.pop();e.add(o);for(const u of s[o])e.has(u)||t.push(u)}return e}function i(s){const n=c(s);return r(n,0).size}function l(s){const n=c(s);let t=new Set,e=0;for(let o=0;o<n.length;o++)t.has(o)||(t=t.union(r(n,o)),e++);return e}const p=[i,l];export{p as default};

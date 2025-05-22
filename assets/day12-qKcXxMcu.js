@@ -1,0 +1,1 @@
+function u(r){return JSON.parse(r)}function o(r,e){const s=Object.values(r);if(e&&!Array.isArray(r)&&s.includes("red"))return 0;let n=0;for(const t of s)typeof t=="number"?n+=t:typeof t=="object"&&t!==null&&(n+=o(t,e));return n}function f(r){const e=u(r);return o(e,!1)}function c(r){const e=u(r);return o(e,!0)}const a=[f,c];export{a as default};

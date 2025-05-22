@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="title" content="Advent of Code Solver" />
+    <meta
+      name="description"
+      content="A free and open-source Advent of Code that runs in your browser."
+    />
+    <meta
+      name="keywords"
+      content="advent of code, advent of code solver, solver, aoc, aoc solver"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://delightful-honeysuckle-cactus.glitch.me/"
+    />
+    <meta property="og:title" content="Advent of Code solver" />
+    <meta
+      property="og:description"
+      content="A free and open-source Advent of Code that runs in your browser."
+    />
+    <meta property="og:image" content="./aoc.png" />
+
+    <title>AOC Solver</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="shortcut icon" href="./aoc.png" />
+    <script type="module" crossorigin src="./assets/index-DPLSfBBi.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BoDqHgoh.css">
+  </head>
+  <body>
+    <div id="content">
+      <div>
+        <h1>Advent of Code Solver</h1>
+        <input type="file" id="input-file" style="display: none" />
+        <div>
+          <label for="data">Input problem data:</label> (or
+          <button id="file-upload">Upload from File</button>)
+        </div>
+        <textarea
+          id="data"
+          placeholder="Problem data..."
+          rows="20"
+          spellcheck="false"
+        ></textarea>
+        <div id="select">
+          <label for="day">Select problem:</label>
+          <select id="year"></select>
+          <select id="day"></select>
+          <select id="part"></select>
+        </div>
+        <div>
+          <button id="run">Run!</button>
+          <button id="runex">Example check</button>
+        </div>
+        <div>
+          <button id="runall">Run all!</button>
+          <button id="runexall">Example check all</button>
+        </div>
+        <div>
+          Result: <span id="result">???</span>
+          <span id="update" class="maybe"></span>
+        </div>
+        <div>Took <span id="time">???</span></div>
+        <div id="error" class="failed"></div>
+      </div>
+      <div>
+        <table id="multi">
+          <thead>
+            <tr>
+              <td colspan="18"><span id="title"></span> Solutions</td>
+            </tr>
+            <tr>
+              <th scope="col">Day</th>
+              <th scope="col">Part</th>
+              <th scope="col">Status</th>
+              <th scope="col">Answer</th>
+              <th scope="col">Time</th>
+              <th scope="col">Part</th>
+              <th scope="col">Status</th>
+              <th scope="col">Answer</th>
+              <th scope="col">Time</th>
+              <th scope="col">Day</th>
+              <th scope="col">Part</th>
+              <th scope="col">Status</th>
+              <th scope="col">Answer</th>
+              <th scope="col">Time</th>
+              <th scope="col">Part</th>
+              <th scope="col">Status</th>
+              <th scope="col">Answer</th>
+              <th scope="col">Time</th>
+            </tr>
+          </thead>
+          <tbody id="stuff"></tbody>
+        </table>
+      </div>
+    </div>
+    <footer>
+      <a href="https://adventofcode.com/">Advent of Code </a> &bull;
+      <a href="https://glitch.com/edit/#!/delightful-honeysuckle-cactus"
+        >Source code</a
+      >
+    </footer>
+  </body>
+</html>

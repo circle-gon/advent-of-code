@@ -1,0 +1,1 @@
+function r(o){let t=0;for(const e of o)e==="("?t++:t--;return t}function a(o){let t=0,e=0;for(const n of o)if(e++,n==="(")t++;else if(t--,t===-1)return e;return"Bad input - Santa should hit the basement eventually."}const f=[r,a];export{f as default};

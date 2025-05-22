@@ -1,0 +1,3 @@
+function h(n){const s=[];for(const r of n.split(`
+`))s.push([...r.matchAll(/-?\d+/g)].map(i=>Number(i[0])));return s}function y(n,s){const r=h(n);for(let i=0;i<1e5;i++){for(const t of r)t[0]+=t[2],t[1]+=t[3];let c=1/0,f=1/0,a=-1/0,u=-1/0;for(const[t,e]of r)c=Math.min(c,t),f=Math.min(f,e),a=Math.max(a,t),u=Math.max(u,e);const p=u-f+1,l=a-c+1;if(p<20&&l<100){if(s)return i+1;const t=Array(p).fill().map(()=>Array(l).fill(" "));for(const[o,m]of r)t[m-f][o-c]="#";const e=[];for(let o=0;o<l;o+=8){const m=t.map(x=>x.slice(o,o+6).join("")).join(`
+`),d=document.createElement("pre");d.textContent=m,e.push(d)}return e}}}function I(n){return y(n,!1)}function M(n){return y(n,!0)}const A=[I,M];export{A as default};

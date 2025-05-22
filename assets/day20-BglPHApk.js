@@ -1,0 +1,2 @@
+function e(o){const r=[];for(const t of o.split(`
+`))r.push(t.split("-").map(n=>Number(n)));return r.sort((t,n)=>t[0]-n[0])}function c(o){const r=e(o);let t=0;for(const n of r){if(t<n[0])return t;t=Math.max(t,n[1]+1)}return"Is your input malformed?"}function l(o,r,t){const n=e(o),f=t?9:2**32-1;let s=0,u=0;for(const a of n)s<a[0]&&(u+=a[0]-s),s=Math.max(s,a[1]+1);return u+=f-s+1,u}const m=[c,l];export{m as default};

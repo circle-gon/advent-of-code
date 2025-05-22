@@ -1,0 +1,2 @@
+function d(l){return l.split(`
+`)}function p(l){let o=0;const c=d(l);for(const t of c){let n=!1,r=!1,a=!1;for(let e=3;e<t.length;e++){const s=t[e-3],f=t[e-2],i=t[e-1],u=t[e];s!==f&&s===u&&f===i&&(n?a=!0:r=!0),u==="["?n=!0:u==="]"&&(n=!1)}r&&!a&&o++}return o}function b(l){let o=0;const c=d(l);for(const t of c){let n=!1;const r=new Set,a=new Set;for(let e=2;e<t.length;e++){const s=t[e-2],f=t[e-1],i=t[e];s===i&&f!==s&&(n?a.add(s+f+i):r.add(f+s+f)),i==="["?n=!0:i==="]"&&(n=!1)}r.isDisjointFrom(a)||o++}return o}const h=[p,b];export{h as default};

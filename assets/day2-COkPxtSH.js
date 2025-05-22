@@ -1,0 +1,2 @@
+function c(o){return o.split(`
+`)}const l=["123","456","789"];function a(o){const s=c(o);let f="",t=1,n=1;for(const r of s){for(const e of r)e==="U"&&n>0?n--:e==="D"&&n<2?n++:e==="L"&&t>0?t--:e==="R"&&t<2&&t++;f+=l[n][t]}return f}const u=["  1  "," 234 ","56789"," ABC ","  D  "];function i(o,s){return Math.abs(o-2)+Math.abs(s-2)<=2}function p(o){const s=c(o);let f="",t=0,n=2;for(const r of s){for(const e of r)e==="U"&&i(t,n-1)?n--:e==="D"&&i(t,n+1)?n++:e==="L"&&i(t-1,n)?t--:e==="R"&&i(t+1,n)&&t++;f+=u[n][t]}return f}const D=[a,p];export{D as default};

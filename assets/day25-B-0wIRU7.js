@@ -1,0 +1,2 @@
+function u(o){return o.split(`
+`).map(e=>e.split(",").map(l=>Number(l)))}function h(o,e,l){const n=[l];for(;n.length>0;){const r=n.pop();if(!o[r]){o[r]=!0;for(let t=0;t<e.length;t++)e[r][t]&&n.push(t)}}}function g(o){const e=u(o),l=Array(e.length).fill().map(()=>Array(e.length).fill(!1)),n=Array(e.length).fill(!1);for(let t=0;t<e.length;t++)for(let s=0;s<t;s++){const i=e[t],a=e[s];i.reduce((f,c,p)=>f+Math.abs(a[p]-c),0)<=3&&(l[t][s]=!0,l[s][t]=!0)}let r=0;for(let t=0;t<n.length;t++)n[t]||(h(n,l,t),r++);return r}const m=[g];export{m as default};

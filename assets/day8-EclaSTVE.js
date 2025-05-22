@@ -1,0 +1,2 @@
+function r(e){return e.split(`
+`)}function i(e){let t=0,n=0;for(;t<e.length;){const o=e[t-1],c=e[t];c==="\\"&&o==="\\"||c==='"'&&o==="\\"?(t+=2,n++):c==="x"&&o==="\\"?t+=3:(n++,t++)}return n-2}function f(e){let t=0;for(const n of e)n==="\\"||n==='"'?t+=2:t++;return t+2}function l(e){const t=r(e);let n=0;for(const o of t){const c=o.length,s=i(o);n+=c-s}return n}function u(e){const t=r(e);let n=0;for(const o of t){const c=o.length,s=f(o);n+=s-c}return n}const a=[l,u];export{a as default};

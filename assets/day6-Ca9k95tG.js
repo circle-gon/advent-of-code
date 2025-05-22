@@ -1,0 +1,2 @@
+function a(t){const n=t.split(`
+`),r=Array(n[0].length).fill().map(()=>new Map);for(const e of n)for(const[o,s]of e.split("").entries())u(r[o],s);return r}function u(t,n){t.set(n,(t.get(n)??0)+1)}function f(t,n){const r=a(t),e=n?-1:1;let o="";for(const s of r)o+=[...s.entries()].sort((c,i)=>e*(i[1]-c[1]))[0][0];return o}function l(t){return f(t,!1)}function p(t){return f(t,!0)}const d=[l,p];export{d as default};

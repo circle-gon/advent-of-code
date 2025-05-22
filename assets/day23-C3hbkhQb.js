@@ -1,0 +1,2 @@
+function f(e){return e.split(`
+`).map(s=>s.split(/ |, /))}function i(e){return(e[0]==="+"?1:-1)*Number(e.slice(1))}function o(e,s,a){const c=f(e),t={a:s,b:0};let r=0;for(;r<c.length;){const[l,n,u]=c[r];switch(l){case"hlf":t[n]/=2,r++;break;case"tpl":t[n]*=3,r++;break;case"inc":t[n]++,r++;break;case"jmp":r+=i(n);break;case"jie":t[n]%2===0?r+=i(u):r++;break;case"jio":t[n]===1?r+=i(u):r++;break;default:throw new Error("What?")}}return a?t.a:t.b}function p(e,s,a){return o(e,0,a)}function b(e){return o(e,1,!1)}const g=[p,b];export{g as default};

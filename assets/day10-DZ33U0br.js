@@ -1,0 +1,1 @@
+function c(t){return t.split("").map(e=>Number(e))}function a(t,e){let n=c(t);for(let l=0;l<e;l++){const o=[];let r=1,u=n[0];for(let s=1;s<n.length;s++){const p=n[s];p===u?r++:(o.push(r,u),u=p,r=1)}o.push(r,u),n=o}return n.length}function f(t,e,n){return a(t,n?1:40)}function i(t){return a(t,50)}const h=[f,i];export{h as default};

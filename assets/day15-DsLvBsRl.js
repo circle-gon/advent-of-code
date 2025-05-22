@@ -1,0 +1,2 @@
+function u(i){return i.split(`
+`).map(t=>Number(t.split(" ")[4]))}const l=2**16-1;function c(i){let[t,e]=u(i),n=0;for(let o=0;o<4e7;o++)t=t*16807%2147483647,e=e*48271%2147483647,(t&l)===(e&l)&&n++;return n}function f(i){let[t,e]=u(i);const n=[],o=[];let r=0,s=0;for(;s<5e6;)t=t*16807%2147483647,e=e*48271%2147483647,t%4===0&&n.push(t),e%8===0&&o.push(e),s<n.length&&s<o.length&&((n[s]&l)===(o[s]&l)&&r++,s++);return r}const a=[c,f];export{a as default};

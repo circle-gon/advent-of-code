@@ -1,0 +1,2 @@
+function m(o){return o.split(`
+`).map(c=>Number(c))}function d(o,c,a){const u=a?25:150,s=m(o);let n=0;for(let t=0;t<1<<s.length;t++){let e=0;for(const[i,r]of s.entries()){const f=1<<i;(t&f)===f&&(e+=r)}e===u&&n++}return n}function j(o,c,a){const u=a?25:150,s=m(o);let n=1/0,t=0;for(let e=0;e<1<<s.length;e++){let i=0,r=0;for(const[f,p]of s.entries()){const l=1<<f;(e&l)===l&&(r++,i+=p)}i===u&&r<=n&&(r<n&&(n=r,t=0),t++)}return t}const g=[d,j];export{g as default};

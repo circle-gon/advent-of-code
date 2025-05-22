@@ -1,0 +1,2 @@
+function l(o){return o.split(`
+`)}function i(o){const e=l(o);let r=0,t=0;for(const f of e){const s=Object.values(Object.groupBy(f,n=>n)),u=s.some(n=>n.length===2),c=s.some(n=>n.length===3);u&&r++,c&&t++}return r*t}function p(o,e){let r=0;for(let t=0;t<o.length;t++)o[t]!==e[t]&&r++;return r===1}function a(o){const e=l(o);for(const r of e)for(const t of e)if(p(r,t))return r.split("").filter((f,s)=>t[s]===f).join("");return"Is your input malformed?"}const g=[i,a];export{g as default};

@@ -1,0 +1,4 @@
+const c=new Map;function p(e,t){return`${e}:${t.join(",")}`}function f(e){let t=0;for(const n of e.split(`
+`)){const i=n.split(" "),o=i[0],r=i[1].split(",").map(s=>Number(s));t+=l(o,r)}return t}function l(e,t){const n=p(e,t);return c.has(n)||c.set(n,u(e,t)),c.get(n)}function u(e,t){if(e.length===0)return 0;switch(e[0]){case"#":{let n=0;for(;e[n]==="#";)n++;let i=0;for(;["?","#"].includes(e[i]);)i++;if(n>t[0]||i<t[0])return 0;if(n===t[0]){const o=t.length===1?[0]:t.slice(1);return l("."+e.slice(t[0]+1),o)}return l("#"+e.slice(2),[t[0]-1,...t.slice(1)])}case".":return e.length===1&&t[0]===0?1:l(e.slice(1),t);case"?":return l("#"+e.slice(1),t)+l("."+e.slice(1),t)}}function a(e){return f(e)}function d(e){const t=[];for(const n of e.split(`
+`)){const i=n.split(" "),o=Array(5).fill(i[0]).join("?"),r=Array(5).fill(i[1]).join(",");t.push(o+" "+r)}return f(t.join(`
+`))}const g=[a,d];export{g as default};

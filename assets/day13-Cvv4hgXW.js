@@ -1,0 +1,2 @@
+function a(n){const t=new Map;for(const e of n.split(`
+`)){const[s,o]=e.split(": ").map(r=>Number(r));t.set(s,o-1)}return t}function c(n,t,e){let s=0;for(const[o,r]of n.entries()){const u=(o+t)%(2*r);if((u>r?2*r-u:u)===0){if(e)return!0;s+=o*(r+1)}}return e?!1:s}function f(n){const t=a(n);return c(t,0,!1)}function i(n){const t=a(n);let e=0;for(;;){if(!c(t,e,!0))return e;e++}}const p=[f,i];export{p as default};

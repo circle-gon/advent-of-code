@@ -1,0 +1,1 @@
+function l(e){let n="";for(let t=0;t<e.length;t+=2)n+=e[t]===e[t+1]?"1":"0";return n.length%2===0?l(n):n}function u(e,n){let t=e;for(;t.length<n;){let f="";for(let r=t.length-1;r>=0;r--)f+=t[r]==="1"?"0":"1";t+="0"+f}return l(t.slice(0,n))}function c(e,n,t){return u(e,t?20:272)}function o(e){return u(e,35651584)}const i=[c,o];export{i as default};

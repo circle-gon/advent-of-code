@@ -1,0 +1,1 @@
+function o(e){return e.split("").map(t=>Number(t))}function c(e){const t=o(e);let r=0;for(let n=0;n<t.length;n++){const s=t[n],u=t[(n+1)%t.length];s===u&&(r+=s)}return r}function l(e){const t=o(e);let r=0;for(let n=0;n<t.length;n++){const s=t[n],u=t[(n+t.length/2)%t.length];s===u&&(r+=s)}return r}const f=[c,l];export{f as default};

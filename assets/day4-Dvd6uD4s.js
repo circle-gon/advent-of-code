@@ -1,0 +1,3 @@
+function u(f){let c=0;for(const r of f.split(`
+`)){const e=r.slice(r.indexOf(":")+1),t=[],o=e.split("|");let i=0;for(const s of o[0].split(" "))s!==""&&t.push(s);for(const s of o[1].split(" "))s!==""&&t.includes(s)&&i++;i>0&&(c+=2**(i-1))}return c}function a(f){const c=new Map;function r(t,o){c.set(t,o+(c.get(t)??0))}let e=0;for(const t of f.split(`
+`)){r(e,1);const o=t.slice(t.indexOf(":")+1),i=[],s=o.split("|");let l=0;for(const n of s[0].split(" "))n!==""&&i.push(n);for(const n of s[1].split(" "))n!==""&&i.includes(n)&&l++;const p=c.get(e);for(let n=1;n<=l;n++)r(e+n,p);e++}return[...c.values()].reduce((t,o)=>t+o)}const d=[u,a];export{d as default};

@@ -1,0 +1,3 @@
+const m="0123456789".split(""),x=["one","two","three","four","five","six","seven","eight","nine"],I=[...m,...x];function b(t){let n=0;for(const s of t.split(`
+`)){const e=s.split("").filter(i=>m.includes(i)),o=e.at(0)+e.at(-1);n+=Number(o)}return n}function p(t){const n=x.indexOf(t);return n!==-1?String(n+1):t}function h(t){let n=0;for(const s of t.split(`
+`)){let e,o,i=1/0,u=-1/0;for(const r of I){const l=s.matchAll(r),a=l.next();if(a.done)continue;const c=a.value.index;let f=c;for(;;){const d=l.next();if(d.done)break;f=d.value.index}c<i&&(i=c,e=p(r)),f>u&&(u=f,o=p(r))}const v=Number(e+o);n+=v}return n}const y=[b,h];export{y as default};

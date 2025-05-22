@@ -1,0 +1,2 @@
+function m(n){return n.split(`
+`).map(t=>Number(t))}function*r(n,t){if(t===1){for(const e of n)yield[e];return}for(let e=0;e<=n.length-t;e++)for(const o of r(n.slice(e+1),t-1))yield[n[e],...o]}function*p(n){for(let t=1;t<=n.length;t++)yield*r(n,t)}function s(n,t,e,o){for(const u of p(n))if(u.reduce((i,c)=>i+c)===t){if(e===1)return o.reduce((c,d)=>c*d);const i=s(n.filter(c=>!u.includes(c)),t,e-1,o??u);if(i)return i}}function l(n,t){const e=m(n),o=e.reduce((u,f)=>u+f)/t;return s(e,o,t)}function b(n){return l(n,3)}function g(n){return l(n,4)}const a=[b,g];export{a as default};

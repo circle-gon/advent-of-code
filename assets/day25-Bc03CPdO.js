@@ -1,0 +1,1 @@
+import{r as o}from"./assembunny-Bo-dNLAd.js";function a(n){for(let r=0;r<1e3;r++){let t=0,e=0;if(o(n,{a:r,b:0,c:0,d:0},u=>u===t?(e++,t=t===1?0:1,e>=20):!0),e>=20)return r}return"Is your input malformed?"}const i=[a];export{i as default};

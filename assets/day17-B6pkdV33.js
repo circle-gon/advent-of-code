@@ -1,0 +1,1 @@
+function o(r){const u=Number(r),t=[0];let e=0;for(let n=1;n<=2017;n++)e=(e+u)%t.length+1,t.splice(e,0,n);return t[t.indexOf(2017)+1]}function l(r){const u=Number(r);let t=0,e=-1;for(let n=1;n<=5e7;n++)t=(t+u)%n+1,t===1&&(e=n);return e}const a=[o,l];export{a as default};

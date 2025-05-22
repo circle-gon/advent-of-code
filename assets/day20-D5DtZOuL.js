@@ -1,0 +1,1 @@
+function u(n,e){const c=e?11:10,r=Math.ceil(n/c),i=Array(r).fill(10);for(let t=2;t<r;t++){const s=Math.ceil(r/t),f=e?Math.min(s,50):s;for(let o=1;o<f;o++)i[t*o]+=c*t}for(let t=0;t<r;t++)if(i[t]>=n)return t;return"Bad input"}function a(n){const e=Number(n);return u(e,!1)}function l(n){const e=Number(n);return u(e,!0)}const d=[a,l];export{d as default};

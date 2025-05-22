@@ -1,0 +1,1 @@
+function i(r){let l=0,f=0,e=!1;for(let t=0;t<r.length;t++){const a=r[t];a==="<"&&(e=!0),a===">"&&(e=!1),e?a==="!"&&t++:(a==="{"&&f++,a==="}"&&(l+=f,f--))}return l}function s(r){let l=0,f=!1;for(let e=0;e<r.length;e++){const t=r[e];t===">"&&(f=!1),f&&(t==="!"?e++:l++),t==="<"&&(f=!0)}return l}const n=[i,s];export{n as default};

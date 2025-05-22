@@ -1,0 +1,1 @@
+function n(r){return[...r.matchAll(/\d+/g)].map(o=>Number(o[0]))}function a(r){const[o,l]=n(r);let e=1,t=1,c=20151125;for(;;){if(e===o&&t===l)return c;c=c*252533%33554393,e>1?(e--,t++):(e=t+1,t=1)}}const u=[a];export{u as default};
