@@ -1,2 +1,0 @@
-import{s as c,f as p}from"./index-CXErhknd.js";const u=""+new URL("worker-Cagho6Wt.js",import.meta.url).href,f=c(u);function i(t){const r=[];for(const n of t.split(`
-`)){const o=[];for(const e of n)o.push(Number(e));r.push(o)}return r}function s(t,r,n,o,e){return f([i(t),r,n],e,o)}function a(t){let r=0;const n=()=>{t(`(${p(r++*1e5)} iterations done)`)};return n(),n}function m(t,r){return s(t,0,3,a(r),0)}function w(t,r){return s(t,4,10,a(r),1)}const d=[m,w];export{d as default};

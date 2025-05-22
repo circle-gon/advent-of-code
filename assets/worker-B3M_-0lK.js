@@ -1,0 +1,1 @@
+function f(e,o){for(const t of o)if(e>=t[1]&&e<t[1]+t[2])return e-t[1]+t[0];return e}function d(e,o,t){let s=1/0;for(let a=0;a<o;a++){const n=t.reduce((c,r)=>f(c,r),e+a);s=Math.min(s,n)}return s}self.addEventListener("message",e=>{const[o,t]=e.data,s=d(...t);self.postMessage({type:"msg",data:[o]}),self.postMessage({type:"done",data:[o,s]})});

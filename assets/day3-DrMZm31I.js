@@ -1,4 +1,4 @@
-import{a,m as i}from"./index-CXErhknd.js";const c=`
+import{a,m as i}from"./index-CJx7zTSC.js";const c=`
 (import "js" "raw" (memory $input 1))
 (func (export "part1") 
   (result i32)

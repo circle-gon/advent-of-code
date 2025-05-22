@@ -1,1 +1,0 @@
-(function(){"use strict";function a(e,o){for(const t of o)if(e>=t[1]&&e<t[1]+t[2])return e-t[1]+t[0];return e}function c(e,o,t){let s=1/0;for(let n=0;n<o;n++){const r=t.reduce((f,i)=>a(f,i),e+n);s=Math.min(s,r)}return s}self.addEventListener("message",e=>{const[o,t]=e.data,s=c(...t);self.postMessage({type:"msg",data:[o]}),self.postMessage({type:"done",data:[o,s]})})})();
