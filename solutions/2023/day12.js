@@ -31,7 +31,7 @@ function lineReal(chars, nums) {
   if (chars.length === 0) return 0;
 
   switch (chars[0]) {
-    case "#":
+    case "#": {
       // Guaranteed #
       let hadGet = 0;
       while (chars[hadGet] === "#") hadGet++;
@@ -53,7 +53,7 @@ function lineReal(chars, nums) {
 
       // Only valid when the very next character is #
       return solForLine("#" + chars.slice(2), [nums[0] - 1, ...nums.slice(1)]);
-
+    }
     case ".":
       // This is the last character, but it works
       if (chars.length === 1 && nums[0] === 0) return 1;
@@ -84,4 +84,4 @@ function part2(input) {
   return sol(processed.join("\n"));
 }
 
-export default [part1, part2]
+export default [part1, part2];

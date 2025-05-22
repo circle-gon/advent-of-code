@@ -89,10 +89,11 @@ function forDay() {
 }
 
 async function getSolution(day) {
+  const day1 = day + 1
   try {
     return (
       await import(
-        `./solutions/${toSave.year}/day${day + 1}${
+        `./solutions/${toSave.year}/day${day1}${
           data[toSave.year][day].special ? "/main" : ""
         }.js`
       )

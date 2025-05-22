@@ -5,10 +5,6 @@ function hash(x, y) {
   return `${x},${y}`;
 }
 
-function unhash(h) {
-  return h.split(",").map((i) => Number(i));
-}
-
 function parse(input) {
   const data = [];
   for (const f of input.split("\n")) {
@@ -132,4 +128,4 @@ function part2(input) {
   return sum;
 }
 
-export default [part1, part2]
+export default [part1, part2];

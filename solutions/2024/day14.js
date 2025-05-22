@@ -19,13 +19,13 @@ function constants(example) {
   const HALF_SIDES = SIDES.map((i) => (i - 1) / 2);
   return {
     SIDES,
-    HALF_SIDES
-  }
+    HALF_SIDES,
+  };
 }
 
 function part1(input, _, example) {
   const robots = parse(input);
-  const { SIDES, HALF_SIDES } = constants(example)
+  const { SIDES, HALF_SIDES } = constants(example);
   const quadrant = [0, 0, 0, 0];
   for (const [p, v] of robots) {
     const newXp = p[0] + v[0] * 100;
@@ -51,7 +51,7 @@ function part1(input, _, example) {
 
 function part2(input, _, example) {
   const robots = parse(input);
-  const { SIDES, HALF_SIDES } = constants(example)
+  const { SIDES } = constants(example);
   let iter = 0;
   while (true) {
     for (const [p, [vx, vy]] of robots) {
@@ -80,7 +80,7 @@ function part2(input, _, example) {
           // Generate the output (looks cool)
           const nums = Array(SIDES[1])
             .fill()
-            .map((i) => Array(SIDES[0]).fill(" "));
+            .map(() => Array(SIDES[0]).fill(" "));
           for (const [x, y] of sorted) nums[y][x] = "*";
           console.log(nums.map((i) => i.join("")).join("\n"));
           return iter;

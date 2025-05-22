@@ -46,9 +46,7 @@ function part2(input) {
     }
   }
 
-  let size = 2;
   while (parties.length > 1) {
-    size++;
     const nextParty = [];
     // Create a bigger party
     for (const group of parties) {
@@ -57,7 +55,7 @@ function part2(input) {
         if (i === 0) inter = nodes.get(g);
         else inter = inter.intersection(nodes.get(g));
       }
-      
+
       // Refine
       const last = group.at(-1);
       const out = [];

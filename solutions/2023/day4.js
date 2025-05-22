@@ -19,7 +19,6 @@ function part1(input) {
 }
 
 function part2(input) {
-  let points = 0;
   const cardCount = new Map();
 
   function giveSome(x, y) {
@@ -56,4 +55,4 @@ function part2(input) {
   return [...cardCount.values()].reduce((a, b) => a + b);
 }
 
-export default [part1, part2]
+export default [part1, part2];

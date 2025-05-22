@@ -1,6 +1,5 @@
 import { compileWasm } from "/utils.js";
 
-/* globals BigInt */
 /*
 Unimplemented features
 - Tables & elements
@@ -311,6 +310,7 @@ function lex(text) {
 
 const VALUE_TYPES = Object.freeze(["u32", "s32", "u64", "s64", "f32", "f64"]);
 const MEMORY_TYPES = Object.freeze([...VALUE_TYPES, "u8", "s8", "u16", "s16"]);
+// eslint-disable-next-line no-unused-vars
 const RESERVED = Object.freeze([
   ...VALUE_TYPES,
   "import",
@@ -1585,6 +1585,7 @@ class Parser {
         }
         this.errorToken(this.peek(), "Expected a token");
       }
+      // eslint-disable-next-line no-fallthrough
       default:
         throw new Error("invalid code");
     }
@@ -2062,7 +2063,7 @@ class VerifyCompiler {
       return 0;
     });
 
-    for (const node of this.ast) {
+    for (const node of astSorted) {
       const name = node.name;
       if (this.globals.has(name))
         this.errorToken(node, "Variable was already declared");
@@ -2101,7 +2102,7 @@ class VerifyCompiler {
 
           globalIdx++;
           break;
-        case AST.REF:
+        case AST.REF: {
           const type = node.type.startsWith("import-")
             ? node.type.slice(7)
             : node.type;
@@ -2185,6 +2186,7 @@ class VerifyCompiler {
             functionIdx++;
           }
           break;
+        }
         case AST.FUNCTION:
           this.globals.set(name, {
             type: "func",
@@ -2350,7 +2352,7 @@ class VerifyCompiler {
           name: node.literal,
           ...toStartEnd(node, node),
         };
-      case AST.ASSIGN:
+      case AST.ASSIGN: {
         const left = this.get(node, node.name);
         if (left.type === "memory" || left.type === "func")
           this.errorToken(
@@ -2367,7 +2369,8 @@ class VerifyCompiler {
           type: left.relative === "local" ? left.type : "void",
           ...toStartEnd(node, node),
         };
-      case AST.ASSIGN_MANY:
+      }
+      case AST.ASSIGN_MANY: {
         const values = this.flatValues([node.body]);
         if (values.length !== node.targets.length)
           this.errorToken(
@@ -2392,6 +2395,7 @@ class VerifyCompiler {
           type: out,
           ...toStartEnd(node, node),
         };
+      }
       case AST.MEMORY_INDEX: {
         const mem = this.get(node, node.memory);
         if (mem.type !== "memory")
@@ -2426,12 +2430,13 @@ class VerifyCompiler {
           ...toStartEnd(node, node),
         };
       }
-      case AST.POSTFIX_VARIABLE:
+      case AST.POSTFIX_VARIABLE: {
         const ident = this.get(node, node.ident);
         return {
           type: ident.relative === "local" ? ident.type : "void",
           ...toStartEnd(node, node),
         };
+      }
       case AST.BINARY_INTEGER_SIGNED:
       case AST.BINARY_INTEGER: {
         const a = this.resolveVariable(this.getType(node.left));
@@ -2515,9 +2520,8 @@ class VerifyCompiler {
           type: type.type,
           ...toStartEnd(node, node),
         };
-        break;
       }
-      case AST.EXPRESSION:
+      case AST.EXPRESSION: {
         const ret = this.validInstructionCall(node);
 
         if (node.level1 === "global" || node.level1 === "local") {
@@ -2662,6 +2666,7 @@ class VerifyCompiler {
           type: ret,
           ...toStartEnd(node, node),
         };
+      }
       default:
         throw new Error("bad code");
     }
@@ -2720,7 +2725,7 @@ class VerifyCompiler {
             this.errorToken(node, "cannot continue if / block");
         }
         break;
-      case AST.RETURN:
+      case AST.RETURN: {
         const retval = this.flatValues(node.values);
         if (func.output.length !== retval.length)
           this.errorToken(
@@ -2732,6 +2737,7 @@ class VerifyCompiler {
           this.shouldMatchType(func.output[i], out);
         }
         break;
+      }
       case AST.BLOCK:
         this.labelTypes.push({
           label: node.label,
@@ -2795,7 +2801,7 @@ class VerifyCompiler {
 
   compileExpression(node, hint) {
     switch (node.node) {
-      case AST.NUMBER:
+      case AST.NUMBER: {
         // A top level number can't actually be used anywhere
         if (hint === "")
           return {
@@ -2807,6 +2813,7 @@ class VerifyCompiler {
           code: [NUM_CONST[uhint], ...encode(uhint, formatToReal(node, uhint))],
           len: 1,
         };
+      }
       case AST.IDENTIFIER: {
         const ref = this.get(node, node.literal);
         return {
@@ -2966,7 +2973,7 @@ class VerifyCompiler {
           len: 1,
         };
       }
-      case AST.EXPRESSION:
+      case AST.EXPRESSION: {
         if (node.level2 === "get") {
           const opcode = OPCODES[node.level1].get;
           return {
@@ -3132,6 +3139,7 @@ class VerifyCompiler {
           code: out,
           len: opcode.output.length,
         };
+      }
       default:
         throw new Error("bad code");
     }
@@ -3162,7 +3170,7 @@ class VerifyCompiler {
           2;
         return [0x0c, ...leb128u32(idx)];
       }
-      case AST.RETURN:
+      case AST.RETURN: {
         if (node.values.length === 1) {
           const val = node.values[0];
           if (
@@ -3186,6 +3194,7 @@ class VerifyCompiler {
         }
         code.push(0x0f);
         return code;
+      }
       case AST.IF: {
         const body = [];
         this.labels.push({
@@ -3259,7 +3268,7 @@ class VerifyCompiler {
         this.labels.pop();
         return body;
       }
-      case AST.BLOCK:
+      case AST.BLOCK: {
         this.labels.push({
           label: node.label,
           continue: false,
@@ -3271,10 +3280,12 @@ class VerifyCompiler {
         body.push(0x0b);
         this.labels.pop();
         return body;
-      default:
+      }
+      default: {
         const res = this.compileExpression(node, "");
         for (let i = 0; i < res.len; i++) res.code.push(0x1a);
         return res.code;
+      }
     }
   }
 
@@ -3283,7 +3294,8 @@ class VerifyCompiler {
     for (const line of body) {
       if (line.node === AST.RETURN) return [true, false];
       // Unreachable immediately halts execution, so it technically returns
-      if (line.node === AST.EXPRESSION && line.level1 === "unreachable") return [true, false]
+      if (line.node === AST.EXPRESSION && line.level1 === "unreachable")
+        return [true, false];
       if (line.node === AST.BREAK || line.node === AST.CONTINUE)
         return [false, true];
       if (line.node === AST.BLOCK) {

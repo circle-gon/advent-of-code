@@ -1,4 +1,4 @@
-import { hash, fall } from "./shared.js"
+import { fall } from "./shared.js";
 
 function solve(echo, blocks) {
   fall(blocks);
@@ -10,29 +10,29 @@ function solve(echo, blocks) {
     const clone = structuredClone(blocks);
     const [removed] = clone.splice(i, 1);
     fall(clone);
-    
+
     // Put it back in
-    clone.splice(i, 0, removed)
-    
+    clone.splice(i, 0, removed);
+
     // See how many fell
     for (let j = 0; j < blocks.length; j++) {
-      if (clone[j][2][0] !== blocks[j][2][0]) total++
+      if (clone[j][2][0] !== blocks[j][2][0]) total++;
     }
-    
+
     if (i % 10 === 9) {
       self.postMessage({
         type: "msg",
-        data: [echo]
-      })
+        data: [echo],
+      });
     }
   }
-  
-  return [echo, total]
+
+  return [echo, total];
 }
 
-self.addEventListener("message", e => {
+self.addEventListener("message", (e) => {
   self.postMessage({
     type: "done",
-    data: solve(...e.data)
-  })
-})
+    data: solve(...e.data),
+  });
+});

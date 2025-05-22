@@ -4,7 +4,7 @@ function isPair(a, b) {
   return pol1 !== pol2 && a.toLowerCase() === b.toLowerCase();
 }
 
-function react(str, ignore) {
+function react(str) {
   let next = "";
   for (let i = 0; i < str.length; i++) {
     if (next.length > 0 && isPair(next[next.length - 1], str[i]))
@@ -15,7 +15,7 @@ function react(str, ignore) {
 }
 
 function part1(input) {
-  return react(input, "").length;
+  return react(input).length;
 }
 
 function part2(input) {

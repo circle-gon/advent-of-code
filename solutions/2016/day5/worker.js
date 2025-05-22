@@ -1,7 +1,6 @@
 import { md5 } from "/externals.js";
 
 function crack(echo, input, start, end) {
-  let idx = start;
   const out = [];
   for (let i = start; i < end; i++) {
     const hash = md5(input + i.toString());

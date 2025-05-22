@@ -35,7 +35,7 @@ function getWeights(weights, tower, program) {
   return weight;
 }
 
-function getBad(weights, tower, program, parent) {
+function getBad(weights, tower, program) {
   const children = tower.get(program).programs;
   const arr = Object.entries(
     Object.groupBy(children, (o) => weights.get(o))

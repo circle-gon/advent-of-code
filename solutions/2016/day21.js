@@ -32,24 +32,31 @@ function part1(input, _, example) {
         );
         break;
       case "rot":
-        if (instr[1] === "right") str = [...str.slice(-instr[2]), ...str.slice(0, -instr[2])]
-        else str = [...str.slice(instr[2]), ...str.slice(0, instr[2])]
-        break
-      case "rotbase":
-        const idx = str.indexOf(instr[1])
-        const rot = (1 + idx + (idx >= 4 ? 1 : 0)) % str.length
-        str = [...str.slice(-rot), ...str.slice(0, -rot)]
-        break
+        if (instr[1] === "right")
+          str = [...str.slice(-instr[2]), ...str.slice(0, -instr[2])];
+        else str = [...str.slice(instr[2]), ...str.slice(0, instr[2])];
+        break;
+      case "rotbase": {
+        const idx = str.indexOf(instr[1]);
+        const rot = (1 + idx + (idx >= 4 ? 1 : 0)) % str.length;
+        str = [...str.slice(-rot), ...str.slice(0, -rot)];
+        break;
+      }
       case "rev":
-        str = [...str.slice(0, instr[1]), ...str.slice(instr[1], instr[2] + 1).reverse(), ...str.slice(instr[2] + 1)]
-        break
-      case "move":
-        const letter = str.splice(instr[1], 1)[0]
-        str.splice(instr[2], 0, letter)
-        break
+        str = [
+          ...str.slice(0, instr[1]),
+          ...str.slice(instr[1], instr[2] + 1).reverse(),
+          ...str.slice(instr[2] + 1),
+        ];
+        break;
+      case "move": {
+        const letter = str.splice(instr[1], 1)[0];
+        str.splice(instr[2], 0, letter);
+        break;
+      }
     }
   }
-  return str.join("")
+  return str.join("");
 }
 
 function part2(input, _, example) {
@@ -66,37 +73,44 @@ function part2(input, _, example) {
         );
         break;
       case "rot":
-        if (instr[1] === "left") str = [...str.slice(-instr[2]), ...str.slice(0, -instr[2])]
-        else str = [...str.slice(instr[2]), ...str.slice(0, instr[2])]
-        break
-      case "rotbase":
+        if (instr[1] === "left")
+          str = [...str.slice(-instr[2]), ...str.slice(0, -instr[2])];
+        else str = [...str.slice(instr[2]), ...str.slice(0, instr[2])];
+        break;
+      case "rotbase": {
         // Guess the rotation
-        let works = false
+        let works = false;
         for (let rot = 0; rot < str.length; rot++) {
-          const see = [...str.slice(rot), ...str.slice(0, rot)]
+          const see = [...str.slice(rot), ...str.slice(0, rot)];
           // Check if this is correct
-          const idx = see.indexOf(instr[1])
-          const rotNext = (1 + idx + (idx >= 4 ? 1 : 0)) % str.length
+          const idx = see.indexOf(instr[1]);
+          const rotNext = (1 + idx + (idx >= 4 ? 1 : 0)) % str.length;
           // Scramble it out
-          const result = [...see.slice(-rotNext), ...see.slice(0, -rotNext)]
+          const result = [...see.slice(-rotNext), ...see.slice(0, -rotNext)];
           if (result.every((i, j) => i === str[j])) {
-            str = see
-            works = true
-            break
+            str = see;
+            works = true;
+            break;
           }
         }
-        if (!works) throw new Error("Something bad happened?")
-        break
+        if (!works) throw new Error("Something bad happened?");
+        break;
+      }
       case "rev":
-        str = [...str.slice(0, instr[1]), ...str.slice(instr[1], instr[2] + 1).reverse(), ...str.slice(instr[2] + 1)]
-        break
-      case "move":
-        const letter = str.splice(instr[2], 1)[0]
-        str.splice(instr[1], 0, letter)
-        break
+        str = [
+          ...str.slice(0, instr[1]),
+          ...str.slice(instr[1], instr[2] + 1).reverse(),
+          ...str.slice(instr[2] + 1),
+        ];
+        break;
+      case "move": {
+        const letter = str.splice(instr[2], 1)[0];
+        str.splice(instr[1], 0, letter);
+        break;
+      }
     }
   }
-  return str.join("")
+  return str.join("");
 }
 
 export default [part1, part2];

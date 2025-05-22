@@ -144,7 +144,6 @@ function part2(input) {
 
   // Try them all!!!!
   const width = instruct[0].length;
-  const possiblePlaces = [];
 
   let max = 0;
   for (let i = 0; i < instruct.length; i++) {
@@ -169,4 +168,4 @@ function part2(input) {
   return max;
 }
 
-export default [part1, part2]
+export default [part1, part2];

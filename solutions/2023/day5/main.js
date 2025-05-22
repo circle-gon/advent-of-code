@@ -36,10 +36,7 @@ function part1(input) {
 const spawnWorker = spawnWorkerFor(import.meta.resolve("./worker.js"));
 
 async function part2(input, update) {
-  const lines = input.split("\n");
   const [seedRanges, data] = parse(input);
-
-  let lowestLoc = Infinity;
 
   const bulk = [];
   for (let i = 0; i < seedRanges.length / 2; i++) {
@@ -61,4 +58,4 @@ async function part2(input, update) {
   ).reduce((a, b) => Math.min(a, b));
 }
 
-export default [part1, part2]
+export default [part1, part2];

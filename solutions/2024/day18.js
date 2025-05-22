@@ -4,11 +4,11 @@ function parse(input, example) {
   const falling = input
     .split("\n")
     .map((i) => i.split(",").map((i) => Number(i)));
-  
-  const dims = example ? 7 : 71
+
+  const dims = example ? 7 : 71;
   const grid = Array(dims)
     .fill()
-    .map((i) => Array(dims).fill(0));
+    .map(() => Array(dims).fill(0));
   return { falling, grid };
 }
 

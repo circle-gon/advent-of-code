@@ -1,7 +1,3 @@
-function hash(a) {
-  return `${a[0]},${a[1]}`;
-}
-
 // Shoelace formula taken from GeeksForGeeks
 function shoelace(points) {
   let x = 0,
@@ -68,4 +64,4 @@ function part2(input) {
   return shoelace(points);
 }
 
-export default [part1, part2]
+export default [part1, part2];

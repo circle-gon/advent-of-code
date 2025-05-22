@@ -1,5 +1,3 @@
-/* globals BigInt */
-
 function parse(input) {
   return input.split("\n").map((i) => BigInt(i));
 }
@@ -33,14 +31,14 @@ function hash(a, b, c, d) {
 }
 
 function addNum(map, num, count) {
-  map[num] = (map[num] ?? 0) + count
+  map[num] = (map[num] ?? 0) + count;
 }
 
 function part2(input) {
   const secrets = parse(input);
   const prices = [];
-  const keys = []
-  const gains = Array(19 ** 4)
+  const keys = [];
+  const gains = Array(19 ** 4);
   for (const secret of secrets) {
     let sec = secret;
     const group = [];
@@ -57,29 +55,29 @@ function part2(input) {
     prices.push(group);
   }
 
-  const seen = Array(19 ** 4)
+  const seen = Array(19 ** 4);
   for (const price of prices) {
-    const newKeys = []
+    const newKeys = [];
     for (let i = 0; i < 1995; i++) {
       const group = price.slice(i, i + 4);
       const h = hash(...group.map((i) => i[1]));
       if (seen[h] === undefined) {
-        if (gains[h] === undefined) keys.push(h)
+        if (gains[h] === undefined) keys.push(h);
         addNum(gains, h, group[3][0]);
       }
-      seen[h] = true
-      newKeys.push(h)
+      seen[h] = true;
+      newKeys.push(h);
     }
     for (const key of newKeys) {
-      seen[key] = undefined
+      seen[key] = undefined;
     }
   }
 
-  let max = 0
+  let max = 0;
   for (const key of keys) {
-    max = Math.max(gains[key] ?? 0, max)
+    max = Math.max(gains[key] ?? 0, max);
   }
-  return max
+  return max;
 }
 
 export default [part1, part2];

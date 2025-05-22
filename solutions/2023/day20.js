@@ -1,4 +1,4 @@
-import { Queue } from "/externals.js"
+import { Queue } from "/externals.js";
 
 function initialFor(prefix) {
   if (prefix === "") return {};
@@ -41,7 +41,7 @@ function part1(input) {
     high = 0;
   for (let i = 0; i < 1000; i++) {
     // Array<pulseSent, low/high, whoSentIt>
-    const pulses = new Queue()
+    const pulses = new Queue();
     pulses.push(["broadcaster", false, ""]);
 
     // 1 because the one sent to the broadcaster matters
@@ -77,7 +77,7 @@ function part1(input) {
             module.state = !module.state;
           }
           break;
-        case "&":
+        case "&": {
           module.pulseState[sent] = type;
           const e = Object.values(module.pulseState).some((i) => i === false);
           for (const d of module.dest) {
@@ -85,6 +85,7 @@ function part1(input) {
             pulses.push([d, e, name]);
           }
           break;
+        }
       }
     }
   }
@@ -114,12 +115,12 @@ function sendsTo(modules, name) {
 
 function part2(input) {
   const modules = parse(input);
-  const emitter = sendsTo(modules, "rx")[0]
+  const emitter = sendsTo(modules, "rx")[0];
 
   // This only works because the final one that sends to rx is &
   // All the inputs for it are also &
   // So we take when they each send a high pulse and then take the LCM
-  const requirements = sendsTo(modules, emitter)
+  const requirements = sendsTo(modules, emitter);
 
   const times = Array(requirements.length).fill(0);
 
@@ -128,7 +129,7 @@ function part2(input) {
   while (times.some((i) => i === 0)) {
     pushed++;
     // Array<pulseSent, low/high, whoSentIt>
-    const pulses = new Queue()
+    const pulses = new Queue();
     pulses.push(["broadcaster", false, ""]);
 
     while (pulses.length > 0) {
@@ -153,7 +154,7 @@ function part2(input) {
             module.state = !module.state;
           }
           break;
-        case "&":
+        case "&": {
           module.pulseState[sent] = type;
           const e = Object.values(module.pulseState).some((i) => i === false);
 
@@ -164,10 +165,11 @@ function part2(input) {
             pulses.push([d, e, name]);
           }
           break;
+        }
       }
     }
   }
   return times.reduce((a, b) => lcm(a, b));
 }
 
-export default [part1, part2]
+export default [part1, part2];

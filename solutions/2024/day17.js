@@ -1,5 +1,3 @@
-/* globals BigInt */
-
 function parse(input) {
   const [r, p] = input.split("\n\n");
   const registers = r.split("\n").map((i) => BigInt(i.slice(12)));
@@ -45,10 +43,11 @@ function run(registers, program) {
     switch (instr) {
       case 0:
       case 6:
-      case 7:
+      case 7: {
         const outI = instr > 0 ? instr - 5 : 0;
         registers[outI] = registers[0] / 2n ** combo;
         break;
+      }
       case 1:
         registers[1] = registers[1] ^ BigInt(op);
         break;

@@ -1,4 +1,3 @@
-import { md5 } from "/externals.js";
 import { getWorkerFor } from "/utils.js";
 
 const getWorker = getWorkerFor(import.meta.resolve("./worker.js"));

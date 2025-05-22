@@ -2,9 +2,9 @@ import { Queue } from "/externals.js";
 
 function parse(input) {
   const grid = [];
-  for (const [y, line] of input.split("\n").entries()) {
+  for (const line of input.split("\n")) {
     const row = [];
-    for (const [x, char] of line.split("").entries()) {
+    for (const char of line.split("").values()) {
       if (char === "G") {
         row.push([200, "G"]);
       } else if (char === "E") {

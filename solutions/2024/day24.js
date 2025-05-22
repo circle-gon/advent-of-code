@@ -90,7 +90,8 @@ function part2(input) {
   // Check that the result of xNN XOR yNN is in a wire that goes to zNN
   const see = [];
   for (const [k, v] of values.entries()) {
-    if (v[0] !== "XOR" || !isInput(v) || k === "z00" || bad.includes(k)) continue;
+    if (v[0] !== "XOR" || !isInput(v) || k === "z00" || bad.includes(k))
+      continue;
     const exists = find(
       values,
       (_, v) => v[0] === "XOR" && matchesOne(v, k) && !isInput(v)
@@ -103,7 +104,7 @@ function part2(input) {
 
   // Are some not? Find the wrong pair
   for (const check of see) {
-    const [out, [, one]] = check;
+    const [, [, one]] = check;
     const ok = values.get(
       // zNN out
       find(

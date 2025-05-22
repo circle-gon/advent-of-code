@@ -88,10 +88,6 @@ function part1(input) {
   return sum;
 }
 
-function stringer(t) {
-  return t.map((i) => i.join("")).join("\n");
-}
-
 function getSum(table) {
   let sum = 0;
   for (const [row, line] of table.entries()) {
@@ -101,8 +97,6 @@ function getSum(table) {
   }
   return sum;
 }
-
-const cache = new Map();
 
 function part2(input) {
   const table = parse(input);
@@ -130,4 +124,4 @@ function part2(input) {
   return getSum(r);
 }
 
-export default [part1, part2]
+export default [part1, part2];

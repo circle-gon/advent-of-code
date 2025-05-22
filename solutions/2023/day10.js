@@ -1,4 +1,4 @@
-import { Queue } from "/externals.js"
+import { Queue } from "/externals.js";
 
 // [x offset, y offset]
 // [||||||||, <------>]
@@ -78,13 +78,13 @@ function parse(input) {
 
 function part1(input) {
   const board = parse(input);
-  
+
   const startX = board.findIndex((b) => b.includes("S"));
   const startY = board[startX].indexOf("S");
 
   // stores the point and the distance
   const matched = new Map();
-  const queue = new Queue()
+  const queue = new Queue();
   queue.push([startX, startY]);
 
   while (queue.length > 0) {
@@ -197,7 +197,7 @@ function part2(input) {
   let enclosed = 0;
 
   for (const [x, line] of board.entries()) {
-    for (const [y, point] of line.entries()) {
+    for (const y of line.keys()) {
       // That's a pipe!
       if (pipePoints.has(toStr(x, y))) continue;
 
@@ -208,4 +208,4 @@ function part2(input) {
   return enclosed;
 }
 
-export default [part1, part2]
+export default [part1, part2];
