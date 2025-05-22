@@ -159,6 +159,7 @@ function addNodes(ele, nodes) {
 function trimInput(input, year, day) {
   // 2017 day 19 doesn't want trimmed whitespace
   if (year === "2017" && day === 18) return input
+  if (year === "2018" && day === 12) return input
   return input.trim()
 }
 

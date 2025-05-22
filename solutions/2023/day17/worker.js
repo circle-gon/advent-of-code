@@ -24,7 +24,7 @@ function shortestPath(echo, map, minSteps, maxSteps) {
 
   let iters = 0;
 
-  while (queue.size() > 0) {
+  while (queue.length > 0) {
     const { x: ox, y: oy, dir, dirSteps, temp: prevTemp } = queue.pop();
 
     iters++;

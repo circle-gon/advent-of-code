@@ -121,7 +121,7 @@ function part2(input) {
       // get the repetition
       const num = i - cache.get(key);
       // then repeatedly add it to i until we can't
-      i += Math.floor((1e9 - 1 - i) / num) * num;
+      i += Math.floor((1e9 - i) / num) * num;
     }
     cache.set(key, i);
   }

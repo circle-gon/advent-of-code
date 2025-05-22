@@ -11,12 +11,12 @@ export class Heap {
 
   _hasLeftChild(parentIndex) {
     const leftChildIndex = parentIndex * 2 + 1;
-    return leftChildIndex < this.size();
+    return leftChildIndex < this.length;
   }
 
   _hasRightChild(parentIndex) {
     const rightChildIndex = parentIndex * 2 + 2;
-    return rightChildIndex < this.size();
+    return rightChildIndex < this.length;
   }
 
   _compareAt(i, j) {
@@ -30,11 +30,11 @@ export class Heap {
   }
 
   _shouldSwap(parentIndex, childIndex) {
-    if (parentIndex < 0 || parentIndex >= this.size()) {
+    if (parentIndex < 0 || parentIndex >= this.length) {
       return false;
     }
 
-    if (childIndex < 0 || childIndex >= this.size()) {
+    if (childIndex < 0 || childIndex >= this.length) {
       return false;
     }
 
@@ -116,9 +116,18 @@ export class Heap {
     }
   }
 
+  findAll(func) {
+    const result = []
+    for (const node of this._nodes) {
+      if (func(node)) result.push(node)
+    }
+    if (func(this._leaf)) result.push(this._leaf)
+    return result
+  }
+
   push(value) {
     this._nodes.push(value);
-    this._heapifyUp(this.size() - 1);
+    this._heapifyUp(this.length - 1);
     if (this._leaf === null || this._compare(value, this._leaf) > 0) {
       this._leaf = value;
     }
@@ -127,7 +136,7 @@ export class Heap {
 
   pop() {
     const root = this.top();
-    this._nodes[0] = this._nodes[this.size() - 1];
+    this._nodes[0] = this._nodes[this.length - 1];
     this._nodes.pop();
     this._heapifyDown(0);
 
@@ -136,6 +145,21 @@ export class Heap {
     }
 
     return root;
+  }
+
+  heapify() {
+    // fix node positions
+    for (let i = Math.floor(this.length / 2) - 1; i >= 0; i--) {
+      this._heapifyDown(i);
+    }
+
+    // fix leaf value
+    for (let i = Math.floor(this.length / 2); i < this.length; i++) {
+      const value = this._nodes[i];
+      if (this._leaf === null || this._compare(value, this._leaf) > 0) {
+        this._leaf = value;
+      }
+    }
   }
 
   top() {
@@ -147,12 +171,12 @@ export class Heap {
     return this._leaf;
   }
 
-  size() {
+  get length() {
     return this._nodes.length;
   }
 
   isEmpty() {
-    return this.size() === 0;
+    return this.length === 0;
   }
 
   clear() {
@@ -179,6 +203,55 @@ export class Queue {
 
   get length() {
     return this.in.length + this.out.length;
+  }
+}
+
+class LinkedListNode {
+  constructor(before, after, value) {
+    this.before = before;
+    this.after = after;
+    this.value = value;
+  }
+
+  ahead(amount) {
+    let n = this;
+    for (let i = 0; i < amount; i++) n = n.after;
+    return n;
+  }
+
+  behind(amount) {
+    let n = this;
+    for (let i = 0; i < amount; i++) n = n.before;
+    return n;
+  }
+}
+
+export class LinkedList {
+  constructor(values = []) {
+    this.root = undefined;
+    for (const node of values) this.push(node);
+  }
+
+  push(value) {
+    if (this.root !== undefined) return this.insert(value, this.root);
+
+    this.root = new LinkedListNode(undefined, undefined, value);
+    this.root.before = this.root;
+    this.root.after = this.root;
+    return this.root;
+  }
+
+  insert(value, before) {
+    const next = new LinkedListNode(before, before.after, value);
+    before.after.before = next;
+    before.after = next;
+    return next;
+  }
+
+  remove(node) {
+    node.before.after = node.after;
+    node.after.before = node.before;
+    return node.value;
   }
 }
 

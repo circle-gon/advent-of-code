@@ -1,5 +1,3 @@
-/* global WabtModule */
-
 const WORKERS = {};
 function createWorkerFor(type, ind) {
   const w = WORKERS[type] ?? (WORKERS[type] = []);
@@ -43,14 +41,18 @@ export function spawnWorkerFor(type) {
 }
 
 export function format(num) {
-  return num.toLocaleString("en-US");
+  return num.toLocaleString(undefined);
 }
 
+const formatter = new Intl.NumberFormat(undefined, {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2,
+});
 export function formatTime(offset) {
   const duration = (performance.now() - offset) / 1000;
   return duration >= 1
-    ? `${duration.toFixed(2)}s`
-    : `${(duration * 1000).toFixed(2)}ms`;
+    ? `${formatter.format(duration)}s`
+    : `${formatter.format(duration * 1000)}ms`;
 }
 
 export const AOC = Object.freeze({
@@ -58,27 +60,47 @@ export const AOC = Object.freeze({
   parts: 2,
 });
 
-export const wabt = WabtModule();
-export async function compile(wat, deps) {
-  const buffer = (await wabt)
-    .parseWat("", wat, {
-      multi_memory: true,
-    })
-    .toBinary({}).buffer;
+let wabt;
+function getWabt() {
+  return new Promise((r) => {
+    if (wabt === undefined) {
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/wabt@1.0.36/index.js";
+      script.addEventListener("load", async () => {
+        wabt = await window.WabtModule();
+        r(wabt);
+      });
+      document.body.append(script);
+    } else r(wabt);
+  });
+}
+
+export async function compileWasm(wasm, deps) {
   const memory = new WebAssembly.Memory({
     initial: 1,
   });
   const depsFinal = {
     js: {
       raw: memory,
+      log(...args) {
+        console.log(...args)
+      },
       ...deps,
     },
   };
 
   return {
-    module: (await WebAssembly.instantiate(buffer, depsFinal)).instance.exports,
+    module: (await WebAssembly.instantiate(wasm, depsFinal)).instance.exports,
     memory,
   };
+}
+export async function compile(wat, deps) {
+  const buffer = (await getWabt())
+    .parseWat("", wat, {
+      multi_memory: true,
+    })
+    .toBinary({}).buffer;
+  return compileWasm(buffer, deps)
 }
 
 export function memstr(str, mem) {

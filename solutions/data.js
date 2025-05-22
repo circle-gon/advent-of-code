@@ -858,16 +858,398 @@ export default {
             240,
           ],
         ],
-        [[
+        [
+          [
             "[1518-11-01 00:00] Guard #10 begins shift\n[1518-11-01 00:05] falls asleep\n[1518-11-01 00:25] wakes up\n[1518-11-01 00:30] falls asleep\n[1518-11-01 00:55] wakes up\n[1518-11-01 23:58] Guard #99 begins shift\n[1518-11-02 00:40] falls asleep\n[1518-11-02 00:50] wakes up\n[1518-11-03 00:05] Guard #10 begins shift\n[1518-11-03 00:24] falls asleep\n[1518-11-03 00:29] wakes up\n[1518-11-04 00:02] Guard #99 begins shift\n[1518-11-04 00:36] falls asleep\n[1518-11-04 00:46] wakes up\n[1518-11-05 00:03] Guard #99 begins shift\n[1518-11-05 00:45] falls asleep\n[1518-11-05 00:55] wakes up",
             4455,
-          ],],
+          ],
+        ],
       ],
     },
     {
       name: "Alchemical Reduction",
       special: false,
-      examples: [[["aA", 0], ['abBA', 0], ['abAB', 4], ['aabAAB', 6], ['dabAcCaCBAcCcaDA', 10]], [['dabAcCaCBAcCcaDA', 4]]],
+      examples: [
+        [
+          ["aA", 0],
+          ["abBA", 0],
+          ["abAB", 4],
+          ["aabAAB", 6],
+          ["dabAcCaCBAcCcaDA", 10],
+        ],
+        [["dabAcCaCBAcCcaDA", 4]],
+      ],
+    },
+    {
+      name: "Chronal Coordinates",
+      special: false,
+      examples: [
+        [["1, 1\n1, 6\n8, 3\n3, 4\n5, 5\n8, 9", 17]],
+        [["1, 1\n1, 6\n8, 3\n3, 4\n5, 5\n8, 9", 16]],
+      ],
+    },
+    {
+      name: "The Sum of Its Parts",
+      special: false,
+      examples: [
+        [
+          [
+            "Step C must be finished before step A can begin.\nStep C must be finished before step F can begin.\nStep A must be finished before step B can begin.\nStep A must be finished before step D can begin.\nStep B must be finished before step E can begin.\nStep D must be finished before step E can begin.\nStep F must be finished before step E can begin.",
+            "CABDFE",
+          ],
+        ],
+        [
+          [
+            "Step C must be finished before step A can begin.\nStep C must be finished before step F can begin.\nStep A must be finished before step B can begin.\nStep A must be finished before step D can begin.\nStep B must be finished before step E can begin.\nStep D must be finished before step E can begin.\nStep F must be finished before step E can begin.",
+            15,
+          ],
+        ],
+      ],
+    },
+    {
+      name: "Memory Maneuver",
+      special: false,
+      examples: [
+        [["2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2", 138]],
+        [["2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2", 66]],
+      ],
+    },
+    {
+      name: "Marble Mania",
+      special: false,
+      examples: [
+        [
+          ["9 players; last marble is worth 25 points", 32],
+          ["10 players; last marble is worth 1618 points", 8317],
+          ["13 players; last marble is worth 7999 points", 146373],
+          ["17 players; last marble is worth 1104 points", 2764],
+          ["21 players; last marble is worth 6111 points", 54718],
+          ["30 players; last marble is worth 5807 point", 37305],
+        ],
+        [],
+      ],
+    },
+    {
+      name: "The Stars Align",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "Chronal Charge",
+      special: false,
+      examples: [
+        [
+          ["18", "33,45"],
+          ["42", "21,61"],
+        ],
+        [
+          ["18", "90,269,16"],
+          ["42", "232,251,12"],
+        ],
+      ],
+    },
+    {
+      name: "Subterranean Sustainability",
+      special: false,
+      examples: [
+        [
+          [
+            "initial state: #..#.#..##......###...###\n\n...## => #\n..#.. => #\n.#... => #\n.#.#. => #\n.#.## => #\n.##.. => #\n.#### => #\n#.#.# => #\n#.### => #\n##.#. => #\n##.## => #\n###.. => #\n###.# => #\n####. => #\n..... => .\n#.... => .\n##... => .\n#.#.. => .\n...#. => .\n#..#. => .\n..##. => .\n#.##. => .\n.###. => .\n....# => .\n#...# => .\n.#..# => .\n##..# => .\n..#.# => .\n.##.# => .\n#..## => .\n..### => .\n##### => .",
+            325,
+          ],
+        ],
+        [],
+      ],
+    },
+    {
+      name: "Mine Cart Madness",
+      special: false,
+      examples: [
+        [
+          [
+            "/->-\\        \n|   |  /----\\\n| /-+--+-\\  |\n| | |  | v  |\n\\-+-/  \\-+--/\n  \\------/   ",
+            "7,3",
+          ],
+        ],
+        [
+          [
+            "/>-<\\  \n|   |  \n| /<+-\\\n| | | v\n\\>+</ |\n  |   ^\n  \\<->/",
+            "6,4",
+          ],
+        ],
+      ],
+    },
+    {
+      name: "Chocolate Charts",
+      special: false,
+      examples: [
+        [
+          ["9", "5158916779"],
+          ["5", "0124515891"],
+          ["18", "9251071085"],
+          ["2018", "5941429882"],
+        ],
+        [
+          ["51589", 9],
+          ["01245", 5],
+          ["92510", 18],
+          ["59414", 2018],
+        ],
+      ],
+    },
+    {
+      name: "Beverage Bandits",
+      special: false,
+      examples: [
+        [
+          [
+            "#######\n#.G...#\n#...EG#\n#.#.#G#\n#..G#E#\n#.....#\n#######",
+            27730,
+          ],
+          [
+            "#######\n#G..#E#\n#E#E.E#\n#G.##.#\n#...#E#\n#...E.#\n#######",
+            36334,
+          ],
+          [
+            "#######\n#E..EG#\n#.#G.E#\n#E.##E#\n#G..#.#\n#..E#.#\n#######",
+            39514,
+          ],
+          [
+            "#######\n#E.G#.#\n#.#G..#\n#G.#.G#\n#G..#.#\n#...E.#\n#######",
+            27755,
+          ],
+          [
+            "#######\n#.E...#\n#.#..G#\n#.###.#\n#E#G#G#\n#...#G#\n#######",
+            28944,
+          ],
+          [
+            "#########\n#G......#\n#.E.#...#\n#..##..G#\n#...##..#\n#...#...#\n#.G...G.#\n#.....G.#\n#########",
+            18740,
+          ],
+        ],
+        [
+          [
+            "#######\n#.G...#\n#...EG#\n#.#.#G#\n#..G#E#\n#.....#\n#######",
+            4988,
+          ],
+          [
+            "#######\n#E..EG#\n#.#G.E#\n#E.##E#\n#G..#.#\n#..E#.#\n#######",
+            31284,
+          ],
+          [
+            "#######\n#E.G#.#\n#.#G..#\n#G.#.G#\n#G..#.#\n#...E.#\n#######",
+            3478,
+          ],
+          [
+            "#######\n#.E...#\n#.#..G#\n#.###.#\n#E#G#G#\n#...#G#\n#######",
+            6474,
+          ],
+          [
+            "#########\n#G......#\n#.E.#...#\n#..##..G#\n#...##..#\n#...#...#\n#.G...G.#\n#.....G.#\n#########",
+            1140,
+          ],
+        ],
+      ],
+    },
+    {
+      name: "Chronal Classification",
+      special: false,
+      examples: [
+        [["Before: [3, 2, 1, 1]\n9 2 1 2\nAfter:  [3, 2, 2, 1]\n\n\n\n1", 1]],
+        [],
+      ],
+    },
+    {
+      name: "Reservoir Research",
+      special: false,
+      examples: [
+        [
+          [
+            "x=495, y=2..7\ny=7, x=495..501\nx=501, y=3..7\nx=498, y=2..4\nx=506, y=1..2\nx=498, y=10..13\nx=504, y=10..13\ny=13, x=498..504",
+            57,
+          ],
+        ],
+        [
+          [
+            "x=495, y=2..7\ny=7, x=495..501\nx=501, y=3..7\nx=498, y=2..4\nx=506, y=1..2\nx=498, y=10..13\nx=504, y=10..13\ny=13, x=498..504",
+            29,
+          ],
+        ],
+      ],
+    },
+    {
+      name: "Settlers of The North Pole",
+      special: false,
+      examples: [
+        [
+          [
+            ".#.#...|#.\n.....#|##|\n.|..|...#.\n..|#.....#\n#.#|||#|#|\n...#.||...\n.|....|...\n||...#|.#|\n|.||||..|.\n...#.|..|.",
+            1147,
+          ],
+        ],
+        [],
+      ],
+    },
+    {
+      name: "Go With The Flow",
+      special: false,
+      examples: [
+        [
+          [
+            "#ip 0\nseti 5 0 1\nseti 6 0 2\naddi 0 1 0\naddr 1 2 3\nsetr 1 0 0\nseti 8 0 4\nseti 9 0 5",
+            6,
+          ],
+        ],
+        [],
+      ],
+    },
+    {
+      name: "A Regular Map",
+      special: false,
+      examples: [
+        [
+          ["^WNE$", 3],
+          ["^ENWWW(NEEE|SSE(EE|N))$", 10],
+          ["^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$", 18],
+          ["^ESSWWN(E|NNENN(EESS(WNSE|)SSS|WWWSSSSE(SW|NNNE)))$", 23],
+          [
+            "^WSSEESWWWNW(S|NENNEEEENN(ESSSSW(NWSW|SSEN)|WSWWN(E|WWS(E|SS))))$",
+            31,
+          ],
+        ],
+        [],
+      ],
+    },
+    {
+      name: "Chronal Conversion",
+      special: true,
+      examples: [[], []],
+    },
+    {
+      name: "Mode Maze",
+      special: false,
+      examples: [
+        [["depth: 510\ntarget: 10,10", 114]],
+        [["depth: 510\ntarget: 10,10", 45]],
+      ],
+    },
+    {
+      name: "Experimental Emergency Teleportation",
+      special: false,
+      examples: [
+        [
+          [
+            "pos=<0,0,0>, r=4\npos=<1,0,0>, r=1\npos=<4,0,0>, r=3\npos=<0,2,0>, r=1\npos=<0,5,0>, r=3\npos=<0,0,3>, r=1\npos=<1,1,1>, r=1\npos=<1,1,2>, r=1\npos=<1,3,1>, r=1",
+            7,
+          ],
+        ],
+        [
+          [
+            "pos=<10,12,12>, r=2\npos=<12,14,12>, r=2\npos=<16,12,12>, r=4\npos=<14,14,14>, r=6\npos=<50,50,50>, r=200\npos=<10,10,10>, r=5",
+            36,
+          ],
+        ],
+      ],
+    },
+    {
+      name: "Immune System Simulator 20XX",
+      special: false,
+      examples: [
+        [
+          [
+            "Immune System:\n17 units each with 5390 hit points (weak to radiation, bludgeoning) with an attack that does 4507 fire damage at initiative 2\n989 units each with 1274 hit points (immune to fire; weak to bludgeoning, slashing) with an attack that does 25 slashing damage at initiative 3\n\nInfection:\n801 units each with 4706 hit points (weak to radiation) with an attack that does 116 bludgeoning damage at initiative 1\n4485 units each with 2961 hit points (immune to radiation; weak to fire, cold) with an attack that does 12 slashing damage at initiative 4",
+            5216,
+          ],
+        ],
+        [],
+      ],
+    },
+    {
+      name: "Four-Dimensional Adventure",
+      special: false,
+      examples: [
+        [
+          [
+            " 0,0,0,0\n3,0,0,0\n0,3,0,0\n0,0,3,0\n0,0,0,3\n0,0,0,6\n9,0,0,0\n12,0,0,0",
+            2,
+          ],
+          [
+            "-1,2,2,0\n0,0,2,-2\n0,0,0,-2\n-1,2,0,0\n-2,-2,-2,2\n3,0,2,-1\n-1,3,2,2\n-1,0,-1,0\n0,2,1,-2\n3,0,0,0",
+            4,
+          ],
+          [
+            "1,-1,0,1\n2,0,-1,0\n3,2,-1,0\n0,0,3,1\n0,0,-1,-1\n2,3,-2,0\n-2,2,0,0\n2,-2,0,-1\n1,-1,0,-1\n3,2,0,2",
+            3,
+          ],
+          [
+            "1,-1,-1,-2\n-2,-2,0,1\n0,2,1,3\n-2,3,-2,1\n0,2,3,-2\n-1,-1,1,-2\n0,-2,-1,0\n-2,2,3,-1\n1,2,2,0\n-1,-2,0,-2",
+            8,
+          ],
+        ],
+        [],
+      ],
+    },
+  ],
+  2019: [
+    {
+      name: "The Tyranny of the Rocket Equation",
+      special: false,
+      examples: [
+        [
+          ["12", 2],
+          ["14", 2],
+          ["1969", 654],
+          ["100756", 33583],
+        ],
+        [
+          ["14", 2],
+          ["1969", 966],
+          ["100756", 50346],
+        ],
+      ],
+    },
+    {
+      name: "1202 Program Alarm",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "Crossed Wires",
+      special: false,
+      examples: [
+        [
+          ["R8,U5,L5,D3\nU7,R6,D4,L4", 6],
+          [
+            "R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83",
+            159,
+          ],
+          [
+            "R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51\nU98,R91,D20,R16,D67,R40,U7,R15,U6,R7",
+            135,
+          ],
+        ],
+        [
+          ["R8,U5,L5,D3\nU7,R6,D4,L4", 30],
+          [
+            "R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83",
+            610,
+          ],
+           [
+            "R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51\nU98,R91,D20,R16,D67,R40,U7,R15,U6,R7",
+            410,
+          ],
+        ],
+      ],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
+    },
+    {
+      name: "",
+      special: false,
+      examples: [[], []],
     },
     {
       name: "",

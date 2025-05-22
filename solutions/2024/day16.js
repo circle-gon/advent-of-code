@@ -52,7 +52,7 @@ function part1(input) {
   queue.push([startX, startY, 0, 0]);
   paths.set(hash(startX, startY, 0), 0)
 
-  while (queue.size() > 0) {
+  while (queue.length > 0) {
     const [x, y, dir, score] = queue.pop()
     if (map[y][x] === "E") 
       return score
@@ -63,7 +63,7 @@ function part1(input) {
       const h = hash(nX, nY, nDir)
       if (!seen.has(h) || nScore < paths.get(h)) {
         paths.set(h, nScore)
-        queue.push([nX, nY, nDir, nScore])
+        queue.push(node)
       }
     }
   }
@@ -83,7 +83,7 @@ function part2(input) {
   queue.push([startX, startY, 0, 0, [[startX, startY]]]);
   paths.set(hash(startX, startY, 0), 0)
 
-  while (queue.size() > 0) {
+  while (queue.length > 0) {
     const [x, y, dir, score, path] = queue.pop()
     if (map[y][x] === "E") {
       // Less optimized solutions can be included, so check

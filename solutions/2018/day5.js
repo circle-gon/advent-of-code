@@ -22,12 +22,12 @@ function part2(input) {
   const core = react(input);
   const letters = new Set(core.toLowerCase());
   let len = Infinity;
-  for (const letter of letters) {
+  for (const letter of letters)
     len = Math.min(
       len,
       react(core.replaceAll(new RegExp(letter, "ig"), "")).length
     );
-  }
+
   return len;
 }
 
