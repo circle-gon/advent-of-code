@@ -1,4 +1,4 @@
-import { Heap } from "/externals.js"
+import { Heap } from "/externals.js";
 
 // With help from https://github.com/pvainio/adventofcode/blob/main/2023/js/day17.js
 
@@ -18,7 +18,7 @@ function hash(x, y, dir, dirSteps) {
 
 function shortestPath(echo, map, minSteps, maxSteps) {
   const visited = new Map();
-  const queue = new Heap((a, b) => a.temp - b.temp)
+  const queue = new Heap((a, b) => a.temp - b.temp);
   queue.push({ x: 0, y: 0, dir: "", dirSteps: minSteps, temp: -map[0][0] });
   let min = Infinity;
 

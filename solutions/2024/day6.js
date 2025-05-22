@@ -506,4 +506,4 @@ async function part2(input) {
   return module.part2();
 }
 
-export default [part1, part2]
+export default [part1, part2];

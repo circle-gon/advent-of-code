@@ -37,4 +37,4 @@ function part2(input, update) {
   return spawn(input, 4, 10, createUpdater(update), 1);
 }
 
-export default [part1, part2]
+export default [part1, part2];

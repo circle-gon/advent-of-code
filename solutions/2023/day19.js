@@ -59,7 +59,7 @@ function parse(input) {
 
     workflows.set(name, chains);
   }
-  
+
   const parts = [];
   for (const line of _parts.split("\n")) {
     const r = line.slice(1, -1);
@@ -165,11 +165,11 @@ function part2(input) {
   for (const final of finalRanges) {
     sum += Object.values(final).reduce(
       (sum, arr) => sum * (arr[1] - arr[0] + 1),
-      1
+      1,
     );
   }
 
   return sum;
 }
 
-export default [part1, part2]
+export default [part1, part2];

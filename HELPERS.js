@@ -13,8 +13,8 @@ const EXAMPLES = /<pre><code>(.*?)<\/code><\/pre>/gs;
           .replaceAll(/<em>(.*?)<\/em>/gs, "$1")
           .replaceAll("&lt;", "<")
           .replaceAll("&gt;", ">")
-          .replaceAll("&amp;", "&")
-      )
+          .replaceAll("&amp;", "&"),
+      ),
     );
   }
   console.log(out);
@@ -31,8 +31,8 @@ const EXAMPLES2 = /<pre><code>(.*?)<\/code><\/pre>/gs;
         .replaceAll(/<em>(.*?)<\/em>/gs, "$1")
         .replaceAll("&lt;", "<")
         .replaceAll("&gt;", ">")
-        .replaceAll("&amp;", "&")
-    )
+        .replaceAll("&amp;", "&"),
+    ),
   );
 })();
 

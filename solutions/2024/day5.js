@@ -1,4 +1,4 @@
-import { compile, memstr } from "/utils.js"
+import { compile, memstr } from "/utils.js";
 
 const wat = `
 (import "js" "raw" (memory $raw 1))
@@ -405,7 +405,7 @@ const wat = `
   call $parse
   call $check2
 )
-`
+`;
 
 const compilee = compile(wat, {});
 

@@ -57,8 +57,8 @@ function part2(input) {
 
     const h = hash(nums);
     if (find) {
-      counter++
-      if (h === find) return counter
+      counter++;
+      if (h === find) return counter;
     } else {
       if (seen.has(h)) find = h;
       else seen.add(h);

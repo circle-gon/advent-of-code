@@ -121,4 +121,4 @@ function part2(input) {
   return cardBids.reduce((sum, item, idx) => sum + item[1] * (idx + 1), 0);
 }
 
-export default [part1, part2]
+export default [part1, part2];

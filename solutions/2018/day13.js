@@ -66,7 +66,7 @@ function part1(input) {
 function part2(input) {
   let { carts, track } = parse(input);
   while (true) {
-    tick(carts, track)
+    tick(carts, track);
     if (carts.length === 1) return `${carts[0][0]},${carts[0][1]}`;
   }
 }

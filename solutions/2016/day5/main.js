@@ -27,7 +27,7 @@ async function useResults(input, callback) {
           };
           cracker.addEventListener("message", listener);
           i++;
-        })
+        }),
       );
     }
     const results = await Promise.all(waiting);

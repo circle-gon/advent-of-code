@@ -67,7 +67,7 @@ function getWabt() {
       const script = document.createElement("script");
       script.src = "https://cdn.jsdelivr.net/npm/wabt@1.0.36/index.js";
       script.addEventListener("load", async () => {
-        wabt = await window.WabtModule();
+        wabt = await WabtModule();
         r(wabt);
       });
       document.body.append(script);
@@ -83,7 +83,7 @@ export async function compileWasm(wasm, deps) {
     js: {
       raw: memory,
       log(...args) {
-        console.log(...args)
+        console.log(...args);
       },
       ...deps,
     },
@@ -100,7 +100,7 @@ export async function compile(wat, deps) {
       multi_memory: true,
     })
     .toBinary({}).buffer;
-  return compileWasm(buffer, deps)
+  return compileWasm(buffer, deps);
 }
 
 export function memstr(str, mem) {

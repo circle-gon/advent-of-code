@@ -103,7 +103,7 @@ export class Heap {
       childIndex = this._compareChildrenBefore(
         index,
         leftChildIndex,
-        rightChildIndex
+        rightChildIndex,
       );
 
       if (this._shouldSwap(parentIndex, childIndex)) {
@@ -117,12 +117,12 @@ export class Heap {
   }
 
   findAll(func) {
-    const result = []
+    const result = [];
     for (const node of this._nodes) {
-      if (func(node)) result.push(node)
+      if (func(node)) result.push(node);
     }
-    if (func(this._leaf)) result.push(this._leaf)
-    return result
+    if (func(this._leaf)) result.push(this._leaf);
+    return result;
   }
 
   push(value) {
@@ -274,7 +274,7 @@ export const md5 = (function () {
   ];
   var BASE64_ENCODE_CHAR =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".split(
-      ""
+      "",
     );
 
   var blocks = [],

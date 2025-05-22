@@ -1,4 +1,4 @@
-import { Heap } from "/externals.js"
+import { Heap } from "/externals.js";
 
 function parse(input) {
   const map = [];
@@ -45,25 +45,24 @@ function part1(input) {
   const map = parse(input);
   const startY = map.findIndex((i) => i.includes("S"));
   const startX = map[startY].indexOf("S");
-  const queue = new Heap((a, b) => a[3] - b[3])
+  const queue = new Heap((a, b) => a[3] - b[3]);
   const seen = new Set();
-  const paths = new Map()
-  
+  const paths = new Map();
+
   queue.push([startX, startY, 0, 0]);
-  paths.set(hash(startX, startY, 0), 0)
+  paths.set(hash(startX, startY, 0), 0);
 
   while (queue.length > 0) {
-    const [x, y, dir, score] = queue.pop()
-    if (map[y][x] === "E") 
-      return score
-    
+    const [x, y, dir, score] = queue.pop();
+    if (map[y][x] === "E") return score;
+
     seen.add(hash(x, y, dir));
     for (const node of getNext(map, x, y, score, dir)) {
       const [nX, nY, nDir, nScore] = node;
-      const h = hash(nX, nY, nDir)
+      const h = hash(nX, nY, nDir);
       if (!seen.has(h) || nScore < paths.get(h)) {
-        paths.set(h, nScore)
-        queue.push(node)
+        paths.set(h, nScore);
+        queue.push(node);
       }
     }
   }
@@ -74,17 +73,17 @@ function part2(input) {
   const map = parse(input);
   const startY = map.findIndex((i) => i.includes("S"));
   const startX = map[startY].indexOf("S");
-  const queue = new Heap((a, b) => a[3] - b[3])
+  const queue = new Heap((a, b) => a[3] - b[3]);
   const seen = new Set();
-  const paths = new Map()
+  const paths = new Map();
   const visited = new Set();
   let max = Infinity;
-  
+
   queue.push([startX, startY, 0, 0, [[startX, startY]]]);
-  paths.set(hash(startX, startY, 0), 0)
+  paths.set(hash(startX, startY, 0), 0);
 
   while (queue.length > 0) {
-    const [x, y, dir, score, path] = queue.pop()
+    const [x, y, dir, score, path] = queue.pop();
     if (map[y][x] === "E") {
       // Less optimized solutions can be included, so check
       if (max === Infinity) max = score;
@@ -95,9 +94,9 @@ function part2(input) {
     seen.add(hash(x, y, dir));
     for (const node of getNext(map, x, y, score, dir, path)) {
       const [nX, nY, nDir, nScore] = node;
-      const h = hash(nX, nY, nDir)
+      const h = hash(nX, nY, nDir);
       if (!seen.has(h) || nScore <= paths.get(h)) {
-        paths.set(h, nScore)
+        paths.set(h, nScore);
         queue.push(node);
       }
     }

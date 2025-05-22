@@ -168,7 +168,7 @@ function getOutput(grid, elveAttack) {
         const target = least[2];
         target[0] = Math.max(
           target[0] - (target[1] === "G" ? elveAttack : 3),
-          0
+          0,
         );
         if (target[0] <= 0) {
           grid[least[1]][least[0]] = ".";

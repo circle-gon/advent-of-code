@@ -15,7 +15,7 @@ function parse(input) {
     data.push(
       lines
         .slice(headers[ind] + 1, (headers[ind + 1] ?? lines.length + 1) - 1)
-        .map((i) => i.split(" ").map((j) => Number(j)))
+        .map((i) => i.split(" ").map((j) => Number(j))),
     );
   }
 
@@ -53,7 +53,7 @@ async function part2(input, update) {
   // find the lowest of them all
   return (
     await Promise.all(
-      bulk.map((i, idx) => spawnWorker([...i, data], idx, newUpdate))
+      bulk.map((i, idx) => spawnWorker([...i, data], idx, newUpdate)),
     )
   ).reduce((a, b) => Math.min(a, b));
 }

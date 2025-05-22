@@ -51,7 +51,7 @@ function cheats(input, size, example) {
   const paths = path(map);
 
   let good = 0;
-  const req = example ? 50 : 100
+  const req = example ? 50 : 100;
   for (const [idx, val] of paths.entries()) {
     const [x, y] = unhash(idx);
     for (let i = -size; i <= size; i++) {

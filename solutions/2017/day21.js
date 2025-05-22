@@ -28,7 +28,7 @@ function parse(input) {
   const map = new Map();
   for (const line of input.split("\n")) {
     const [from, toX] = line.split(" => ");
-    const to = toX.split("/")
+    const to = toX.split("/");
     let pattern = from.split("/").map((i) => i.split(""));
     for (let i = 0; i < 4; i++) {
       map.set(toString(pattern), to);
@@ -58,7 +58,7 @@ function run(input, size) {
         for (let k = 0; k < chunks; k++)
           parts.push(rowCol[i + k].slice(j, j + chunks).join(""));
 
-        const result = map.get(parts.join("/"))
+        const result = map.get(parts.join("/"));
         for (let k = 0; k <= chunks; k++) {
           for (let l = 0; l <= chunks; l++) {
             out[factor * i + k][factor * j + l] = result[k][l];
@@ -71,7 +71,7 @@ function run(input, size) {
   }
   return rowCol.reduce(
     (a, b) => a + b.reduce((c, d) => c + (d === "#" ? 1 : 0), 0),
-    0
+    0,
   );
 }
 

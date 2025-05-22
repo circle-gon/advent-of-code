@@ -19,8 +19,8 @@ function getMax(comps, end, currScore, used) {
           comps,
           other,
           currScore + comp[0] + comp[1],
-          new Set(used).add(comp)
-        )
+          new Set(used).add(comp),
+        ),
       );
   }
   return score;
@@ -59,7 +59,7 @@ function getMax2(comps, end, currScore, used) {
         comps,
         other,
         currScore + comp[0] + comp[1],
-        new Set(used).add(comp)
+        new Set(used).add(comp),
       );
       if (newWidth > width || (newWidth === width && newScore > score)) {
         width = newWidth;
@@ -83,7 +83,12 @@ function part2(input) {
       other = comp[0];
     }
     if (other !== -1) {
-      const [newScore, newWidth] = getMax2(comps, other, other, new Set([comp]));
+      const [newScore, newWidth] = getMax2(
+        comps,
+        other,
+        other,
+        new Set([comp]),
+      );
       if (newWidth > width || (newWidth === width && newScore > score)) {
         width = newWidth;
         score = newScore;

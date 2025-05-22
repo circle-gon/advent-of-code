@@ -115,7 +115,7 @@ function part1(input) {
         if (matched.has(toStr(newX, newY))) {
           smallDistance = Math.min(
             smallDistance,
-            matched.get(toStr(newX, newY)) + 1
+            matched.get(toStr(newX, newY)) + 1,
           );
         } else {
           // If for some reason we don't have the point, add it

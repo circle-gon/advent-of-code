@@ -50,11 +50,11 @@ function solve(input, part1) {
 }
 
 function part1(input) {
-  return solve(input, true)
+  return solve(input, true);
 }
 
 function part2(input) {
-  return solve(input, false)
+  return solve(input, false);
 }
 
 export default [part1, part2];

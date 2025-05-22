@@ -31,7 +31,7 @@ function part2(input) {
     if (num === nums[state]) {
       if (state === 0) start = idx;
       state++;
-      if (state === nums.length) out = start
+      if (state === nums.length) out = start;
     }
   }
 

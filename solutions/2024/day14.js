@@ -7,8 +7,8 @@ function parse(input) {
         i
           .slice(2)
           .split(",")
-          .map((i) => Number(i))
-      )
+          .map((i) => Number(i)),
+      ),
     );
   }
   return robots;

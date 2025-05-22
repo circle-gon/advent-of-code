@@ -42,7 +42,7 @@ function part1(input) {
     out += char;
     seen.add(char);
     order.push(
-      ...next.filter((i) => graph.get(i).req.every((j) => seen.has(j)))
+      ...next.filter((i) => graph.get(i).req.every((j) => seen.has(j))),
     );
   }
 
@@ -77,11 +77,9 @@ function part2(input, _, example) {
       idx[1] = a;
     }
 
-    
     // Finish a task
-    let low = [Infinity, ""]
-    for (const obj of work)
-      if (obj[0] > 0 && obj[0] < low[0]) low = obj;
+    let low = [Infinity, ""];
+    for (const obj of work) if (obj[0] > 0 && obj[0] < low[0]) low = obj;
 
     const t = low[0];
     for (const obj of work) if (obj[0] > 0) obj[0] -= t;
@@ -93,7 +91,7 @@ function part2(input, _, example) {
 
     seen.add(char);
     look.push(
-      ...next.filter((i) => graph.get(i).req.every((j) => seen.has(j)))
+      ...next.filter((i) => graph.get(i).req.every((j) => seen.has(j))),
     );
   }
 

@@ -50,13 +50,13 @@ function part1(input, _, example) {
     0,
     0,
     nums,
-    input.split(",").map((i) => Number(i))
+    input.split(",").map((i) => Number(i)),
   );
   return nums[0] * nums[1];
 }
 
 function part2(input) {
-  return knotHash(input)
+  return knotHash(input);
 }
 
 export default [part1, part2];

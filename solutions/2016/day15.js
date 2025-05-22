@@ -2,10 +2,7 @@ function parse(input) {
   const slots = [];
   for (const line of input.split("\n")) {
     const places = line.split(" ");
-    slots.push([
-      Number(places[3]),
-      Number(places[11].slice(0, -1)),
-    ]);
+    slots.push([Number(places[3]), Number(places[11].slice(0, -1))]);
   }
   return slots;
 }
@@ -23,13 +20,13 @@ function run(disks) {
 }
 
 function part1(input) {
-  return run(parse(input))
+  return run(parse(input));
 }
 
 function part2(input) {
-  const disks = parse(input)
-  disks.push([11, 0])
-  return run(disks)
+  const disks = parse(input);
+  disks.push([11, 0]);
+  return run(disks);
 }
 
 export default [part1, part2];

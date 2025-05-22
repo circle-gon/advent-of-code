@@ -4,7 +4,7 @@ function part1(input) {
   const edgedist = Math.min(
     ...Array(4)
       .fill()
-      .map((_, i) => Math.abs(num - (2 * ring + 1) ** 2 + 2 * i * ring + ring))
+      .map((_, i) => Math.abs(num - (2 * ring + 1) ** 2 + 2 * i * ring + ring)),
   );
   return ring + edgedist;
 }

@@ -44,4 +44,4 @@ function part2(input, u) {
   return run(input, u, spawn2);
 }
 
-export default [part1, part2]
+export default [part1, part2];

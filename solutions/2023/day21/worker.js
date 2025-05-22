@@ -57,9 +57,9 @@ function solve(echo, cells) {
     .map((_, i) => {
       self.postMessage({
         type: "msg",
-        data: [echo]
+        data: [echo],
       });
-      
+
       const v = [i, gridSteps(cells, i === 0 ? 65 : 131, set)];
 
       return v;

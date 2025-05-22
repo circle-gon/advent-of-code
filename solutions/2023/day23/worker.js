@@ -8,7 +8,7 @@ function getGraph(input) {
   function addConnectNode(cur) {
     // try to locate existing one
     let newJuncId = nodes.findIndex(
-      (n) => n.p[0] === cur.p[0] && n.p[1] === cur.p[1]
+      (n) => n.p[0] === cur.p[0] && n.p[1] === cur.p[1],
     );
 
     if (newJuncId === cur.lastJuncId) return newJuncId;
@@ -19,7 +19,7 @@ function getGraph(input) {
     // we need to connect cur.lastJuncId and newJuncId
     if (
       nodes[cur.lastJuncId].connections.findIndex(
-        (conn) => conn.id === newJuncId
+        (conn) => conn.id === newJuncId,
       ) === -1
     )
       nodes[cur.lastJuncId].connections.push({
@@ -29,7 +29,7 @@ function getGraph(input) {
 
     if (
       nodes[newJuncId].connections.findIndex(
-        (conn) => conn.id === cur.lastJuncId
+        (conn) => conn.id === cur.lastJuncId,
       ) === -1
     )
       nodes[newJuncId].connections.push({
@@ -50,7 +50,7 @@ function getGraph(input) {
     const cur = stack.pop(),
       k = key(cur.p),
       moves = DS.map((d) => addVect(cur.p, d)).filter((item) =>
-        validPos(map, item)
+        validPos(map, item),
       );
 
     if (moves.length > 2) {
@@ -87,14 +87,15 @@ function solve(echo, input) {
 
   let maxSteps = 0;
 
-  let iter = 0
+  let iter = 0;
   while (stack.length > 0) {
     const cur = stack.pop();
-    iter++
-    if (iter % 1e6 === 0) self.postMessage({
-      type: "msg",
-      data: [echo]
-    })
+    iter++;
+    if (iter % 1e6 === 0)
+      self.postMessage({
+        type: "msg",
+        data: [echo],
+      });
 
     const k = cur.p;
     cur.seen[k] = 1;
@@ -105,7 +106,7 @@ function solve(echo, input) {
     }
 
     for (const node of nodes[k].connections.filter(
-      (n) => cur.seen[n.id] === undefined
+      (n) => cur.seen[n.id] === undefined,
     )) {
       stack.push({
         p: node.id,
@@ -118,9 +119,9 @@ function solve(echo, input) {
   return [echo, maxSteps];
 }
 
-self.addEventListener("message", e => {
+self.addEventListener("message", (e) => {
   self.postMessage({
     type: "done",
-    data: solve(...e.data)
-  })
-})
+    data: solve(...e.data),
+  });
+});

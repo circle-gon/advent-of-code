@@ -25,7 +25,7 @@ function part2(input) {
   for (const letter of letters)
     len = Math.min(
       len,
-      react(core.replaceAll(new RegExp(letter, "ig"), "")).length
+      react(core.replaceAll(new RegExp(letter, "ig"), "")).length,
     );
 
   return len;

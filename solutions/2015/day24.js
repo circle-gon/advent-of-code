@@ -27,7 +27,7 @@ function subgroups(numbers, target, count, top) {
         numbers.filter((i) => !comb.includes(i)),
         target,
         count - 1,
-        top ?? comb
+        top ?? comb,
       );
       if (next) return next;
     }

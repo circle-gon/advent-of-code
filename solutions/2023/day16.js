@@ -161,7 +161,7 @@ function part2(input) {
   for (let i = 0; i < width; i++) {
     max = Math.max(
       max,
-      energizeFor(instruct, [instruct.length - 1, i, DIRECTIONS.DOWN])
+      energizeFor(instruct, [instruct.length - 1, i, DIRECTIONS.DOWN]),
     );
   }
 

@@ -68,4 +68,4 @@ function part2(input) {
   return sum;
 }
 
-export default [part1, part2]
+export default [part1, part2];

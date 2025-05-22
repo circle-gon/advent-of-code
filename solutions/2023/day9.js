@@ -35,10 +35,10 @@ function part2(input) {
 
     sum += differences.reduce(
       (sum, number, idx) => sum + number * (-1) ** idx,
-      0
+      0,
     );
   }
   return sum;
 }
 
-export default [part1, part2]
+export default [part1, part2];

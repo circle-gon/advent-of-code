@@ -41,7 +41,7 @@ function maxHappy(happy, arrangement, curr) {
         hap,
         nextCurr +
           happy.get(name).get(arrangement[0]) +
-          happy.get(arrangement[0]).get(name)
+          happy.get(arrangement[0]).get(name),
       );
     } else {
       hap = Math.max(hap, maxHappy(happy, [...arrangement, name], nextCurr));

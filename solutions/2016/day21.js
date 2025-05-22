@@ -28,7 +28,7 @@ function part1(input, _, example) {
         break;
       case "swaplet":
         str = str.map((i) =>
-          i === instr[1] ? instr[2] : i === instr[2] ? instr[1] : i
+          i === instr[1] ? instr[2] : i === instr[2] ? instr[1] : i,
         );
         break;
       case "rot":
@@ -69,7 +69,7 @@ function part2(input, _, example) {
         break;
       case "swaplet":
         str = str.map((i) =>
-          i === instr[1] ? instr[2] : i === instr[2] ? instr[1] : i
+          i === instr[1] ? instr[2] : i === instr[2] ? instr[1] : i,
         );
         break;
       case "rot":

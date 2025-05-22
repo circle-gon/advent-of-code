@@ -1,4 +1,4 @@
-import { hash, fall } from "./shared.js"
+import { hash, fall } from "./shared.js";
 
 function solve(echo, blocks) {
   fall(blocks);
@@ -14,21 +14,21 @@ function solve(echo, blocks) {
     fall(clone);
 
     if (hash(clone) === orig) valid++;
-    
+
     if (i % 10 === 9) {
       self.postMessage({
         type: "msg",
-        data: [echo]
-      })
+        data: [echo],
+      });
     }
   }
-  
-  return [echo, valid]
+
+  return [echo, valid];
 }
 
-self.addEventListener("message", e => {
+self.addEventListener("message", (e) => {
   self.postMessage({
     type: "done",
-    data: solve(...e.data)
-  })
-})
+    data: solve(...e.data),
+  });
+});

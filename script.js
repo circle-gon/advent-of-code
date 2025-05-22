@@ -89,7 +89,7 @@ function forDay() {
 }
 
 async function getSolution(day) {
-  const day1 = day + 1
+  const day1 = day + 1;
   try {
     return (
       await import(
@@ -146,22 +146,22 @@ function clearTable() {
 }
 
 function getType(solution) {
-  if (Array.isArray(solution) && solution.every(i => i instanceof Node)) {
-    return "dom"
+  if (Array.isArray(solution) && solution.every((i) => i instanceof Node)) {
+    return "dom";
   }
-  return ""
+  return "";
 }
 
 function addNodes(ele, nodes) {
-  ele.textContent = ""
-  ele.append(...nodes)
+  ele.textContent = "";
+  ele.append(...nodes);
 }
 
 function trimInput(input, year, day) {
   // 2017 day 19 doesn't want trimmed whitespace
-  if (year === "2017" && day === 18) return input
-  if (year === "2018" && day === 12) return input
-  return input.trim()
+  if (year === "2017" && day === 18) return input;
+  if (year === "2018" && day === 12) return input;
+  return input.trim();
 }
 
 function main() {
@@ -220,7 +220,7 @@ function main() {
           solution = await solver(
             trimInput(forDay().input, toSave.year, getDay()),
             (value) => (updateSpan.textContent = value),
-            false
+            false,
           );
           name = "success";
         } else {
@@ -243,10 +243,11 @@ function main() {
       }
 
       const type = getType(solution);
-      if (type === "dom") addNodes(resultSpan, solution)
-      else resultSpan.textContent = `${solution}${
-        isNumberLike && solution >= 1000 ? ` (${format(solution)})` : ""
-      }`;
+      if (type === "dom") addNodes(resultSpan, solution);
+      else
+        resultSpan.textContent = `${solution}${
+          isNumberLike && solution >= 1000 ? ` (${format(solution)})` : ""
+        }`;
       resultSpan.className = name;
       timeSpan.className = name;
       timeSpan.textContent = formatTime(start);
@@ -290,7 +291,7 @@ function main() {
           const result = await solver(
             trimInput(input, toSave.year, getDay()),
             (value) => (updateSpan.textContent = value),
-            true
+            true,
           );
           if (result !== expected) {
             console.error(
@@ -298,7 +299,7 @@ function main() {
               result,
               "expected",
               expected,
-              "for"
+              "for",
             );
             console.log(input);
             name = "failed";
@@ -378,9 +379,9 @@ function main() {
                 solver(
                   trimInput(input, toSave.year, i),
                   (i) => (elements[1].textContent = i),
-                  false
-                )
-              )
+                  false,
+                ),
+              ),
             )
               .then(async (r) => {
                 elements[0].textContent = "done";
@@ -390,7 +391,7 @@ function main() {
                 elements[2].className = "success";
 
                 const type = getType(r);
-                if (type === "dom") addNodes(elements[1], r)
+                if (type === "dom") addNodes(elements[1], r);
                 else elements[1].textContent = r;
 
                 await wait();
@@ -405,7 +406,7 @@ function main() {
                 failed = true;
                 console.error(e);
                 await wait();
-              })
+              }),
           );
         }
       }
@@ -465,7 +466,9 @@ function main() {
         }
         for (const [t, see] of test) {
           waiting.push(
-            new Promise((r) => r(solver(trimInput(t, toSave.year, i), () => {}, true)))
+            new Promise((r) =>
+              r(solver(trimInput(t, toSave.year, i), () => {}, true)),
+            )
               .then((r) => {
                 if (r !== see) {
                   console.error(
@@ -473,7 +476,7 @@ function main() {
                     r,
                     "expected",
                     see,
-                    "for"
+                    "for",
                   );
                   console.log(t);
                   if (failed.findIndex(([a, b]) => a === i && b === j) === -1)
@@ -489,12 +492,12 @@ function main() {
                 count++;
                 if (count === test.length) {
                   const idx = checking.findIndex(
-                    ([a, b]) => a === i && b === j
+                    ([a, b]) => a === i && b === j,
                   );
                   checking.splice(idx, 1);
                   await update();
                 }
-              })
+              }),
           );
         }
       }

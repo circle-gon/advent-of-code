@@ -73,11 +73,14 @@ function parse(pattern) {
     table.push(r);
   }
 
-  return table; 
+  return table;
 }
 
 function part1(input) {
-  return input.split("\n\n").map((pattern) => getSum(parse(pattern), -1)).reduce((a, b) => a + b);
+  return input
+    .split("\n\n")
+    .map((pattern) => getSum(parse(pattern), -1))
+    .reduce((a, b) => a + b);
 }
 
 function part2(input) {
@@ -111,4 +114,4 @@ function part2(input) {
   return sum;
 }
 
-export default [part1, part2]
+export default [part1, part2];

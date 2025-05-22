@@ -1,4 +1,4 @@
-import { Queue } from "/externals.js"
+import { Queue } from "/externals.js";
 
 function hash(x, y) {
   return `${x},${y}`;
@@ -36,15 +36,15 @@ function findMostUsed(nodes) {
   for (const key of nodes.keys()) {
     const already = new Set();
     const queue = new Queue();
-    already.add(key)
-    queue.push(key)
+    already.add(key);
+    queue.push(key);
 
     while (queue.length > 0) {
       const k = queue.pop();
 
       for (const next of nodes.get(k)) {
         if (already.has(next)) continue;
-        already.add(next)
+        already.add(next);
 
         queue.push(next);
         const path = k < next ? hash(k, next) : hash(next, k);
@@ -62,39 +62,45 @@ function solve(echo, input) {
   for (let i = 0; i < 3; i++) {
     self.postMessage({
       type: "msg",
-      data: [echo]
-    })
-    
+      data: [echo],
+    });
+
     const [one, two] = findMostUsed(nodes);
 
     // remove the link from each one
-    nodes.set(one, nodes.get(one).filter(i => i !== two))
-    nodes.set(two, nodes.get(two).filter(i => i !== one))
+    nodes.set(
+      one,
+      nodes.get(one).filter((i) => i !== two),
+    );
+    nodes.set(
+      two,
+      nodes.get(two).filter((i) => i !== one),
+    );
   }
-  
+
   self.postMessage({
     type: "msg",
-    data: [echo]
-  })
-  
+    data: [echo],
+  });
+
   // Then find all
-  const found = new Set()
-  const queue = [[...nodes.keys()][0]]
-  
+  const found = new Set();
+  const queue = [[...nodes.keys()][0]];
+
   while (queue.length > 0) {
-    const now = queue.pop()
-    if (found.has(now)) continue
-    found.add(now)
-    
-    queue.push(...nodes.get(now))
+    const now = queue.pop();
+    if (found.has(now)) continue;
+    found.add(now);
+
+    queue.push(...nodes.get(now));
   }
-  
-  return [echo, (nodes.size - found.size) * found.size]
+
+  return [echo, (nodes.size - found.size) * found.size];
 }
 
-self.addEventListener("message", e => {
+self.addEventListener("message", (e) => {
   self.postMessage({
     type: "done",
-    data: solve(...e.data)
-  })
-})
+    data: solve(...e.data),
+  });
+});

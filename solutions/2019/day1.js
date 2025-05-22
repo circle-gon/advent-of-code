@@ -1,5 +1,5 @@
-import { compile } from "/emwasm.js"
-import { memstr } from "/utils.js"
+import { compile } from "/emwasm.js";
+import { memstr } from "/utils.js";
 
 const code = `
 export input = import js.raw(memory<u8>(1))
@@ -53,9 +53,9 @@ export fn part2()() -> u32 {
   parse()
   return getResult2()
 }
-`
+`;
 
-const compilee = compile(code, {})
+const compilee = compile(code, {});
 
 async function part1(input) {
   const { module, memory } = await compilee;
@@ -69,4 +69,4 @@ async function part2(input) {
   return module.part2();
 }
 
-export default [part1, part2]
+export default [part1, part2];

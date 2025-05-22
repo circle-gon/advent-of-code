@@ -1,23 +1,23 @@
 import { md5 } from "/externals.js";
 
 function stretch(input, times) {
-  let hash = md5(input)
+  let hash = md5(input);
   for (let i = 0; i < times; i++) {
-    hash = md5(hash)
+    hash = md5(hash);
   }
-  return hash
+  return hash;
 }
 
 function memoHash(cache, input, idx, times) {
-  while (idx >= cache.length) cache.push(stretch(input + cache.length, times))
-  return cache[idx]
+  while (idx >= cache.length) cache.push(stretch(input + cache.length, times));
+  return cache[idx];
 }
 
 export function run(input, times, cb) {
   let hashes = 0;
   let idx = 0;
-  const cache = []
-  
+  const cache = [];
+
   while (hashes < 64) {
     const hash = memoHash(cache, input, idx, times);
     let match = "";
@@ -34,7 +34,7 @@ export function run(input, times, cb) {
         const hash = memoHash(cache, input, i, times);
         if (hash.includes(repeat)) {
           hashes++;
-          cb(idx, hashes)
+          cb(idx, hashes);
           break;
         }
       }

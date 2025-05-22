@@ -51,4 +51,4 @@ function part2(input) {
   return Math.ceil(sols[1]) - Math.floor(sols[0]) - 1;
 }
 
-export default [part1, part2]
+export default [part1, part2];

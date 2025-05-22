@@ -24,8 +24,8 @@ function calc(values, name) {
     val[0] === "AND"
       ? first & second
       : val[0] === "OR"
-      ? first | second
-      : first ^ second;
+        ? first | second
+        : first ^ second;
   values.set(name, result);
   return result;
 }
@@ -94,7 +94,7 @@ function part2(input) {
       continue;
     const exists = find(
       values,
-      (_, v) => v[0] === "XOR" && matchesOne(v, k) && !isInput(v)
+      (_, v) => v[0] === "XOR" && matchesOne(v, k) && !isInput(v),
     );
     if (!exists) {
       bad.push(k);
@@ -109,8 +109,8 @@ function part2(input) {
       // zNN out
       find(
         values,
-        (k, v) => v[0] === "XOR" && !isInput(v) && k === `z${one.slice(1)}`
-      )
+        (k, v) => v[0] === "XOR" && !isInput(v) && k === `z${one.slice(1)}`,
+      ),
     );
     // OR pair
     const match = find(values, (k, v) => v[0] === "OR" && matchesOne(ok, k));

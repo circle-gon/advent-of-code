@@ -71,10 +71,10 @@ export function run(input, registers, look) {
         if (typeof instr[1] === "string")
           registers[instr[1]] *= toNumber(registers, instr[2]);
         break;
-        
+
       case "out":
-        if (look(toNumber(registers, instr[1]))) return
-        break
+        if (look(toNumber(registers, instr[1]))) return;
+        break;
 
       case "nop":
         break;

@@ -14,7 +14,6 @@ function countOf(grid, x, y, type) {
   return count;
 }
 
-
 function part1(input) {
   let grid = parse(input);
   for (let i = 0; i < 10; i++) {
@@ -37,7 +36,7 @@ function part1(input) {
         nextGrid[y][x] = next;
       }
     }
-    
+
     grid = nextGrid;
   }
 
@@ -50,7 +49,7 @@ function part1(input) {
 
 function part2(input) {
   let grid = parse(input);
-  const map = new Map()
+  const map = new Map();
   for (let i = 0; i < 1e9; i++) {
     const nextGrid = Array(grid.length)
       .fill()
@@ -71,13 +70,13 @@ function part2(input) {
         nextGrid[y][x] = next;
       }
     }
-    
+
     grid = nextGrid;
-    const str = grid.map(i => i.join("")).join("\n")
+    const str = grid.map((i) => i.join("")).join("\n");
     if (map.has(str)) {
-      const diff = i - map.get(str)
-      i += Math.floor((1e9 - i) / diff) * diff
-    } else map.set(str, i)
+      const diff = i - map.get(str);
+      i += Math.floor((1e9 - i) / diff) * diff;
+    } else map.set(str, i);
   }
 
   const flat = grid.flat();

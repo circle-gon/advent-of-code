@@ -58,4 +58,4 @@ function part2(input) {
   return expand(input, 1e6 - 1);
 }
 
-export default [part1, part2]
+export default [part1, part2];

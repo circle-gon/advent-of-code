@@ -8,7 +8,10 @@ export default defineConfig([
   prettier,
   {
     languageOptions: {
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        WabtModule: "readonly",
+      },
     },
   },
   globalIgnores(["dist/"]),

@@ -46,7 +46,7 @@ function part1(input) {
       registers.set(
         instr[0],
         (registers.get(instr[0]) ?? 0) +
-          (instr[1] === "inc" ? 1 : -1) * instr[2]
+          (instr[1] === "inc" ? 1 : -1) * instr[2],
       );
     }
   }

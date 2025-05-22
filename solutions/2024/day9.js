@@ -34,7 +34,7 @@ function part1(input) {
 
 function part2(input) {
   const drive = parse(input);
-  const effSize = [...drive]
+  const effSize = [...drive];
   let sum = 0;
 
   let lastIdx = drive.length - 1;
@@ -46,7 +46,7 @@ function part2(input) {
     let pos = 0;
     let n = -1;
     for (let idx = 0; idx < lastIdx; idx++) {
-      const num = drive[idx]
+      const num = drive[idx];
       pos += effSize[idx] - num;
       if (idx % 2 === 1 && size <= num) {
         n = idx;

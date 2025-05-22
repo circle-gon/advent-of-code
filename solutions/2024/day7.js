@@ -26,7 +26,7 @@ function part1(input) {
         can = true;
         break;
       }
-      
+
       // Increment
       masks[numbers.length - 2]++;
       for (let i = numbers.length - 2; i >= 0; i--) {

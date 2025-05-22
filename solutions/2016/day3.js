@@ -3,7 +3,7 @@ function parse(input) {
     i
       .trim()
       .split(/ +/)
-      .map((i) => Number(i))
+      .map((i) => Number(i)),
   );
 }
 
@@ -21,9 +21,9 @@ function part2(input) {
   let possible = 0;
   for (let i = 0; i < 3; i++) {
     for (let j = 2; j < triangles.length; j += 3) {
-      const a = triangles[j][i]
-      const b = triangles[j - 1][i]
-      const c = triangles[j - 2][i]
+      const a = triangles[j][i];
+      const b = triangles[j - 1][i];
+      const c = triangles[j - 2][i];
       if (a + b > c && a + c > b && b + c > a) possible++;
     }
   }

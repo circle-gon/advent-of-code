@@ -6,7 +6,7 @@ function parse(input) {
       i
         .slice(3, -1)
         .split(",")
-        .map((i) => Number(i))
+        .map((i) => Number(i)),
     );
     particles.push(each);
   }

@@ -31,7 +31,7 @@ function simulate(logs) {
 
   let guard = -1;
   let sleep = 0;
-  for (const [,,,, minute, val] of logs) {
+  for (const [, , , , minute, val] of logs) {
     if (typeof val === "number") {
       guard = val;
       if (!guards.has(guard)) guards.set(guard, Array(60).fill(0));
@@ -39,14 +39,14 @@ function simulate(logs) {
       for (let i = sleep; i < minute; i++) guards.get(guard)[i]++;
     else sleep = minute;
   }
-  return guards
+  return guards;
 }
 
 function part1(input) {
   const guards = simulate(parse(input));
 
   const guardMin = [...guards.entries()].sort(
-    (a, b) => b[1].reduce((a, b) => a + b) - a[1].reduce((a, b) => a + b)
+    (a, b) => b[1].reduce((a, b) => a + b) - a[1].reduce((a, b) => a + b),
   )[0][0];
   const guardMax = guards
     .get(guardMin)
@@ -58,17 +58,19 @@ function part1(input) {
 function part2(input) {
   const guards = simulate(parse(input));
 
-  let guard = -1, min = -1, count = -1
+  let guard = -1,
+    min = -1,
+    count = -1;
   for (const [g, m] of guards.entries()) {
     for (const [mm, c] of m.entries()) {
       if (c > count) {
-        guard = g
-        min = mm
-        count = c
+        guard = g;
+        min = mm;
+        count = c;
       }
     }
   }
-  return guard * min
+  return guard * min;
 }
 
 export default [part1, part2];

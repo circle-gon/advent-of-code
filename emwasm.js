@@ -876,22 +876,22 @@ class Parser {
     this.expect(TOKENS.EQUAL);
     const type = this.expect(
       TOKENS.IDENTIFIER,
-      "Expected an import declaration or an initializer"
+      "Expected an import declaration or an initializer",
     );
     if (type.identifier === "import") {
       const level1 = this.expect(
         TOKENS.IDENTIFIER,
-        "Expected the first level of import"
+        "Expected the first level of import",
       ).identifier;
       this.expect(TOKENS.DOT);
       const level2 = this.expect(
         TOKENS.IDENTIFIER,
-        "Expected the second level of import"
+        "Expected the second level of import",
       ).identifier;
       this.expect(TOKENS.LEFT_PAREN);
       const ref = this.expect(
         TOKENS.IDENTIFIER,
-        "Expected a value type"
+        "Expected a value type",
       ).identifier;
       this.assertValueType(ref);
       const end = this.expect(TOKENS.RIGHT_PAREN);
@@ -911,7 +911,7 @@ class Parser {
       this.expect(TOKENS.LEFT_PAREN);
       const val = this.expect(
         TOKENS.NUMBER,
-        "Expected a value for a global initializer"
+        "Expected a value for a global initializer",
       );
       if (type[0] === "s" || type[0] === "u")
         this.assertInteger(val, type[0] === "u");
@@ -934,7 +934,7 @@ class Parser {
     const choose = this.expectOneOf(
       "Expected either 'memory' or 'import' for a top level reference",
       "memory",
-      "import"
+      "import",
     );
     if (choose === "memory") {
       let index = null;
@@ -948,7 +948,7 @@ class Parser {
       this.expect(TOKENS.LEFT_PAREN);
       const min = this.expect(
         TOKENS.NUMBER,
-        "Expected a memory minimum parameter"
+        "Expected a memory minimum parameter",
       );
       this.assertInteger(min, true);
 
@@ -973,18 +973,18 @@ class Parser {
 
     const level1 = this.expect(
       TOKENS.IDENTIFIER,
-      "Expected the first level of import"
+      "Expected the first level of import",
     ).identifier;
     this.expect(TOKENS.DOT);
     const level2 = this.expect(
       TOKENS.IDENTIFIER,
-      "Expected the second level of import"
+      "Expected the second level of import",
     ).identifier;
     this.expect(TOKENS.LEFT_PAREN);
     const branch = this.expectOneOf(
       "Expected either 'func' or 'memory' for an import declaration",
       "func",
-      "memory"
+      "memory",
     );
 
     if (branch === "func") {
@@ -992,7 +992,7 @@ class Parser {
       if (this.match(TOKENS.LEFT_ARROW)) {
         const v = this.expect(
           TOKENS.IDENTIFIER,
-          "Expected a function return type"
+          "Expected a function return type",
         );
         output.push({
           type: v.identifier,
@@ -1002,7 +1002,7 @@ class Parser {
           this.expect(TOKENS.COMMA);
           const v = this.expect(
             TOKENS.IDENTIFIER,
-            "Expected a function return type"
+            "Expected a function return type",
           );
           output.push({
             type: v.identifier,
@@ -1017,7 +1017,7 @@ class Parser {
       if (!this.match(TOKENS.RIGHT_PAREN)) {
         const arg = this.expect(
           TOKENS.IDENTIFIER,
-          "Expected a function parameter type"
+          "Expected a function parameter type",
         );
         this.assertValueType(arg);
         params.push({
@@ -1027,7 +1027,7 @@ class Parser {
           this.expect(TOKENS.COMMA);
           const arg = this.expect(
             TOKENS.IDENTIFIER,
-            "Expected a function parameter type"
+            "Expected a function parameter type",
           );
           this.assertValueType(arg);
           params.push({
@@ -1086,12 +1086,12 @@ class Parser {
   matchArg() {
     const name = this.expect(
       TOKENS.IDENTIFIER,
-      "Expected the name of a function argument"
+      "Expected the name of a function argument",
     );
     this.expect(TOKENS.COLON);
     const type = this.expect(
       TOKENS.IDENTIFIER,
-      "Expected the type of a function argument"
+      "Expected the type of a function argument",
     );
     this.assertValueType(type);
     return {
@@ -1412,10 +1412,10 @@ class Parser {
                 find.token === TOKENS.AMPERSAND
                   ? "and"
                   : find.token === TOKENS.CARET
-                  ? "xor"
-                  : find.token === TOKENS.LEFT_ARROW_ARROW
-                  ? "shl"
-                  : "or",
+                    ? "xor"
+                    : find.token === TOKENS.LEFT_ARROW_ARROW
+                      ? "shl"
+                      : "or",
               left: body,
               right: expr,
               ...toStartEnd(body, expr),
@@ -1498,7 +1498,7 @@ class Parser {
         if (this.match(TOKENS.DOT)) {
           level2t = this.expect(
             TOKENS.IDENTIFIER,
-            "Expected the level 2 of a function or constant reference"
+            "Expected the level 2 of a function or constant reference",
           );
           level2 = level2t.identifier;
         }
@@ -1767,7 +1767,7 @@ class Parser {
     if (this.match(TOKENS.ARROW)) {
       const v = this.expect(
         TOKENS.IDENTIFIER,
-        "Expected a function return type"
+        "Expected a function return type",
       );
       this.assertValueType(v);
       output.push(v.identifier);
@@ -1775,7 +1775,7 @@ class Parser {
         this.expect(TOKENS.COMMA);
         const v = this.expect(
           TOKENS.IDENTIFIER,
-          "Expected a function return type"
+          "Expected a function return type",
         );
         this.assertValueType(v);
         output.push(v.identifier);
@@ -1834,7 +1834,7 @@ class Parser {
         else if (this.matchLiteral("const")) writable = false;
         const name = this.expect(
           TOKENS.IDENTIFIER,
-          "Expected a global or reference name"
+          "Expected a global or reference name",
         );
 
         if (writable !== null)
@@ -2114,7 +2114,7 @@ class VerifyCompiler {
             if (node.max !== null && node.max < node.min)
               this.errorToken(
                 node,
-                "Memory maximum size must be at least memory minimum size"
+                "Memory maximum size must be at least memory minimum size",
               );
             obj.min = node.min;
             obj.max = node.max;
@@ -2179,7 +2179,7 @@ class VerifyCompiler {
             this.types.push([
               0x60,
               ...encodevec(
-                node.params.map((i) => NUM_OPCODE[toRawType(i.type)])
+                node.params.map((i) => NUM_OPCODE[toRawType(i.type)]),
               ),
               ...encodevec(node.output.map((i) => NUM_OPCODE[toRawType(i)])),
             ]);
@@ -2257,7 +2257,7 @@ class VerifyCompiler {
     if (!this.matchesType(expected, val))
       this.errorToken(
         val,
-        `Got type ${val.type} but expected type ${expected}`
+        `Got type ${val.type} but expected type ${expected}`,
       );
   }
 
@@ -2267,7 +2267,7 @@ class VerifyCompiler {
     }
     this.errorToken(
       val,
-      `Got type ${val.type} but expected one of ${expectations.join(", ")}`
+      `Got type ${val.type} but expected one of ${expectations.join(", ")}`,
     );
   }
 
@@ -2357,13 +2357,13 @@ class VerifyCompiler {
         if (left.type === "memory" || left.type === "func")
           this.errorToken(
             node,
-            "Cannot assign to a memory index or a function"
+            "Cannot assign to a memory index or a function",
           );
         if (!left.writable)
           this.errorToken(node, "Cannot set read-only variable");
         this.shouldMatchType(
           left.type,
-          this.resolveVariable(this.getType(node.body))
+          this.resolveVariable(this.getType(node.body)),
         );
         return {
           type: left.relative === "local" ? left.type : "void",
@@ -2375,7 +2375,7 @@ class VerifyCompiler {
         if (values.length !== node.targets.length)
           this.errorToken(
             node,
-            `Expected ${node.targets.length} values but got ${values.length} values`
+            `Expected ${node.targets.length} values but got ${values.length} values`,
           );
 
         const out = [];
@@ -2384,7 +2384,7 @@ class VerifyCompiler {
           if (left.type === "memory" || left.type === "func")
             this.errorToken(
               val,
-              "Cannot assign to a memory index or a function"
+              "Cannot assign to a memory index or a function",
             );
           if (!left.writable)
             this.errorToken(val, "Cannot set read-only variable");
@@ -2404,7 +2404,7 @@ class VerifyCompiler {
           this.errorToken(node, "Memory is not indexable");
         this.shouldMatchType(
           "u32",
-          this.resolveVariable(this.getType(node.index))
+          this.resolveVariable(this.getType(node.index)),
         );
         return {
           type: toBigType(mem.index),
@@ -2419,11 +2419,11 @@ class VerifyCompiler {
           this.errorToken(node, "Memory is not indexable");
         this.shouldMatchType(
           "u32",
-          this.resolveVariable(this.getType(node.index))
+          this.resolveVariable(this.getType(node.index)),
         );
         this.shouldMatchType(
           toBigType(mem.index),
-          this.resolveVariable(this.getType(node.body))
+          this.resolveVariable(this.getType(node.body)),
         );
         return {
           type: "void",
@@ -2444,12 +2444,12 @@ class VerifyCompiler {
         if (!this.nodeIsInteger(a))
           this.errorToken(
             node.left,
-            "Integer operators should have integer values"
+            "Integer operators should have integer values",
           );
         if (!this.nodeIsInteger(b))
           this.errorToken(
             node.right,
-            "Integer operators should have integer values"
+            "Integer operators should have integer values",
           );
         const [left, right] = typeNotNumbers(a, b);
         if (node.type === "shl" || node.type === "shr") {
@@ -2475,12 +2475,12 @@ class VerifyCompiler {
         if (!this.typeIsNumberLike(a.type))
           this.errorToken(
             node.left,
-            "Binary operators should have number values"
+            "Binary operators should have number values",
           );
         if (!this.typeIsNumberLike(b.type))
           this.errorToken(
             node.right,
-            "Binary operators should have number values"
+            "Binary operators should have number values",
           );
         this.shouldMatchType(left.type, right);
         if (node.comparison) return { type: "i32", ...toStartEnd(node, node) };
@@ -2529,13 +2529,13 @@ class VerifyCompiler {
           if (param.relative === "local" && node.level1 === "global") {
             this.errorToken(
               node,
-              "global operations can only be done on globals"
+              "global operations can only be done on globals",
             );
           }
           if (param.relative === "global" && node.level1 === "local")
             this.errorToken(
               node,
-              "local operations can only be done on locals"
+              "local operations can only be done on locals",
             );
         }
         if (node.level2 === "get")
@@ -2653,7 +2653,7 @@ class VerifyCompiler {
           if (want[0] !== resolvedType[0])
             this.errorToken(
               node.params[0],
-              `expected ${want[0]}, got ${resolvedType}`
+              `expected ${want[0]}, got ${resolvedType}`,
             );
           const arity = this.toTypeSize(resolvedType);
           return {
@@ -2730,7 +2730,7 @@ class VerifyCompiler {
         if (func.output.length !== retval.length)
           this.errorToken(
             node,
-            `Expected ${func.output.length} return values, but got ${retval.length} values`
+            `Expected ${func.output.length} return values, but got ${retval.length} values`,
           );
         for (let i = 0; i < retval.length; i++) {
           const out = retval[i];
@@ -2771,7 +2771,7 @@ class VerifyCompiler {
         this.isLoop++;
         this.shouldMatchType(
           "i32",
-          this.resolveVariable(this.getType(node.cond))
+          this.resolveVariable(this.getType(node.cond)),
         );
         // Just verify that it's valid, but it also doesn't need to match a type since it gets discarded
         if (node.update !== null) this.getType(node.update);
@@ -2841,7 +2841,7 @@ class VerifyCompiler {
           const ref = this.get(node, target.literal);
           code.push(
             ref.relative === "local" ? (hint === "" ? 0x21 : 0x22) : 0x24,
-            ...leb128u32(ref.ref)
+            ...leb128u32(ref.ref),
           );
           if (ref.relative === "local" && hint !== "") len++;
         }
@@ -2980,7 +2980,7 @@ class VerifyCompiler {
             code: [
               opcode.opcode,
               ...leb128u32(
-                this[node.level1 + "s"].get(node.params[0].literal).ref
+                this[node.level1 + "s"].get(node.params[0].literal).ref,
               ),
             ],
             len: 1,
@@ -2991,11 +2991,11 @@ class VerifyCompiler {
             code: [
               ...this.compileExpression(
                 node.params[1],
-                this[node.level1 + "s"].get(node.params[0].literal).type
+                this[node.level1 + "s"].get(node.params[0].literal).type,
               ).code,
               opcode,
               ...leb128u32(
-                this[node.level1 + "s"].get(node.params[0].literal).ref
+                this[node.level1 + "s"].get(node.params[0].literal).ref,
               ),
             ],
             // tee could be optimized with set but this optimization is already done
@@ -3030,7 +3030,7 @@ class VerifyCompiler {
             node.params.length === 2
               ? typeNotNumbers(
                   typeA,
-                  this.resolveVariable(this.getType(node.params[1]))
+                  this.resolveVariable(this.getType(node.params[1])),
                 )[0]
               : typeA
           ).type;
@@ -3069,7 +3069,7 @@ class VerifyCompiler {
             out.push(
               ...leb128u32(10),
               ...leb128u32(memidx),
-              ...leb128u32(this.globals.get(node.params[1].literal).ref)
+              ...leb128u32(this.globals.get(node.params[1].literal).ref),
             );
           else if (node.level2 === "fill") out.push(...leb128u32(11), memidx);
           else if (node.level2 === "byteSize")
@@ -3094,7 +3094,7 @@ class VerifyCompiler {
             opcode.opcode,
             ...leb128u32(64),
             ...leb128u32(this.globals.get(node.params[0].literal).ref),
-            ...leb128u32(0)
+            ...leb128u32(0),
           );
           return {
             code: out,
@@ -3131,8 +3131,8 @@ class VerifyCompiler {
           out.push(
             ...leb128u32(
               (node.level1 === "i64" ? 4 : 0) +
-                TRUNC_SAT_ORDER.indexOf(node.level2)
-            )
+                TRUNC_SAT_ORDER.indexOf(node.level2),
+            ),
           );
 
         return {
@@ -3153,7 +3153,7 @@ class VerifyCompiler {
             (node.label === null && i.continue === true) ||
             (node.label !== null &&
               node.label === i.label &&
-              i.continue !== null)
+              i.continue !== null),
         );
         const idx =
           this.labels.length - index - (this.labels[index].continue ? 0 : 1);
@@ -3165,7 +3165,7 @@ class VerifyCompiler {
           this.labels.findLastIndex(
             (i) =>
               i.continue === true &&
-              (node.label === null || node.label === i.label)
+              (node.label === null || node.label === i.label),
           ) -
           2;
         return [0x0c, ...leb128u32(idx)];
@@ -3189,7 +3189,7 @@ class VerifyCompiler {
         const code = [];
         for (let i = 0; i < node.values.length; i++) {
           code.push(
-            ...this.compileExpression(node.values[i], func.output[i]).code
+            ...this.compileExpression(node.values[i], func.output[i]).code,
           );
         }
         code.push(0x0f);
@@ -3211,7 +3211,7 @@ class VerifyCompiler {
           body.push(
             ...this.compileExpression(state.cond, "i32").code,
             0x04,
-            0x40
+            0x40,
           );
           for (const line of state.body)
             body.push(...this.compileStatement(line, func));
@@ -3249,7 +3249,7 @@ class VerifyCompiler {
           {
             label: null, // to continue
             continue: null,
-          }
+          },
         );
         for (const line of node.body)
           body.push(...this.compileStatement(line, func));
@@ -3261,7 +3261,7 @@ class VerifyCompiler {
           0x0d,
           ...leb128u32(0),
           0x0b,
-          0x0b
+          0x0b,
         );
         this.labels.pop();
         this.labels.pop();

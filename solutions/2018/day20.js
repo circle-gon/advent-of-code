@@ -93,13 +93,13 @@ function getPossible(map, x, y, doors) {
 }
 
 function maxDistance(map) {
-  const distances = new Map()
+  const distances = new Map();
   const queue = [[0, 0, 0]];
   const seen = new Set([hash(0, 0)]);
 
   while (queue.length > 0) {
     const [x, y, dist] = queue.shift();
-    distances.set(hash(x, y), dist)
+    distances.set(hash(x, y), dist);
     for (const paths of getPossible(map, x, y, dist)) {
       if (!seen.has(hash(paths[0], paths[1]))) {
         seen.add(hash(paths[0], paths[1]));
@@ -119,13 +119,13 @@ function genResult(input) {
 }
 
 function part1(input) {
-  const map = genResult(input)
-  return [...map.values()].sort((a, b) => b - a)[0]
+  const map = genResult(input);
+  return [...map.values()].sort((a, b) => b - a)[0];
 }
 
 function part2(input) {
-  const map = genResult(input)
-  return [...map.values()].reduce((a, b) => a + (b >= 1000 ? 1 : 0), 0)
+  const map = genResult(input);
+  return [...map.values()].reduce((a, b) => a + (b >= 1000 ? 1 : 0), 0);
 }
 
 export default [part1, part2];

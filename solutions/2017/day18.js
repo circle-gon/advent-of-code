@@ -14,7 +14,7 @@ function parse(input) {
 }
 
 function toNumber(registers, place) {
-  return typeof place === "number" ? place : registers.get(place) ?? 0;
+  return typeof place === "number" ? place : (registers.get(place) ?? 0);
 }
 
 function runOnce(instrs, registers, ip, queueIn, queueOut, part1) {
@@ -31,19 +31,19 @@ function runOnce(instrs, registers, ip, queueIn, queueOut, part1) {
     case "add":
       registers.set(
         instr[1],
-        toNumber(registers, instr[1]) + toNumber(registers, instr[2])
+        toNumber(registers, instr[1]) + toNumber(registers, instr[2]),
       );
       break;
     case "mul":
       registers.set(
         instr[1],
-        toNumber(registers, instr[1]) * toNumber(registers, instr[2])
+        toNumber(registers, instr[1]) * toNumber(registers, instr[2]),
       );
       break;
     case "mod":
       registers.set(
         instr[1],
-        toNumber(registers, instr[1]) % toNumber(registers, instr[2])
+        toNumber(registers, instr[1]) % toNumber(registers, instr[2]),
       );
       break;
     case "rcv":
@@ -90,17 +90,17 @@ function part2(input) {
     const resultA = runOnce(instrs, registersA, ipA, queueA, queueB, false);
     const sizeBefore = queueA.length;
     const resultB = runOnce(instrs, registersB, ipB, queueB, queueA, false);
-    const sizeChange = Math.max(queueA.length - sizeBefore, 0)
-    
+    const sizeChange = Math.max(queueA.length - sizeBefore, 0);
+
     if (
       (resultA === false && resultB === false) ||
       (ipA >= instrs.length && ipB >= instrs.length)
     )
       break;
-    
+
     if (resultA) ipA = resultA[0];
     if (resultB) ipB = resultB[0];
-    
+
     count += sizeChange;
   }
   return count;

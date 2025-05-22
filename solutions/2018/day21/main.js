@@ -47,14 +47,14 @@ function compile(input, part1) {
   const body = instrs
     .map(
       (i, j) =>
-        `case ${j}:{${instructions[i[0]](i)};${j === eqstr ? check : ""}break}`
+        `case ${j}:{${instructions[i[0]](i)};${j === eqstr ? check : ""}break}`,
     )
     .join("");
   return `${header}while(${reg[ip]}>=0&&${reg[ip]}<${instrs.length}){switch(${reg[ip]}){${body}}${reg[ip]}++}`;
 }
 
 function part1(input) {
-  return Function(compile(input, true))()
+  return Function(compile(input, true))();
 }
 
 const spawnWorker = spawnWorkerFor(import.meta.resolve("./worker.js"));
@@ -65,7 +65,7 @@ function part2(input, u) {
     u(`(${format(1000 * i++)} iterations done)`);
   };
   update();
-  
+
   return spawnWorker(code, 0, update);
 }
 

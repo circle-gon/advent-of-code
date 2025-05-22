@@ -107,7 +107,7 @@ function part2(input) {
       const [nx, ny, nitem, ntime] = node;
       const h = hash(nx, ny, nitem);
       const frontier = queue.findAll(
-        (t) => t !== null && t[0] === nx && t[1] === ny
+        (t) => t !== null && t[0] === nx && t[1] === ny,
       );
       const point = frontier.find((i) => i[2] === nitem);
 

@@ -39,7 +39,7 @@ function part1(input, _, example) {
         j1[0],
         j1[1],
         j1[3],
-        j1[4]
+        j1[4],
       );
 
       if (!Number.isFinite(t0) || !Number.isFinite(t1) || t0 <= 0 || t1 <= 0)
@@ -87,7 +87,7 @@ function rockVelocity(hailstones, id) {
     if (pairs.length < 2) continue;
 
     possible = possible.filter(
-      (i) => (pairs[0] - pairs[1]) % (i - velocity) === 0
+      (i) => (pairs[0] - pairs[1]) % (i - velocity) === 0,
     );
   }
 

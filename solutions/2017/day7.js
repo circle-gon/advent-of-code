@@ -38,7 +38,7 @@ function getWeights(weights, tower, program) {
 function getBad(weights, tower, program) {
   const children = tower.get(program).programs;
   const arr = Object.entries(
-    Object.groupBy(children, (o) => weights.get(o))
+    Object.groupBy(children, (o) => weights.get(o)),
   ).sort((x, y) => y[1].length - x[1].length);
   if (arr.length > 1) {
     const badProgram = getBad(weights, tower, arr[1][1][0], program);

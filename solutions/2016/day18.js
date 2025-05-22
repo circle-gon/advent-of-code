@@ -12,26 +12,26 @@ function check(input, size) {
   let safe = prevRow.reduce((a, b) => a + (b ? 1 : 0), 0);
 
   for (let i = 1; i < size; i++) {
-    const nextRow = []
+    const nextRow = [];
     for (let j = 0; j < input.length; j++) {
       const left = prevRow[j - 1] ?? true;
       const middle = prevRow[j];
       const right = prevRow[j + 1] ?? true;
-      const good = isSafe(left, middle, right)
-      if (good) safe++
-      nextRow.push(good)
+      const good = isSafe(left, middle, right);
+      if (good) safe++;
+      nextRow.push(good);
     }
-    prevRow = nextRow
+    prevRow = nextRow;
   }
   return safe;
 }
 
 function part1(input, _, example) {
-  return check(input, example ? 10 : 40)
+  return check(input, example ? 10 : 40);
 }
 
 function part2(input) {
-  return check(input, 400000)
+  return check(input, 400000);
 }
 
-export default [part1, part2]
+export default [part1, part2];

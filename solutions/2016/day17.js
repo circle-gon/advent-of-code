@@ -1,4 +1,4 @@
-import { md5, Queue } from "/externals.js"
+import { md5, Queue } from "/externals.js";
 
 const TO_CHECK = [
   [0, -1, "U"],
@@ -27,32 +27,32 @@ function getNext(hash, x, y, path) {
 }
 
 function part1(input) {
-  const paths = new Queue()
-  
-  paths.push([0, 0, ""])
+  const paths = new Queue();
+
+  paths.push([0, 0, ""]);
   while (paths.length > 0) {
-    const [x, y, str] = paths.pop()
-    if (x === 3 && y === 3) return str
-    for (const path of getNext(md5(input + str), x, y, str)) paths.push(path)
+    const [x, y, str] = paths.pop();
+    if (x === 3 && y === 3) return str;
+    for (const path of getNext(md5(input + str), x, y, str)) paths.push(path);
   }
-  
-  return "Is your input malformed?"
+
+  return "Is your input malformed?";
 }
 
 function part2(input) {
-  const paths = [[0, 0, ""]]
-  let len = 0
-  
+  const paths = [[0, 0, ""]];
+  let len = 0;
+
   while (paths.length > 0) {
-    const [x, y, str] = paths.pop()
+    const [x, y, str] = paths.pop();
     if (x === 3 && y === 3) {
-      len = Math.max(len, str.length)
-      continue
+      len = Math.max(len, str.length);
+      continue;
     }
-    paths.push(...getNext(md5(input + str), x, y, str))
+    paths.push(...getNext(md5(input + str), x, y, str));
   }
-  
-  return len
+
+  return len;
 }
 
-export default [part1, part2]
+export default [part1, part2];

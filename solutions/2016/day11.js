@@ -70,13 +70,13 @@ function run(floors) {
 
     if (
       !floors.every(
-        (floor) => floor.gen.size === 0 || floor.mc.isSubsetOf(floor.gen)
+        (floor) => floor.gen.size === 0 || floor.mc.isSubsetOf(floor.gen),
       )
     )
       continue;
 
     if (floors.slice(0, -1).every((i) => i.gen.size === 0 && i.mc.size === 0)) {
-      return dist
+      return dist;
     }
 
     const h = hash(floors, floor);
@@ -108,7 +108,7 @@ function run(floors) {
       }
     }
   }
-  return "Is your input malformed?"
+  return "Is your input malformed?";
 }
 
 function part1(input) {

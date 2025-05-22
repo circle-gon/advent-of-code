@@ -14,7 +14,7 @@ function simulate(
   turn,
   sturn,
   pturn,
-  rturn
+  rturn,
 ) {
   if (spmana > mmana) return mmana;
   if (mana < 0) return Infinity;
@@ -48,8 +48,8 @@ function simulate(
           false,
           sturn,
           pturn,
-          rturn
-        )
+          rturn,
+        ),
       );
 
     if (mana >= 73)
@@ -66,8 +66,8 @@ function simulate(
           false,
           sturn,
           pturn,
-          rturn
-        )
+          rturn,
+        ),
       );
 
     if (mana >= 113 && sturn === 0)
@@ -84,8 +84,8 @@ function simulate(
           false,
           6,
           pturn,
-          rturn
-        )
+          rturn,
+        ),
       );
 
     if (mana >= 173 && pturn === 0)
@@ -102,8 +102,8 @@ function simulate(
           false,
           sturn,
           6,
-          rturn
-        )
+          rturn,
+        ),
       );
 
     if (mana >= 229 && rturn === 0)
@@ -120,8 +120,8 @@ function simulate(
           false,
           sturn,
           pturn,
-          5
-        )
+          5,
+        ),
       );
 
     return min;
@@ -142,7 +142,7 @@ function simulate(
     true,
     sturn,
     pturn,
-    rturn
+    rturn,
   );
 }
 

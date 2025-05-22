@@ -33,7 +33,7 @@ function part1(input) {
     }
     score = Math.max(
       score,
-      stats.reduce((a, b) => a * Math.max(b, 0), 1)
+      stats.reduce((a, b) => a * Math.max(b, 0), 1),
     );
   }
   return score;
@@ -50,7 +50,7 @@ function part2(input) {
     if (stats[4] === 500)
       score = Math.max(
         score,
-        stats.slice(0, -1).reduce((a, b) => a * Math.max(b, 0), 1)
+        stats.slice(0, -1).reduce((a, b) => a * Math.max(b, 0), 1),
       );
   }
   return score;

@@ -16,7 +16,7 @@ function part1(input) {
     else DS.forEach((d) => moves.push(addVect(cur.p, d)));
 
     return moves.filter(
-      (p) => validPos(map, p) && cur.seen[key(p)] === undefined
+      (p) => validPos(map, p) && cur.seen[key(p)] === undefined,
     );
   }
 
@@ -62,8 +62,8 @@ function part2(input, u) {
     u(`(${format(1e6 * i++)} iterations done)`);
   };
   update();
-  
+
   return spawn(input, 0, update);
 }
 
-export default [part1, part2]
+export default [part1, part2];

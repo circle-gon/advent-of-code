@@ -35,23 +35,23 @@ function part1(input) {
 function part2(input) {
   const claims = parse(input);
   const mat = new Map();
-  const bad = new Set()
+  const bad = new Set();
   for (const [idx, [left, top, width, height]] of claims.entries()) {
     for (let i = 0; i < width; i++) {
       for (let j = 0; j < height; j++) {
         const h = hash(left + i, top + j);
         if (mat.has(h)) {
-          bad.add(idx)
-          bad.add(mat.get(h))
+          bad.add(idx);
+          bad.add(mat.get(h));
         } else mat.set(h, idx);
       }
     }
   }
-  
+
   for (let i = 0; i < claims.length; i++) {
-    if (!bad.has(i)) return i + 1
+    if (!bad.has(i)) return i + 1;
   }
-  return "Is your input malformed?"
+  return "Is your input malformed?";
 }
 
 export default [part1, part2];
