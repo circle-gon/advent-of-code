@@ -1,4 +1,4 @@
-import{c as p}from"./emwasm-DwTE8Fc6.js";import{m as s}from"./index-DPLSfBBi.js";const n=`
+import{c as p}from"./emwasm-CvgVXl6S.js";import{m as s}from"./index-Cj1OVREy.js";const n=`
 input = import js.raw(memory<u8>(1))
 export table = memory<u16>(1)
 export wires = memory<u16>(30000)

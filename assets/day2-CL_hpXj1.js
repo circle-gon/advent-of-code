@@ -1,4 +1,4 @@
-import{c as p}from"./emwasm-DwTE8Fc6.js";import{m}from"./index-DPLSfBBi.js";const t=`
+import{c as p}from"./emwasm-CvgVXl6S.js";import{m}from"./index-Cj1OVREy.js";const t=`
 input = import js.raw(memory<u8>(1))
 program = memory<u32>(1)
 temp = memory<u32>(1)

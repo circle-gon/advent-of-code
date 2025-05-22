@@ -1,0 +1,2 @@
+import{s as p,f as c}from"./index-Cj1OVREy.js";const u=p(import.meta.resolve("./worker.js"));function f(t){const r=[];for(const n of t.split(`
+`)){const o=[];for(const e of n)o.push(Number(e));r.push(o)}return r}function s(t,r,n,o,e){return u([f(t),r,n],e,o)}function a(t){let r=0;const n=()=>{t(`(${c(r++*1e5)} iterations done)`)};return n(),n}function i(t,r){return s(t,0,3,a(r),0)}function m(t,r){return s(t,4,10,a(r),1)}const l=[i,m];export{l as default};
