@@ -5,7 +5,7 @@ function createWorkerFor(type, ind) {
     w.push(
       new Worker(type, {
         type: "module",
-      })
+      }),
     );
   return w[ind];
 }
