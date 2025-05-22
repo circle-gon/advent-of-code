@@ -91,13 +91,10 @@ function forDay() {
 async function getSolution(day) {
   const day1 = day + 1;
   try {
-    return (
-      await import(
-        `./solutions/${toSave.year}/day${day1}${
-          data[toSave.year][day].special ? "/main" : ""
-        }.js`
-      )
-    ).default;
+    if (data[toSave.year][day].special)
+      return (await import(`./solutions/${toSave.year}/day${day1}/main.js`))
+        .default;
+    return (await import(`./solutions/${toSave.year}/day${day1}.js`)).default;
   } catch (e) {
     // It's not possible to differentiate between non-existant module and syntax error, so log it just in case
     console.error(e);
