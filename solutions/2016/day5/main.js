@@ -1,6 +1,7 @@
 import { getWorkerFor } from "/utils.js";
+import worker from "./worker.js?worker&url";
 
-const getWorker = getWorkerFor(import.meta.resolve("./worker.js"));
+const getWorker = getWorkerFor(worker);
 const BATCH_SIZE = 100000;
 
 async function useResults(input, callback) {

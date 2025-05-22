@@ -1,6 +1,7 @@
 import { spawnWorkerFor, format } from "/utils.js";
+import worker from "./worker.js?worker&url";
 
-const spawnWorker = spawnWorkerFor(import.meta.resolve("./worker.js"));
+const spawnWorker = spawnWorkerFor(worker);
 
 function parse(input) {
   const map = [];

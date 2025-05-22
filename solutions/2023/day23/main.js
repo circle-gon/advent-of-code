@@ -1,6 +1,7 @@
 // With help from from https://github.com/surgi1/adventofcode/blob/main/2023/day23/script.jsimport { spawnWorkerFor, format } from "/utils.js";
 import { spawnWorkerFor, format } from "/utils.js";
 import { parse, DS, addVect, validPos, key } from "./shared.js";
+import worker from "./worker.js?worker&url";
 
 const D = { ">": 0, v: 1, "<": 2, "^": 3 };
 function part1(input) {
@@ -55,7 +56,7 @@ function part1(input) {
   return maxSteps;
 }
 
-const spawn = spawnWorkerFor(import.meta.resolve("./worker.js"));
+const spawn = spawnWorkerFor(worker);
 function part2(input, u) {
   let i = 0;
   const update = () => {

@@ -1,7 +1,8 @@
 import { spawnWorkerFor, format } from "/utils.js";
 import { run } from "./shared.js";
+import worker from "./worker.js?worker&url";
 
-const spawnWorker = spawnWorkerFor(import.meta.resolve("./worker.js"));
+const spawnWorker = spawnWorkerFor(worker);
 
 function part1(input) {
   return run(input, 0, () => {});

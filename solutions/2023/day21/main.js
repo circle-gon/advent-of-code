@@ -1,5 +1,6 @@
 import { gridSteps } from "./shared.js";
 import { spawnWorkerFor } from "/utils.js";
+import worker from "./worker.js?worker&url";
 
 function parse(input) {
   const cells = [];
@@ -18,7 +19,7 @@ function part1(input, _, example) {
   return gridSteps(parse(input), example ? 6 : 64);
 }
 
-const spawnWorker = spawnWorkerFor(import.meta.resolve("./worker.js"));
+const spawnWorker = spawnWorkerFor(worker);
 
 function part2(input, u) {
   let i = 0;

@@ -1,4 +1,5 @@
 import { spawnWorkerFor, format } from "/utils.js";
+import worker from "./worker.js?worker&url";
 
 function parse(input) {
   const lines = input.split("\n");
@@ -57,7 +58,7 @@ function part1(input) {
   return Function(compile(input, true))();
 }
 
-const spawnWorker = spawnWorkerFor(import.meta.resolve("./worker.js"));
+const spawnWorker = spawnWorkerFor(worker);
 function part2(input, u) {
   const code = compile(input, false);
   let i = 0;

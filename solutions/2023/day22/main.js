@@ -1,4 +1,6 @@
 import { spawnWorkerFor, format } from "/utils.js";
+import w1 from "./w1.js?worker&url";
+import w2 from "./w2.js?worker&url";
 
 function numify(str) {
   return str.split(",").map((i) => Number(i));
@@ -34,12 +36,12 @@ function run(input, u, create) {
   return create(blocks, 0, update);
 }
 
-const spawn1 = spawnWorkerFor(import.meta.resolve("./w1.js"));
+const spawn1 = spawnWorkerFor(w1);
 function part1(input, u) {
   return run(input, u, spawn1);
 }
 
-const spawn2 = spawnWorkerFor(import.meta.resolve("./w2.js"));
+const spawn2 = spawnWorkerFor(w2);
 function part2(input, u) {
   return run(input, u, spawn2);
 }

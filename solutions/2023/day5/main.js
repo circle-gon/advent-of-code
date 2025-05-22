@@ -1,5 +1,6 @@
 import { spawnWorkerFor } from "/utils.js";
 import { mapTo } from "./shared.js";
+import worker from "./worker.js?worker&url";
 
 function parse(input) {
   const lines = input.split("\n");
@@ -33,7 +34,7 @@ function part1(input) {
   return lowestLoc;
 }
 
-const spawnWorker = spawnWorkerFor(import.meta.resolve("./worker.js"));
+const spawnWorker = spawnWorkerFor(worker);
 
 async function part2(input, update) {
   const [seedRanges, data] = parse(input);
