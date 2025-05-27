@@ -55,7 +55,7 @@ export fn part2()() -> u32 {
 }
 `;
 
-const compilee = compile(code, {});
+const compilee = compile(code, {}, {});
 
 async function part1(input) {
   const { module, memory } = await compilee;

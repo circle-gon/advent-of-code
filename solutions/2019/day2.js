@@ -1,69 +1,41 @@
 import { compile } from "/emwasm.js";
 import { memstr } from "/utils.js";
+import intcode from "./intcode.js";
 
 const code = `
-input = import js.raw(memory<u8>(1))
-program = memory<u32>(1)
-temp = memory<u32>(1)
+${intcode}
+
+temp = memory(1)
 let range = u32(0)
 
-fn inRange(m: u32)() -> u32 {
-  return (m >= 48) & (m <= 57)
-}
-
-fn parse()(idx: u32, val: u32, accum: u32, outIdx: u32) {
-  while (input[idx] != 0) {
-    val = input[idx]
-    if (inRange(val)) {
-      accum = 10 * accum + (val - 48)
-    } else {
-      program[outIdx] = accum
-      accum = 0
-      outIdx++
-    }
-    idx++
-  }
-  if (accum != 0) { program[outIdx] = accum; outIdx++ }
-  range = outIdx * 4
-}
-
-fn evalIntcode()(ip: u32, instr: u32, val1: u32, val2: u32) {
-  while (true) {
-    instr = program[ip]
-    if (instr == 1) {
-      val1 = program[program[ip + 1]]
-      val2 = program[program[ip + 2]]
-      program[program[ip + 3]] = val1 + val2
-    } else if (instr == 2) {
-      val1 = program[program[ip + 1]]
-      val2 = program[program[ip + 2]]
-      program[program[ip + 3]] = val1 * val2
-    } else if (instr == 99) { return }
-    else { unreachable() }
-    ip += 4
-  }
-}
-
-export fn part1()() -> u32 {
+export fn part1()() -> s64 {
   parse()
   program[1] = 12
   program[2] = 2
-  evalIntcode()
+  evalIntcode(0, get, set)
   return program[0]
 }
 
-export fn part2()(i: u32, j: u32) -> u32 {
-  parse()
+fn get()() -> s64 {
+  unreachable()
+}
+
+fn set(a: s64)() {
+  unreachable()
+}
+
+export fn part2()(i: u64, j: u64) -> u32 {
+  range = parse() * i64.size
   
   memory.copy(temp, program, 0, 0, range)
   for (; i <= 99; i++) {
     for (j = 0; j <= 99; j++) {
       memory.copy(program, temp, 0, 0, range)
-      program[1] = i
-      program[2] = j
-      evalIntcode()
+      program[1] = sint(i)
+      program[2] = sint(j)
+      evalIntcode(0, get, set)
       if (program[0] == 19690720) {
-        return 100 * i + j
+        return i32.wrap_i64(100 * i + j)
       }
     }
   }
@@ -71,7 +43,7 @@ export fn part2()(i: u32, j: u32) -> u32 {
 }
 `;
 
-const compilee = compile(code, {});
+const compilee = compile(code, {}, {});
 
 async function part1(input) {
   const { module, memory } = await compilee;

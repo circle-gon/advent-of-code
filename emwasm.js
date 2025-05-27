@@ -4,8 +4,10 @@ import { compileWasm } from "/utils.js";
 Unimplemented features
 - Tables & elements
 - Vectors + Relaxed SIMD
-- References + Typed function references + Garbage collection
-- Data segments
+- References + Garbage collection
+
+Typed function reference goodies
+- Type aliases
 
 Unimplemented semanatics (difficult)
 - Hash tables
@@ -13,7 +15,10 @@ Unimplemented semanatics (difficult)
 Unimplemented semanatics (easier)
 - Branch hinting
 - min/max/abs functions for integers
-- u32/u64 max constants and s32/s64 min/max constants
+- easy conversion from i32 to i64 and vice versa
+- better code references in error messages
+- multiple error messages at one time
+- Start functions
 
 Optimizations separate from binaryen
 - Tail call optimization
@@ -130,6 +135,9 @@ const CHARACTER_TABLE = Object.freeze({
   "[": TOKENS.LEFT_BRACKET,
   "]": TOKENS.RIGHT_BRACKET,
 });
+const MAX_SIZE = Object.keys(CHARACTER_TABLE)
+  .map((i) => i.length)
+  .sort((a, b) => b - a)[0];
 
 function mapTokenToChar(token) {
   for (const [k, v] of Object.entries(CHARACTER_TABLE)) {
@@ -184,15 +192,17 @@ function lex(text) {
   while (idx < text.length) {
     const char = text[idx];
     let found = false;
-    for (const [key, val] of Object.entries(CHARACTER_TABLE)) {
-      if (text.startsWith(key, idx)) {
+    for (let i = MAX_SIZE; i > 0; i--) {
+      const t = text.slice(idx, idx + i);
+      const entry = CHARACTER_TABLE[t];
+      if (entry !== undefined) {
         tokens.push({
-          token: val,
+          token: entry,
           newline,
           start: idx,
-          end: idx + key.length,
+          end: idx + i,
         });
-        idx += key.length;
+        idx += i;
         found = true;
         break;
       }
@@ -615,10 +625,23 @@ const OPCODES = Object.freeze({
       params: ["memory", "i32", "i32", "i32"],
       output: [],
     },
+    init: {
+      opcode: 0xfc,
+      params: ["memory", "data-segment", "i32", "i32", "i32"],
+      output: [],
+    },
+  },
+  data: {
+    __proto__: null,
+    drop: {
+      opcode: 0xfc,
+      params: ["data-segment"],
+      output: [],
+    },
   },
   select: {
     __proto__: null,
-    opcode: 0x1b,
+    opcode: null,
     params: [null, null, "i32"],
     output: [null],
   },
@@ -736,6 +759,12 @@ const OPCODES = Object.freeze({
 });
 const CONSTANTS = Object.freeze({
   __proto__: null,
+  i32: {
+    size: 4,
+  },
+  i64: {
+    size: 8,
+  },
   u32: {
     max: 2 ** 32 - 1,
   },
@@ -780,6 +809,28 @@ const AST = Object.freeze({
 function looseInteger(val) {
   if (val === null) return val;
   return Number(val.integer);
+}
+
+function getOpcode(level1, level2) {
+  if (level1.node !== AST.IDENTIFIER) return undefined;
+  const base = OPCODES[level1.literal];
+  return level2 !== null ? base?.[level2] : base;
+}
+
+function toLongType(token) {
+  const size = Number(token.slice(1));
+  if (token[0] === "f") {
+    return {
+      type: "float",
+      size,
+    };
+  }
+
+  return {
+    type: "int",
+    signed: token[0] === "s" ? 1 : 0,
+    size,
+  };
 }
 
 function toStartEnd(tokenStart, tokenEnd) {
@@ -845,9 +896,7 @@ class Parser {
         return tkn.identifier;
       }
     }
-    const msg =
-      message ??
-      `Expected one of ${payloads.map((i) => mapTokenToChar(i)).join(", ")}`;
+    const msg = message ?? `Expected one of ${payloads.join(", ")}`;
     this.errorToken(tkn, msg);
   }
 
@@ -870,6 +919,50 @@ class Parser {
   assertValueType(token) {
     if (!VALUE_TYPES.includes(token.identifier))
       this.errorToken(token, "Expected u32, s32, u64, s64, f32, or f64");
+    return toLongType(token.identifier);
+  }
+
+  getValueType() {
+    const tkn = this.expect(TOKENS.IDENTIFIER);
+    if (tkn.identifier === "func") {
+      const output = [];
+      if (this.match(TOKENS.LEFT_ARROW)) {
+        output.push(this.getValueType());
+        while (!this.match(TOKENS.RIGHT_ARROW)) {
+          this.expect(TOKENS.COMMA);
+          output.push(this.getValueType());
+        }
+      }
+
+      this.expect(TOKENS.LEFT_PAREN);
+
+      const params = [];
+      if (!this.match(TOKENS.RIGHT_PAREN)) {
+        params.push(this.getValueType());
+        while (!this.match(TOKENS.RIGHT_PAREN)) {
+          this.expect(TOKENS.COMMA);
+          params.push(this.getValueType());
+        }
+      }
+
+      return {
+        type: "func",
+        params,
+        output,
+        ref: true,
+      };
+    }
+
+    return this.assertValueType(tkn);
+  }
+
+  assertMemoryType(token) {
+    if (!MEMORY_TYPES.includes(token.identifier))
+      this.errorToken(
+        token,
+        "Expected u8, s8, u16, s16, u32, s32, u64, s64, f32, or f64",
+      );
+    return toLongType(token.identifier);
   }
 
   topLevelGlobal(name, exported, writable) {
@@ -889,39 +982,63 @@ class Parser {
         "Expected the second level of import",
       ).identifier;
       this.expect(TOKENS.LEFT_PAREN);
-      const ref = this.expect(
-        TOKENS.IDENTIFIER,
-        "Expected a value type",
-      ).identifier;
-      this.assertValueType(ref);
+      const type = this.getValueType();
       const end = this.expect(TOKENS.RIGHT_PAREN);
       return {
         node: AST.GLOBAL,
         name: name.identifier,
         exported,
         writable,
-        type: type.identifier,
-        level1,
-        level2,
-        ref,
+        imported: {
+          level1,
+          level2,
+        },
+        type,
         ...toStartEnd(name, end),
       };
     } else {
-      this.assertValueType(type);
+      if (type.identifier === "ref") {
+        const a = this.expect(TOKENS.LEFT_ARROW);
+        const type = this.getValueType();
+        const b = this.expect(TOKENS.RIGHT_ARROW);
+        if (type.type !== "func")
+          this.errorToken(
+            toStartEnd(a, b),
+            "Expected a reference, not a number",
+          );
+        this.expect(TOKENS.LEFT_PAREN);
+        const val = this.expect(
+          TOKENS.IDENTIFIER,
+          "Expected an initializer value",
+        );
+        const end = this.expect(TOKENS.RIGHT_PAREN);
+        return {
+          node: AST.GLOBAL,
+          name: name.identifier,
+          exported,
+          imported: false,
+          writable,
+          type,
+          val,
+          ...toStartEnd(name, end),
+        };
+      }
+
+      const t = this.assertValueType(type);
       this.expect(TOKENS.LEFT_PAREN);
       const val = this.expect(
         TOKENS.NUMBER,
         "Expected a value for a global initializer",
       );
-      if (type[0] === "s" || type[0] === "u")
-        this.assertInteger(val, type[0] === "u");
+      if (type.type === "int") this.assertInteger(val, type.signed === 0);
       const end = this.expect(TOKENS.RIGHT_PAREN);
       return {
         node: AST.GLOBAL,
         name: name.identifier,
         exported,
         writable,
-        type: type.identifier,
+        imported: false,
+        type: t,
         integer: val.integer,
         fractional: val.fractional,
         ...toStartEnd(name, end),
@@ -932,17 +1049,16 @@ class Parser {
   topLevelRef(name, exported) {
     this.expect(TOKENS.EQUAL);
     const choose = this.expectOneOf(
-      "Expected either 'memory' or 'import' for a top level reference",
+      "Expected either 'memory', 'import', or 'data' for a top level reference",
       "memory",
       "import",
+      "data",
     );
     if (choose === "memory") {
       let index = null;
       if (this.match(TOKENS.LEFT_ARROW)) {
         const tmp = this.expect(TOKENS.IDENTIFIER, "Expected a memory index");
-        index = tmp.identifier;
-        if (!MEMORY_TYPES.includes(index))
-          this.errorToken(tmp, "Invalid index");
+        index = this.assertMemoryType(tmp);
         this.expect(TOKENS.RIGHT_ARROW);
       }
       this.expect(TOKENS.LEFT_PAREN);
@@ -963,11 +1079,60 @@ class Parser {
         node: AST.REF,
         name: name.identifier,
         exported,
-        type: choose,
+        imported: false,
+        type: {
+          type: "memory",
+        },
         index,
         min: looseInteger(min),
         max: looseInteger(max),
         ...toStartEnd(name, end),
+      };
+    } else if (choose === "data") {
+      this.expect(TOKENS.LEFT_ARROW);
+      const type = this.expectOneOf(
+        "Expected either an active or passive data segment",
+        "active",
+        "passive",
+      );
+      this.expect(TOKENS.RIGHT_ARROW);
+      this.expect(TOKENS.LEFT_PAREN);
+      if (type === "active") {
+        const mem = this.expect(TOKENS.IDENTIFIER, "Expected a memory name");
+        this.expect(TOKENS.COMMA);
+        const offset = this.expect(
+          TOKENS.NUMBER,
+          "Expected an offset into a memory",
+        );
+        this.assertInteger(offset, true);
+        const right = this.expect(TOKENS.RIGHT_PAREN);
+        if (exported) this.errorToken(name, "Can't export a data segment");
+        return {
+          node: AST.REF,
+          name: name.identifier,
+          exported: false,
+          imported: false,
+          type: {
+            type: "data-segment",
+            active: true,
+          },
+          mem,
+          offset: looseInteger(offset),
+          ...toStartEnd(name, right),
+        };
+      }
+
+      const right = this.expect(TOKENS.RIGHT_PAREN);
+      return {
+        node: AST.REF,
+        name: name.identifier,
+        exported: false,
+        imported: false,
+        type: {
+          type: "data-segment",
+          active: false,
+        },
+        ...toStartEnd(name, right),
       };
     }
 
@@ -990,24 +1155,10 @@ class Parser {
     if (branch === "func") {
       const output = [];
       if (this.match(TOKENS.LEFT_ARROW)) {
-        const v = this.expect(
-          TOKENS.IDENTIFIER,
-          "Expected a function return type",
-        );
-        output.push({
-          type: v.identifier,
-        });
-        this.assertValueType(v);
+        output.push(this.getValueType());
         while (!this.match(TOKENS.RIGHT_ARROW)) {
           this.expect(TOKENS.COMMA);
-          const v = this.expect(
-            TOKENS.IDENTIFIER,
-            "Expected a function return type",
-          );
-          output.push({
-            type: v.identifier,
-          });
-          this.assertValueType(v);
+          output.push(this.getValueType());
         }
       }
 
@@ -1015,24 +1166,10 @@ class Parser {
 
       const params = [];
       if (!this.match(TOKENS.RIGHT_PAREN)) {
-        const arg = this.expect(
-          TOKENS.IDENTIFIER,
-          "Expected a function parameter type",
-        );
-        this.assertValueType(arg);
-        params.push({
-          type: arg.identifier,
-        });
+        params.push(this.getValueType());
         while (!this.match(TOKENS.RIGHT_PAREN)) {
           this.expect(TOKENS.COMMA);
-          const arg = this.expect(
-            TOKENS.IDENTIFIER,
-            "Expected a function parameter type",
-          );
-          this.assertValueType(arg);
-          params.push({
-            type: arg.identifier,
-          });
+          params.push(this.getValueType());
         }
       }
 
@@ -1042,11 +1179,16 @@ class Parser {
         node: AST.REF,
         name: name.identifier,
         exported,
-        type: "import-func",
-        level1,
-        level2,
-        output,
-        params,
+        imported: {
+          level1,
+          level2,
+        },
+        type: {
+          type: "func",
+          output,
+          params,
+          ref: false,
+        },
         ...toStartEnd(name, end),
       };
     }
@@ -1054,8 +1196,7 @@ class Parser {
     let index = null;
     if (this.match(TOKENS.LEFT_ARROW)) {
       const tmp = this.expect(TOKENS.IDENTIFIER, "Expected a memory index");
-      index = tmp.identifier;
-      if (!MEMORY_TYPES.includes(index)) this.errorToken(tmp, "Invalid index");
+      index = this.assertMemoryType(tmp);
       this.expect(TOKENS.RIGHT_ARROW);
     }
 
@@ -1073,9 +1214,13 @@ class Parser {
       node: AST.REF,
       name: name.identifier,
       exported,
-      type: "import-memory",
-      level1,
-      level2,
+      imported: {
+        level1,
+        level2,
+      },
+      type: {
+        type: "memory",
+      },
       index,
       min: looseInteger(min),
       max: looseInteger(max),
@@ -1089,15 +1234,12 @@ class Parser {
       "Expected the name of a function argument",
     );
     this.expect(TOKENS.COLON);
-    const type = this.expect(
-      TOKENS.IDENTIFIER,
-      "Expected the type of a function argument",
-    );
-    this.assertValueType(type);
+    const type = this.getValueType();
+    const end = this.was();
     return {
       name: name.identifier,
-      type: type.identifier,
-      ...toStartEnd(name, type),
+      type,
+      ...toStartEnd(name, end),
     };
   }
 
@@ -1112,6 +1254,46 @@ class Parser {
       }
     }
     return params;
+  }
+
+  topLevelFunc(exported) {
+    const name = this.expect(TOKENS.IDENTIFIER, "Expected a function name");
+
+    const params = this.getNames();
+    const paramTypes = params.map((i) => i.type);
+
+    const locals = this.getNames();
+    const output = [];
+    if (this.match(TOKENS.ARROW)) {
+      output.push(this.getValueType());
+      while (!this.match(TOKENS.LEFT_BRACE)) {
+        this.expect(TOKENS.COMMA);
+        output.push(this.getValueType());
+      }
+    } else this.expect(TOKENS.LEFT_BRACE);
+
+    const body = [];
+    while (!this.match(TOKENS.RIGHT_BRACE)) {
+      body.push(this.statement());
+    }
+
+    const end = this.was();
+    return {
+      node: AST.FUNCTION,
+      name: name.identifier,
+      exported,
+      imported: false,
+      type: {
+        type: "func",
+        params: paramTypes,
+        output,
+        ref: false,
+      },
+      params,
+      locals,
+      body,
+      ...toStartEnd(name, end),
+    };
   }
 
   assertAssignment(node) {
@@ -1255,7 +1437,11 @@ class Parser {
 
           return {
             node: AST.EXPRESSION,
-            level1: "select",
+            level1: {
+              node: AST.IDENTIFIER,
+              literal: "select",
+              ...toStartEnd(cond, right),
+            },
             level2: null,
             params: [left, right, cond],
             ...toStartEnd(cond, right),
@@ -1485,58 +1671,56 @@ class Parser {
         return left;
       }
       case 9: {
-        const level1t = this.expr(10);
-        if (
-          level1t.node !== AST.IDENTIFIER ||
-          (!this.is(TOKENS.DOT) && !this.is(TOKENS.LEFT_PAREN))
-        )
-          return level1t;
-
-        const level1 = level1t.literal;
-        let level2 = null;
-        let level2t = null;
-        if (this.match(TOKENS.DOT)) {
-          level2t = this.expect(
-            TOKENS.IDENTIFIER,
-            "Expected the level 2 of a function or constant reference",
-          );
-          level2 = level2t.identifier;
-        }
-
-        const opcode = getOpcode(level1, level2);
-        const params = [];
-        if (this.match(TOKENS.LEFT_PAREN)) {
-          if (!this.match(TOKENS.RIGHT_PAREN)) {
-            params.push(this.expression());
-            while (!this.match(TOKENS.RIGHT_PAREN)) {
-              this.expect(TOKENS.COMMA);
-              params.push(this.expression());
-            }
+        let level1 = this.expr(10);
+        while (this.is(TOKENS.DOT) || this.is(TOKENS.LEFT_PAREN)) {
+          let level2 = null;
+          let level2t = null;
+          if (this.match(TOKENS.DOT)) {
+            level2t = this.expect(
+              TOKENS.IDENTIFIER,
+              "Expected the level 2 of a function or constant reference",
+            );
+            level2 = level2t.identifier;
           }
-          // This is kind of cheating but whatever
-          const parenToken = this.was();
-          if (level2 && !opcode)
-            this.errorToken(toStartEnd(level1t, parenToken), "Invalid opcode");
 
-          return {
-            node: AST.EXPRESSION,
-            level1,
-            level2,
-            params,
-            ...toStartEnd(level1t, parenToken),
-          };
+          const opcode = getOpcode(level1, level2);
+          const params = [];
+          if (this.match(TOKENS.LEFT_PAREN)) {
+            if (!this.match(TOKENS.RIGHT_PAREN)) {
+              params.push(this.expression());
+              while (!this.match(TOKENS.RIGHT_PAREN)) {
+                this.expect(TOKENS.COMMA);
+                params.push(this.expression());
+              }
+            }
+            // This is kind of cheating but whatever
+            const parenToken = this.was();
+            if (level2 && opcode === undefined)
+              this.errorToken(toStartEnd(level1, parenToken), "Invalid opcode");
+
+            level1 = {
+              node: AST.EXPRESSION,
+              level1,
+              level2,
+              params,
+              ...toStartEnd(level1, parenToken),
+            };
+          } else {
+            if (level1.node !== AST.IDENTIFIER)
+              this.errorToken(level1, "Invalid constant");
+            if (level2 === null) this.errorToken(level1, "Invalid constant");
+            const constant = CONSTANTS[level1.literal]?.[level2];
+            if (constant === undefined)
+              this.errorToken(toStartEnd(level1, level2t), "Invalid constant");
+            level1 = {
+              node: AST.NUMBER,
+              integer: constant.toString(),
+              fractional: "",
+              ...toStartEnd(level1, level2t),
+            };
+          }
         }
-
-        if (level2 === null) this.errorToken(level1t, "Invalid constant");
-        const constant = CONSTANTS[level1]?.[level2];
-        if (constant === undefined)
-          this.errorToken(toStartEnd(level1t, level2), "Invalid constant");
-        return {
-          node: AST.NUMBER,
-          integer: constant.toString(),
-          fractional: "",
-          ...toStartEnd(level1t, level2t),
-        };
+        return level1;
       }
       case 10: {
         const tk1 = this.match(TOKENS.LEFT_PAREN);
@@ -1759,47 +1943,6 @@ class Parser {
     return val;
   }
 
-  topLevelFunc(exported) {
-    const name = this.expect(TOKENS.IDENTIFIER, "Expected a function name");
-    const params = this.getNames();
-    const locals = this.getNames();
-    const output = [];
-    if (this.match(TOKENS.ARROW)) {
-      const v = this.expect(
-        TOKENS.IDENTIFIER,
-        "Expected a function return type",
-      );
-      this.assertValueType(v);
-      output.push(v.identifier);
-      while (!this.match(TOKENS.LEFT_BRACE)) {
-        this.expect(TOKENS.COMMA);
-        const v = this.expect(
-          TOKENS.IDENTIFIER,
-          "Expected a function return type",
-        );
-        this.assertValueType(v);
-        output.push(v.identifier);
-      }
-    } else this.expect(TOKENS.LEFT_BRACE);
-
-    const body = [];
-    while (!this.match(TOKENS.RIGHT_BRACE)) {
-      body.push(this.statement());
-    }
-
-    const end = this.was();
-    return {
-      node: AST.FUNCTION,
-      name: name.identifier,
-      exported,
-      params,
-      locals,
-      output,
-      body,
-      ...toStartEnd(name, end),
-    };
-  }
-
   hasEnd() {
     const tkn = this.peek();
     return (
@@ -1826,7 +1969,7 @@ class Parser {
     const ast = [];
 
     while (this.peek().token !== TOKENS.EOF) {
-      const exported = this.matchLiteral("export");
+      const exported = this.matchLiteral("export") !== null;
       if (this.matchLiteral("fn")) ast.push(this.topLevelFunc(exported));
       else {
         let writable = null;
@@ -1959,9 +2102,16 @@ function encodevec(vec) {
   return [...leb128u32(vec.length), ...vec.flat()];
 }
 
+function encodevecnoflat(vec) {
+  return [...leb128u32(vec.length), ...vec];
+}
+
 function encodesection(section, id) {
-  const vec = encodevec(section);
-  return [id, ...leb128u32(vec.length), ...vec];
+  return encodesection2(encodevec(section), id);
+}
+
+function encodesection2(section, id) {
+  return [id, ...leb128u32(section.length), ...section];
 }
 
 const TRUNC_SAT_ORDER = Object.freeze([
@@ -1971,62 +2121,121 @@ const TRUNC_SAT_ORDER = Object.freeze([
   "trunc_sat_f64_u",
 ]);
 
-function typeNotNumbers(a, b) {
-  if (a.type === "number") return [b, a];
-  return [a, b];
+function toRawType(type) {
+  if (type.type === "int") return "i" + type.size;
+  if (type.type === "float") return "f" + type.size;
+  throw new Error("bad code");
 }
 
-function toRawType(type) {
-  switch (type) {
-    case "u32":
-    case "s32":
-    case "i32":
-      return "i32";
-    case "u64":
-    case "s64":
-    case "i64":
-      return "i64";
-    case "f32":
-    case "f64":
-      return type;
-    default:
-      throw new Error("bad code");
+function isSameType(a, b) {
+  if (a.type !== b.type) return false;
+  if (a.type === "func") {
+    return (
+      a.params.length === b.params.length &&
+      a.output.length === b.output.length &&
+      a.params.every((i, j) => isSameType(i, b.params[j])) &&
+      a.output.every((i, j) => isSameType(i, b.output[j]))
+    );
   }
+  // Signed vs unsigned doesn't matter for compiled output
+  if (a.type === "int" || a.type === "float") return a.size === b.size;
+  throw new Error("missing type?");
 }
 
 function toBigType(type) {
-  switch (type) {
-    case "u8":
-    case "u16":
-      return "u32";
-    case "s8":
-    case "s16":
-      return "s32";
-    case "u32":
-    case "s32":
-    case "u64":
-    case "s64":
-    case "f32":
-    case "f64":
-      return type;
-    default:
-      throw new Error("bad code");
-  }
+  if (type.type === "int")
+    return {
+      ...type,
+      size: Math.max(type.size, 32),
+    };
+  if (type.type === "float") return type;
+  throw new Error("bad type");
 }
 
-function getOpcode(level1, level2) {
-  const base = OPCODES[level1];
-  return level2 !== null ? base?.[level2] : base;
+function moreSpecific(a, b) {
+  if (a.type === "number") return b;
+  return a;
+}
+
+function matchesType(expected, val) {
+  if (expected.type === "number" && val.type !== "number")
+    return matchesType(val, expected);
+
+  if (val.type === "number") {
+    if (expected.type === "number") return true;
+    if (expected.type !== "int" && expected.type !== "float") return false;
+    return (
+      (expected.type === "float" || !val.isDecimal) &&
+      (expected.type === "float" || expected.signed !== 0 || !val.isNegative)
+    );
+  }
+
+  if (expected.type !== val.type) return false;
+  if (expected.type === "int")
+    return (
+      val.size === expected.size &&
+      (expected.signed === val.signed ||
+        expected.signed === 2 ||
+        val.signed === 2)
+    );
+  if (expected.type === "float") return val.size === expected.size;
+  if (expected.type === "func")
+    return (
+      expected.params.length === val.params.length &&
+      expected.output.length === val.output.length &&
+      expected.params.every((i, j) => matchesType(i, val.params[j])) &&
+      expected.output.every((i, j) => matchesType(i, val.output[j]))
+    );
+  throw new Error("missing type check?");
+}
+
+function matchesTypes(expected, val) {
+  if (expected.length !== val.length) return false;
+  for (let i = 0; i < expected.length; i++) {
+    if (!matchesType(expected[i], val[i])) return false;
+  }
+  return true;
+}
+
+function typesToString(types) {
+  const out = [];
+  for (const type of types) {
+    if (type.type === "int")
+      out.push(
+        `${type.signed === 2 ? "i" : type.signed === 1 ? "s" : "u"}${type.size}`,
+      );
+    else if (type.type === "float") out.push("f" + type.size);
+    else if (type.type === "number" || type.type === "memory")
+      out.push(type.type);
+    else if (type.type === "func")
+      out.push(
+        `${typesToString(type.params)} -> ${typesToString(type.output)}`,
+      );
+    else if (type.type !== "void")
+      throw new Error("missing type? " + type.type);
+  }
+  return `[${out.join(", ")}]`;
+}
+
+function skipSame(a, b, check) {
+  const ac = check(a);
+  const bc = check(b);
+  if (ac && !bc) return -1;
+  if (bc && !ac) return 1;
+  return 0;
 }
 
 class VerifyCompiler {
-  constructor(ast, text) {
+  constructor(ast, text, dataMap) {
     this.text = text;
     this.ast = ast;
     this.globals = new Map();
     this.locals = new Map();
     this.labelTypes = [];
+    this.dataMap = dataMap;
+    Object.setPrototypeOf(this.dataMap, null);
 
+    this.typeIdx = 0;
     this.labels = [];
     this.types = [];
     this.imports = [];
@@ -2035,6 +2244,8 @@ class VerifyCompiler {
     this.globalArr = [];
     this.exports = [];
     this.code = [];
+    this.elements = [];
+    this.data = [];
   }
   errorToken(tkn, message) {
     error(this.text, tkn.start, tkn.end, message);
@@ -2044,23 +2255,30 @@ class VerifyCompiler {
     if (this.globals.has(name)) return this.globals.get(name);
     this.errorToken(node, "Variable does not exist");
   }
+
+  defineType(type) {
+    if (type.type !== "func") return [NUM_OPCODE[toRawType(type)]];
+    this.types.push([
+      0x60,
+      ...encodevec(type.params.map((i) => this.defineType(i))),
+      ...encodevec(type.output.map((i) => this.defineType(i))),
+    ]);
+    this.typeIdx++;
+    return [0x64, ...leb128s32(this.typeIdx - 1)];
+  }
+
   locateGlobals() {
     let globalIdx = 0;
     let memoryIdx = 0;
     let functionIdx = 0;
+    let dataIdx = 0;
 
     const astSorted = this.ast.toSorted((a, b) => {
-      const aImport =
-        a.type === "import" ||
-        a.type === "import-func" ||
-        a.type === "import-memory";
-      const bImport =
-        b.type === "import" ||
-        b.type === "import-func" ||
-        b.type === "import-memory";
-      if (aImport && !bImport) return -1;
-      if (bImport && !aImport) return 1;
-      return 0;
+      const importStatus = skipSame(a, b, (r) => r.imported !== false);
+      if (importStatus !== 0) return importStatus;
+      const globalStatus = -skipSame(a, b, (r) => r.node === AST.GLOBAL);
+      if (globalStatus !== 0) return globalStatus;
+      return -skipSame(a, b, (r) => r.type.type === "data-segment");
     });
 
     for (const node of astSorted) {
@@ -2068,49 +2286,72 @@ class VerifyCompiler {
       if (this.globals.has(name))
         this.errorToken(node, "Variable was already declared");
       switch (node.node) {
-        case AST.GLOBAL:
-          this.globals.set(name, {
-            ref: globalIdx,
-            type: node.type === "import" ? node.ref : node.type,
-            writable: node.writable,
-            relative: "global",
-            ...toStartEnd(node, node),
-          });
-
+        case AST.GLOBAL: {
           if (node.exported) {
             this.exports.push([...utf8(node.name), 0x03, globalIdx]);
           }
 
-          if (node.type === "import") {
+          const obj = {
+            ref: globalIdx,
+            type: node.type,
+            writable: node.writable,
+            relative: "global",
+            ...toStartEnd(node, node),
+          };
+
+          if (node.imported) {
             this.imports.push([
-              ...utf8(node.level1),
-              ...utf8(node.level2),
+              ...utf8(node.imported.level1),
+              ...utf8(node.imported.level2),
               0x03,
-              NUM_OPCODE[toRawType(node.ref)],
+              NUM_OPCODE[toRawType(node.type)],
               node.writable ? 1 : 0,
             ]);
           } else {
-            const utype = toRawType(node.type);
-            this.globalArr.push([
-              NUM_OPCODE[utype],
-              node.writable ? 1 : 0,
-              NUM_CONST[utype],
-              ...encode(utype, formatToReal(node, utype)),
-              0x0b,
-            ]);
+            if (node.type.type === "func") {
+              const code = this.defineType(node.type);
+              obj.typeRef = obj.type.typeRef = this.typeIdx - 1;
+              // This is fine because globals are hoisted last
+              const funcref = this.get(node.val, node.val.identifier);
+              this.shouldMatchTypes(
+                [node.type],
+                [
+                  {
+                    ...funcref.type,
+                    ...toStartEnd(node, node),
+                  },
+                ],
+              );
+              this.globalArr.push([
+                ...code,
+                node.writable ? 1 : 0,
+                0xd2,
+                funcref.ref,
+                0x0b,
+              ]);
+            } else {
+              const utype = toRawType(node.type);
+              this.globalArr.push([
+                NUM_OPCODE[utype],
+                node.writable ? 1 : 0,
+                NUM_CONST[utype],
+                ...encode(utype, formatToReal(node, utype)),
+                0x0b,
+              ]);
+            }
           }
 
+          this.globals.set(name, obj);
           globalIdx++;
           break;
+        }
         case AST.REF: {
-          const type = node.type.startsWith("import-")
-            ? node.type.slice(7)
-            : node.type;
           const obj = {
-            type,
+            type: node.type,
+            writable: false,
             ...toStartEnd(node, node),
           };
-          if (type === "memory") {
+          if (node.type.type === "memory") {
             if (node.max !== null && node.max < node.min)
               this.errorToken(
                 node,
@@ -2120,52 +2361,54 @@ class VerifyCompiler {
             obj.max = node.max;
             obj.ref = memoryIdx;
             obj.index = node.index;
-          } else {
-            obj.params = node.params;
-            obj.output = node.output;
+          } else if (node.type.type === "func") {
             obj.ref = functionIdx;
+          } else {
+            obj.ref = dataIdx;
           }
           this.globals.set(name, obj);
 
-          if (node.type === "memory") {
-            const out = [node.max !== null ? 1 : 0, ...leb128u32(node.min)];
-            if (node.max !== null) out.push(...leb128u32(node.max));
-
-            if (node.exported) {
-              this.exports.push([
-                ...utf8(node.name),
+          if (node.type.type === "memory") {
+            if (node.imported) {
+              const out = [
+                ...utf8(node.imported.level1),
+                ...utf8(node.imported.level2),
                 0x02,
-                ...leb128u32(memoryIdx),
-              ]);
-            }
-            this.memories.push(out);
-            memoryIdx++;
-          } else if (node.type === "import-memory") {
-            const out = [
-              ...utf8(node.level1),
-              ...utf8(node.level2),
-              0x02,
-              node.max !== null ? 1 : 0,
-              ...leb128u32(node.min),
-            ];
-            if (node.max !== null) out.push(...leb128u32(node.max));
+                node.max !== null ? 1 : 0,
+                ...leb128u32(node.min),
+              ];
+              if (node.max !== null) out.push(...leb128u32(node.max));
 
-            if (node.exported) {
-              this.exports.push([
-                ...utf8(node.name),
-                0x02,
-                ...leb128u32(memoryIdx),
-              ]);
-            }
+              if (node.exported) {
+                this.exports.push([
+                  ...utf8(node.name),
+                  0x02,
+                  ...leb128u32(memoryIdx),
+                ]);
+              }
 
-            this.imports.push(out);
+              this.imports.push(out);
+            } else {
+              const out = [node.max !== null ? 1 : 0, ...leb128u32(node.min)];
+              if (node.max !== null) out.push(...leb128u32(node.max));
+
+              if (node.exported) {
+                this.exports.push([
+                  ...utf8(node.name),
+                  0x02,
+                  ...leb128u32(memoryIdx),
+                ]);
+              }
+              this.memories.push(out);
+            }
             memoryIdx++;
-          } else if (node.type === "import-func") {
+          } else if (node.type.type === "func") {
+            this.defineType(node.type);
             this.imports.push([
-              ...utf8(node.level1),
-              ...utf8(node.level2),
+              ...utf8(node.imported.level1),
+              ...utf8(node.imported.level2),
               0x00,
-              ...leb128u32(functionIdx),
+              ...leb128u32(this.typeIdx - 1),
             ]);
 
             if (node.exported) {
@@ -2175,24 +2418,37 @@ class VerifyCompiler {
                 ...leb128u32(functionIdx),
               ]);
             }
-
-            this.types.push([
-              0x60,
-              ...encodevec(
-                node.params.map((i) => NUM_OPCODE[toRawType(i.type)]),
-              ),
-              ...encodevec(node.output.map((i) => NUM_OPCODE[toRawType(i)])),
-            ]);
             functionIdx++;
+          } else {
+            const bytevecdata = this.dataMap[name];
+            if (!bytevecdata)
+              this.errorToken(
+                node,
+                "No data was present for this data segment",
+              );
+            const bytevec = encodevecnoflat(bytevecdata);
+            if (node.type.active) {
+              this.data.push([
+                ...leb128u32(2),
+                ...leb128u32(this.get(node.mem, node.mem.identifier).ref),
+                NUM_CONST.i32,
+                ...encode("i32", node.offset),
+                0x0b,
+                ...bytevec,
+              ]);
+            } else {
+              this.data.push([...leb128u32(1), ...bytevec]);
+            }
+            dataIdx++;
           }
           break;
         }
         case AST.FUNCTION:
           this.globals.set(name, {
-            type: "func",
+            type: node.type,
             params: node.params,
-            output: node.output,
             ref: functionIdx,
+            writable: false,
             ...toStartEnd(node, node),
           });
 
@@ -2204,12 +2460,8 @@ class VerifyCompiler {
             ]);
           }
 
-          this.functions.push(leb128u32(functionIdx));
-          this.types.push([
-            0x60,
-            ...encodevec(node.params.map((i) => NUM_OPCODE[toRawType(i.type)])),
-            ...encodevec(node.output.map((i) => NUM_OPCODE[toRawType(i)])),
-          ]);
+          this.defineType(node.type);
+          this.functions.push(leb128u32(this.typeIdx - 1));
           functionIdx++;
           break;
         default:
@@ -2218,91 +2470,122 @@ class VerifyCompiler {
     }
   }
 
-  typeIsInteger(type) {
-    return type[0] === "u" || type[0] === "s" || type[0] === "i";
-  }
-
-  nodeIsInteger(node) {
-    return (
-      this.typeIsInteger(node.type) ||
-      (node.type === "number" && !node.isDecimal)
-    );
-  }
-
-  typeIsNumberLike(type) {
-    return type === "number" || this.typeIsInteger(type) || type[0] === "f";
-  }
-
-  toTypeSize(type) {
-    return Number(type.slice(1));
-  }
-
-  matchesType(expected, val) {
-    const type = Array.isArray(val.type) ? val.type[0] : val.type;
-    if (Array.isArray(val.type) && val.type.length > 1) return false;
-    const just =
-      type === expected ||
-      (this.toTypeSize(type) === this.toTypeSize(expected) &&
-        ((type[0] === "i" && this.typeIsInteger(expected)) ||
-          (expected[0] === "i" && this.typeIsInteger(type))));
-    const numbercast =
-      type === "number" &&
-      ((this.typeIsInteger(expected) && !val.isDecimal) ||
-        expected[0] === "f") &&
-      (expected[0] !== "u" || !val.isNegative);
-    return just || numbercast;
-  }
-
-  shouldMatchType(expected, val) {
-    if (!this.matchesType(expected, val))
+  shouldMatchTypes(expected, val) {
+    if (!matchesTypes(expected, val))
       this.errorToken(
-        val,
-        `Got type ${val.type} but expected type ${expected}`,
+        toStartEnd(val[0], val[val.length - 1]),
+        `Got types ${typesToString(val)} but expected ${typesToString(expected)}`,
       );
   }
 
-  shouldMatchAnyType(val, ...expectations) {
-    for (const expected of expectations) {
-      if (this.matchesType(expected, val)) return;
+  resolveVariable(node) {
+    const out = [];
+    for (const n of node) {
+      if (n.type === "variable")
+        out.push({
+          ...this.get(n, n.name).type,
+          ...toStartEnd(n, n),
+        });
+      else out.push(n);
     }
-    this.errorToken(
-      val,
-      `Got type ${val.type} but expected one of ${expectations.join(", ")}`,
-    );
+    return out;
   }
 
-  resolveVariable(node) {
-    if (node.type === "variable") {
-      const attr = this.get(node, node.name);
-      return {
-        ...attr,
-        // The location of the node should still be preserved
-        ...toStartEnd(node, node),
-      };
+  flatValues(output) {
+    const next = [];
+    for (const member of output) {
+      for (const o of this.resolveVariable(this.getType(member))) {
+        if (o.type !== "void")
+          next.push({
+            ...o,
+            ...toStartEnd(member, member),
+          });
+      }
     }
-    return node;
+    return next;
+  }
+
+  flatValuesResolvable(output) {
+    const next = [];
+    for (const member of output) {
+      for (const o of this.getType(member)) {
+        if (o.type !== "void")
+          next.push({
+            ...o,
+            ...toStartEnd(o, o),
+          });
+      }
+    }
+    return next;
+  }
+
+  typeIsIntegerLike(types) {
+    if (types.length !== 1)
+      this.errorToken(
+        toStartEnd(types[0], types.at(-1)),
+        "Expected 1 value, but got 0 values",
+      );
+    const type = types[0];
+    if ((type.type !== "number" || type.isDecimal) && type.type !== "int")
+      this.errorToken(
+        type,
+        `Expected a number or int but got ${typesToString(types)}`,
+      );
+  }
+
+  typeIsFloatLike(types) {
+    if (types.length !== 1)
+      this.errorToken(
+        toStartEnd(types[0], types.at(-1)),
+        "Expected 1 value, but got 0 values",
+      );
+    const type = types[0];
+    if (type.type !== "number" && type.type !== "float")
+      this.errorToken(
+        type,
+        `Expected an number or float but got ${typesToString(types)}`,
+      );
+  }
+
+  typeIsNumberLike(types) {
+    if (types.length !== 1)
+      this.errorToken(
+        toStartEnd(types[0], types.at(-1)),
+        "Expected 1 value, but got 0 values",
+      );
+    const type = types[0];
+    if (type.type !== "number" && type.type !== "int" && type.type !== "float")
+      this.errorToken(
+        type,
+        `Expected a number, float, or int but got ${typesToString(types)}`,
+      );
   }
 
   validInstructionCall(node) {
     const opt = getOpcode(node.level1, node.level2);
     if (opt === undefined) {
-      const attr = this.get(node, node.level1);
+      const attrs = this.resolveVariable(this.getType(node.level1));
+      const attr = attrs[0];
       const params = this.flatValues(node.params);
+      if (attrs.length !== 1)
+        this.errorToken(node, "Only one value can be called");
       if (attr.type !== "func") this.errorToken(node, "Not a function");
       if (attr.params.length !== params.length)
-        this.errorToken(node, "Wrong parameter count");
+        this.errorToken(
+          node,
+          `Expected ${attr.params.length} parameters, but got ${params.length}`,
+        );
 
-      for (let i = 0; i < attr.params.length; i++) {
-        const expected = attr.params[i].type;
-        this.shouldMatchType(expected, params[i]);
-      }
-
+      this.shouldMatchTypes(attr.params, params);
       return attr.output;
     }
 
     const params = this.flatValuesResolvable(node.params);
     if (opt.params.length !== params.length)
-      this.errorToken(node, "Wrong parameter count");
+      this.errorToken(
+        node,
+        `Expected ${opt.params.length} parameters, but got ${params.length}`,
+      );
     for (let i = 0; i < opt.params.length; i++) {
       const expected = opt.params[i];
       const given = params[i];
@@ -2313,62 +2596,103 @@ class VerifyCompiler {
         case "variable": {
           if (given.type !== "variable")
             this.errorToken(given, "Expected a variable reference");
-          const val = this.get(given, given.name);
-          if (val.type === "memory" || val.type === "func")
+          const val = this.get(given, given.name).type;
+          if (val.type === "memory" || (val.type === "func" && !val.type.ref))
             this.errorToken(given, "Expected a global reference");
           break;
         }
         case "memory": {
           if (given.type !== "variable")
             this.errorToken(given, "Expected a variable reference");
-          const val = this.get(given, given.name);
+          const val = this.get(given, given.name).type;
           if (val.type !== "memory")
             this.errorToken(given, "Expected a memory reference");
           break;
         }
+        case "data-segment": {
+          if (given.type !== "variable")
+            this.errorToken(given, "Expected a variable reference");
+          const val = this.get(given, given.name).type;
+          if (val.type !== "data-segment")
+            this.errorToken(given, "Expected a data segment reference");
+          if (val.active)
+            this.errorToken(given, "Expected a passive data segment");
+          break;
+        }
         default: {
-          const val = this.resolveVariable(given);
-          this.shouldMatchType(expected, val);
+          const val = this.resolveVariable([given]);
+          this.shouldMatchTypes(
+            [
+              {
+                ...toLongType(expected),
+                signed: 2,
+              },
+            ],
+            val,
+          );
           break;
         }
       }
     }
 
-    return opt.output;
+    return opt.output.map((i) =>
+      i !== null
+        ? {
+            ...toLongType(i),
+            signed: 2,
+          }
+        : null,
+    );
   }
 
   getType(node) {
     switch (node.node) {
       case AST.NUMBER:
-        return {
-          type: "number",
-          isDecimal: node.fractional.length > 0,
-          isNegative: node.negative,
-          ...toStartEnd(node, node),
-        };
+        return [
+          {
+            type: "number",
+            isDecimal: node.fractional.length > 0,
+            isNegative: node.negative,
+            ...toStartEnd(node, node),
+          },
+        ];
       case AST.IDENTIFIER:
-        return {
-          type: "variable",
-          name: node.literal,
-          ...toStartEnd(node, node),
-        };
+        return [
+          {
+            type: "variable",
+            name: node.literal,
+            ...toStartEnd(node, node),
+          },
+        ];
       case AST.ASSIGN: {
         const left = this.get(node, node.name);
-        if (left.type === "memory" || left.type === "func")
+        if (
+          left.type.type === "memory" ||
+          (left.type.type === "func" && !left.type.ref)
+        )
           this.errorToken(
             node,
             "Cannot assign to a memory index or a function",
           );
         if (!left.writable)
           this.errorToken(node, "Cannot set read-only variable");
-        this.shouldMatchType(
-          left.type,
+        this.shouldMatchTypes(
+          [left.type],
           this.resolveVariable(this.getType(node.body)),
         );
-        return {
-          type: left.relative === "local" ? left.type : "void",
-          ...toStartEnd(node, node),
-        };
+        if (left.relative !== "local")
+          return [
+            {
+              type: "void",
+              ...toStartEnd(node, node),
+            },
+          ];
+        return [
+          {
+            ...left.type,
+            ...toStartEnd(node, node),
+          },
+        ];
       }
       case AST.ASSIGN_MANY: {
         const values = this.flatValues([node.body]);
@@ -2381,325 +2705,365 @@ class VerifyCompiler {
         const out = [];
         for (const [idx, val] of node.targets.entries()) {
           const left = this.get(node, val.literal);
-          if (left.type === "memory" || left.type === "func")
+          if (left.type.type === "memory" || left.type.type === "func")
             this.errorToken(
               val,
               "Cannot assign to a memory index or a function",
             );
           if (!left.writable)
             this.errorToken(val, "Cannot set read-only variable");
-          this.shouldMatchType(left.type, values[idx]);
-          out.push(left.relative === "local" ? left.type : "void");
+          this.shouldMatchTypes([left.type], [values[idx]]);
+          if (left.relative === "local")
+            out.push({
+              ...left.type,
+              ...toStartEnd(node, node),
+            });
         }
-        return {
-          type: out,
-          ...toStartEnd(node, node),
-        };
+        return out.length === 0
+          ? [
+              {
+                type: "void",
+                ...toStartEnd(node, node),
+              },
+            ]
+          : out;
       }
       case AST.MEMORY_INDEX: {
         const mem = this.get(node, node.memory);
-        if (mem.type !== "memory")
+        if (mem.type.type !== "memory")
           this.errorToken(node, "Can only index memories");
         if (mem.index === null)
           this.errorToken(node, "Memory is not indexable");
-        this.shouldMatchType(
-          "u32",
+        this.shouldMatchTypes(
+          [{ type: "int", signed: 0, size: 32 }],
           this.resolveVariable(this.getType(node.index)),
         );
-        return {
-          type: toBigType(mem.index),
-          ...toStartEnd(node, node),
-        };
+        return [
+          {
+            ...toBigType(mem.index),
+            ...toStartEnd(node, node),
+          },
+        ];
       }
       case AST.ASSIGN_MEMORY_INDEX: {
         const mem = this.get(node, node.memory);
-        if (mem.type !== "memory")
+        if (mem.type.type !== "memory")
           this.errorToken(node, "Can only index memories");
         if (mem.index === null)
           this.errorToken(node, "Memory is not indexable");
-        this.shouldMatchType(
-          "u32",
+        this.shouldMatchTypes(
+          [{ type: "int", signed: 0, size: 32 }],
           this.resolveVariable(this.getType(node.index)),
         );
-        this.shouldMatchType(
-          toBigType(mem.index),
+        this.shouldMatchTypes(
+          [toBigType(mem.index)],
           this.resolveVariable(this.getType(node.body)),
         );
-        return {
-          type: "void",
-          ...toStartEnd(node, node),
-        };
+        return [
+          {
+            type: "void",
+            ...toStartEnd(node, node),
+          },
+        ];
       }
       case AST.POSTFIX_VARIABLE: {
         const ident = this.get(node, node.ident);
-        return {
-          type: ident.relative === "local" ? ident.type : "void",
-          ...toStartEnd(node, node),
-        };
+        if (ident.relative !== "local")
+          return [
+            {
+              type: "void",
+              ...toStartEnd(node, node),
+            },
+          ];
+        return [
+          {
+            ...ident.type,
+            ...toStartEnd(node, node),
+          },
+        ];
       }
       case AST.BINARY_INTEGER_SIGNED:
       case AST.BINARY_INTEGER: {
         const a = this.resolveVariable(this.getType(node.left));
         const b = this.resolveVariable(this.getType(node.right));
-        if (!this.nodeIsInteger(a))
-          this.errorToken(
-            node.left,
-            "Integer operators should have integer values",
-          );
-        if (!this.nodeIsInteger(b))
-          this.errorToken(
-            node.right,
-            "Integer operators should have integer values",
-          );
-        const [left, right] = typeNotNumbers(a, b);
+        this.typeIsIntegerLike(a);
+        this.typeIsIntegerLike(b);
         if (node.type === "shl" || node.type === "shr") {
-          this.shouldMatchType(a.type.replace("s", "u"), b);
-        } else this.shouldMatchType(left.type, right);
-        if (left.type === "number") {
-          return {
-            type: "number",
-            isDecimal: false,
-            ...toStartEnd(node, node),
-          };
+          this.shouldMatchTypes(
+            [
+              {
+                ...a[0],
+                signed: 0,
+              },
+            ],
+            b,
+          );
+        } else this.shouldMatchTypes(a, b);
+        // This is fine because typeIsIntegerLike already checks that there is one value
+        const specific = moreSpecific(a[0], b[0]);
+        if (specific.type === "number") {
+          return [
+            {
+              type: "number",
+              isDecimal: false,
+              ...toStartEnd(node, node),
+            },
+          ];
         }
-        return {
-          type: left.type,
-          ...toStartEnd(node, node),
-        };
+        return [
+          {
+            ...specific,
+            ...toStartEnd(node, node),
+          },
+        ];
       }
       case AST.BINARY_SIGNED:
       case AST.BINARY: {
         const a = this.resolveVariable(this.getType(node.left));
         const b = this.resolveVariable(this.getType(node.right));
-        const [left, right] = typeNotNumbers(a, b);
-        if (!this.typeIsNumberLike(a.type))
-          this.errorToken(
-            node.left,
-            "Binary operators should have number values",
-          );
-        if (!this.typeIsNumberLike(b.type))
-          this.errorToken(
-            node.right,
-            "Binary operators should have number values",
-          );
-        this.shouldMatchType(left.type, right);
-        if (node.comparison) return { type: "i32", ...toStartEnd(node, node) };
-        if (left.type === "number") {
-          return {
-            type: "number",
-            isDecimal: a.isDecimal || b.isDecimal,
-            ...toStartEnd(node, node),
-          };
+        this.typeIsNumberLike(a);
+        this.typeIsNumberLike(b);
+        this.shouldMatchTypes(a, b);
+        if (node.comparison)
+          return [
+            { type: "int", signed: 2, size: 32, ...toStartEnd(node, node) },
+          ];
+        const specific = moreSpecific(a[0], b[0]);
+        if (specific.type === "number") {
+          return [
+            {
+              type: "number",
+              isDecimal: a[0].isDecimal || b[0].isDecimal,
+              ...toStartEnd(node, node),
+            },
+          ];
         }
-        return {
-          type: left.type,
-          ...toStartEnd(node, node),
-        };
+        return [
+          {
+            ...specific,
+            ...toStartEnd(node, node),
+          },
+        ];
       }
       case AST.NOT: {
         const type = this.resolveVariable(this.getType(node.body));
-        this.shouldMatchAnyType(type, "i32", "i64");
-        return {
-          ...toStartEnd(node, node),
-          type: "i32", // NOT uses eqz which always returns i32
-        };
+        this.typeIsIntegerLike(type);
+        return [
+          {
+            type: "int",
+            signed: 2,
+            size: 32, // NOT uses eqz which always returns i32
+            ...toStartEnd(node, node),
+          },
+        ];
       }
       case AST.NEGATION: {
         const type = this.resolveVariable(this.getType(node.body));
-        this.shouldMatchAnyType(type, "f32", "f64");
-        if (type.type === "number") {
-          return {
-            type: "number",
-            // technically it should be float but having isDecimal be true
-            // is good enough to satisfy the invariant that negation can't return ints
-            isDecimal: true,
-            ...toStartEnd(node, node),
-          };
+        this.typeIsFloatLike(type);
+        if (type[0].type === "number") {
+          return [
+            {
+              type: "number",
+              // technically it should be float but having isDecimal be true
+              // is good enough to satisfy the invariant that negation can't return ints
+              isDecimal: true,
+              ...toStartEnd(node, node),
+            },
+          ];
         }
-        return {
-          type: type.type,
-          ...toStartEnd(node, node),
-        };
+        return [
+          {
+            ...type[0],
+            ...toStartEnd(node, node),
+          },
+        ];
       }
       case AST.EXPRESSION: {
         const ret = this.validInstructionCall(node);
 
-        if (node.level1 === "global" || node.level1 === "local") {
+        if (
+          node.level1.literal === "global" ||
+          node.level1.literal === "local"
+        ) {
           const param = this.get(node.params[0], node.params[0].literal);
-          if (param.relative === "local" && node.level1 === "global") {
+          if (param.relative === "local" && node.level1.literal === "global") {
             this.errorToken(
               node,
               "global operations can only be done on globals",
             );
           }
-          if (param.relative === "global" && node.level1 === "local")
+          if (param.relative === "global" && node.level1.literal === "local")
             this.errorToken(
               node,
               "local operations can only be done on locals",
             );
         }
         if (node.level2 === "get")
-          return {
-            type: this.get(node.params[0], node.params[0].literal).type,
-            ...toStartEnd(node, node),
-          };
+          return [
+            {
+              ...this.get(node.params[0], node.params[0].literal).type,
+              ...toStartEnd(node, node),
+            },
+          ];
         if (node.level2 === "set" || node.level2 === "tee") {
           const rvar = this.get(node.params[0], node.params[0].literal);
           if (!rvar.writable)
             this.errorToken(node.params[0], "Cannot set read-only variable");
-          const retVar = rvar.type;
           const retType = this.resolveVariable(this.getType(node.params[1]));
-          this.shouldMatchType(retVar, retType);
+          this.shouldMatchTypes([rvar.type], retType);
 
           if (node.level2 === "tee")
-            return {
-              type: retVar,
-              ...toStartEnd(node, node),
-            };
+            return [
+              {
+                ...rvar.type,
+                ...toStartEnd(node, node),
+              },
+            ];
         }
-        if (node.level1 === "select") {
-          const a = this.resolveVariable(this.getType(node.params[0]));
-          const b = this.resolveVariable(this.getType(node.params[1]));
-          const [rt1, rt2] = typeNotNumbers(a, b);
+        if (node.level1.literal === "select") {
+          // This is valid because validInstructionCall already checks that there is two parameters
+          const [a, b] = this.flatValues(node.params);
 
-          if (a.type === "memory" || a.type === "func")
+          if (a.type === "memory")
             this.errorToken(node.params[0], "Not a variable");
-          if (b.type === "memory" || b.type === "func")
+          if (b.type === "memory")
             this.errorToken(node.params[1], "Not a variable");
-          this.shouldMatchType(rt1.type, rt2);
-          if (rt1.type === "number")
-            return {
-              type: "number",
-              isDecimal: a.isDecimal || b.isDecimal,
+          this.shouldMatchTypes([a], [b]);
+
+          const specific = moreSpecific(a, b);
+          if (specific.type === "number")
+            return [
+              {
+                type: "number",
+                isDecimal: a.isDecimal || b.isDecimal,
+                ...toStartEnd(node, node),
+              },
+            ];
+          return [
+            {
+              ...specific,
               ...toStartEnd(node, node),
-            };
-          return {
-            type: rt1.type,
-            ...toStartEnd(node, node),
-          };
+            },
+          ];
         }
-        if (node.level1 === "generic") {
+        if (node.level1.literal === "generic") {
           const opcode = OPCODES.generic[node.level2];
-          const hasDouble = node.params.length === 2;
-          const a = this.resolveVariable(this.getType(node.params[0]));
-          const b = hasDouble
-            ? this.resolveVariable(this.getType(node.params[1]))
-            : null;
+          const hasDouble = opcode.params.length === 2;
+          const [a, b] = this.flatValues(node.params);
 
           let left;
           if (hasDouble) {
-            const ret = typeNotNumbers(a, b);
-            left = ret[0];
+            left = moreSpecific(a, b);
             if (node.level2 !== "rotl" && node.level2 !== "rotr")
-              this.shouldMatchType(left.type, ret[1]);
+              this.shouldMatchTypes([a], [b]);
           } else {
             left = a;
           }
           if (opcode.type) {
             // int
-            if (!this.nodeIsInteger(a))
-              this.errorToken(node.params[0], "Should be an integer");
+            this.typeIsIntegerLike([a]);
             if (hasDouble) {
               if (node.level2 === "rotl" || node.level2 === "rotr")
-                this.shouldMatchType(a.type.replace("s", "u"), b);
-              else if (!this.nodeIsInteger(b))
-                this.errorToken(node.params[1], "Should be an integer");
+                this.shouldMatchTypes(
+                  [
+                    {
+                      ...a,
+                      signed: 0,
+                    },
+                  ],
+                  [b],
+                );
+              this.typeIsIntegerLike(b);
             }
             if (left.type === "number")
-              return {
-                type: "number",
-                isDecimal: false,
-                ...toStartEnd(node, node),
-              };
+              return [
+                {
+                  type: "number",
+                  isDecimal: false,
+                  ...toStartEnd(node, node),
+                },
+              ];
             if (
               node.level2 === "clz" ||
               node.level2 === "ctz" ||
               node.level2 === "popcnt"
             )
-              return {
-                type: a.type.replace("s", "u"),
+              return [
+                {
+                  ...a,
+                  ...toStartEnd(node, node),
+                },
+              ];
+            return [
+              {
+                ...left,
                 ...toStartEnd(node, node),
-              };
-            return {
-              type: left.type,
-              ...toStartEnd(node, node),
-            };
+              },
+            ];
           }
 
           // float
-          if (!this.typeIsNumberLike(a.type))
-            this.errorToken(node.params[0], "Should be a number");
-          if (hasDouble && !this.typeIsNumberLike(b.type))
-            this.errorToken(node.params[1], "Should be a number");
+          this.typeIsNumberLike([a]);
+          if (hasDouble) {
+            this.typeIsNumberLike([b]);
+          }
           if (left.type === "number")
-            return {
-              type: "number",
-              isDecimal: true,
+            return [
+              {
+                type: "number",
+                isDecimal: true,
+                ...toStartEnd(node, node),
+              },
+            ];
+          return [
+            {
+              ...left,
               ...toStartEnd(node, node),
-            };
-          return {
-            type: left.type,
-            ...toStartEnd(node, node),
-          };
+            },
+          ];
         }
 
-        if (node.level1 === "uint" || node.level1 === "sint") {
-          const to = node.level1[0];
-          const want = to === "u" ? "s" : "u";
-          const type = this.resolveVariable(this.getType(node.params[0])).type;
-          if (Array.isArray(type) && type.length > 1)
-            this.errorToken(node.params[0], "uint/sint expects 1 parameter");
-          const resolvedType = Array.isArray(type) ? type[0] : type;
-          if (want[0] !== resolvedType[0])
-            this.errorToken(
-              node.params[0],
-              `expected ${want[0]}, got ${resolvedType}`,
-            );
-          const arity = this.toTypeSize(resolvedType);
-          return {
-            type: `${to}${arity}`,
-            ...toStartEnd(node, node),
-          };
+        if (node.level1.literal === "uint" || node.level1.literal === "sint") {
+          const tot = node.level1.literal[0];
+          const to = tot === "u" ? 0 : 1;
+          const want = to === 0 ? 1 : 0;
+
+          const type = this.resolveVariable(this.getType(node.params[0]))[0];
+          this.shouldMatchTypes(
+            [
+              {
+                type: "int",
+                size: type.size,
+                signed: want,
+              },
+            ],
+            [type],
+          );
+          return [
+            {
+              type: "int",
+              size: type.size,
+              signed: to,
+              ...toStartEnd(node, node),
+            },
+          ];
         }
 
-        return {
-          type: ret,
-          ...toStartEnd(node, node),
-        };
+        return ret.length === 0
+          ? [
+              {
+                type: "void",
+                ...toStartEnd(node, node),
+              },
+            ]
+          : ret.map((i) => ({
+              ...i,
+              ...toStartEnd(node, node),
+            }));
       }
       default:
         throw new Error("bad code");
     }
-  }
-
-  flatValuesResolvable(output) {
-    const next = [];
-    for (const member of output) {
-      const t = this.getType(member);
-      if (Array.isArray(t.type))
-        for (const o of t.type)
-          next.push({
-            type: o,
-            ...toStartEnd(t, t),
-          });
-      else next.push(t);
-    }
-    return next;
-  }
-
-  flatValues(output) {
-    const next = [];
-    for (const member of output) {
-      const t = this.resolveVariable(this.getType(member));
-      if (Array.isArray(t.type))
-        for (const o of t.type)
-          next.push({
-            type: o,
-            ...toStartEnd(t, t),
-          });
-      else next.push(t);
-    }
-    return next;
   }
 
   verifyStatement(node, func) {
@@ -2732,10 +3096,7 @@ class VerifyCompiler {
             node,
             `Expected ${func.output.length} return values, but got ${retval.length} values`,
           );
-        for (let i = 0; i < retval.length; i++) {
-          const out = retval[i];
-          this.shouldMatchType(func.output[i], out);
-        }
+        this.shouldMatchTypes(func.output, retval);
         break;
       }
       case AST.BLOCK:
@@ -2755,7 +3116,7 @@ class VerifyCompiler {
         });
         for (const line of node.bodies) {
           const expr = this.resolveVariable(this.getType(line.cond));
-          this.shouldMatchType("i32", expr);
+          this.shouldMatchTypes([{ type: "int", signed: 2, size: 32 }], expr);
           for (const node of line.body) this.verifyStatement(node, func);
         }
         if (node.elseb) {
@@ -2769,8 +3130,8 @@ class VerifyCompiler {
           continue: true,
         });
         this.isLoop++;
-        this.shouldMatchType(
-          "i32",
+        this.shouldMatchTypes(
+          [{ type: "int", signed: 2, size: 32 }],
           this.resolveVariable(this.getType(node.cond)),
         );
         // Just verify that it's valid, but it also doesn't need to match a type since it gets discarded
@@ -2784,17 +3145,194 @@ class VerifyCompiler {
     }
   }
 
+  // Returns a tuple: [hasReturn, causedByBreakContinue]
+  hasReturn(body) {
+    for (const line of body) {
+      if (line.node === AST.RETURN) return [true, false];
+      // Unreachable immediately halts execution, so it technically returns
+      if (line.node === AST.EXPRESSION && line.level1.literal === "unreachable")
+        return [true, false];
+      if (line.node === AST.BREAK || line.node === AST.CONTINUE)
+        return [false, true];
+      if (line.node === AST.BLOCK) {
+        const res = this.hasReturn(line.body);
+        if (res[0]) return [true, false];
+        if (res[1]) return [false, true];
+      }
+      if (line.node === AST.IF) {
+        // If there is no else all the if conditions could be false
+        let possible = line.elseb !== null;
+        for (const body of line.bodies) {
+          const res = this.hasReturn(body.body);
+          if (!res[0]) possible = false;
+          if (res[1]) return [false, true];
+        }
+        if (line.elseb) {
+          const res = this.hasReturn(line.elseb);
+          if (!res[0]) possible = false;
+          if (res[1]) return [false, true];
+        }
+        if (possible) return [true, false];
+      }
+      // If isDo is false assume the condition is always false, so the loop never runs
+      if (line.node === AST.WHILE && line.isDo) {
+        const res = this.hasReturn(line.body);
+        if (res[0]) return [true, false];
+        if (res[1]) return [false, true];
+      }
+    }
+
+    return [false, false];
+  }
+
+  verifyLocalInitialization(body, init) {
+    for (const line of body) {
+      switch (line.node) {
+        case AST.NUMBER:
+        case AST.BREAK:
+        case AST.CONTINUE:
+        case AST.POSTFIX_VARIABLE:
+          break;
+        case AST.RETURN:
+          this.verifyLocalInitialization(line.values, init);
+          break;
+        case AST.BLOCK:
+          this.verifyLocalInitialization(line.body, init);
+          break;
+        case AST.IF: {
+          // The first condition counts as being in the same block
+          init = this.verifyLocalInitialization([line.bodies[0].cond], init);
+          this.verifyLocalInitialization(line.bodies[0].body, init);
+          if (line.bodies.length > 1) {
+            // When compiled, each inner body counts as being in the same block as the previous one
+            this.verifyLocalInitialization(
+              [
+                {
+                  node: AST.IF,
+                  bodies: line.bodies.slice(1),
+                  elseb: line.elseb,
+                  // Label and text marker don't matter here
+                },
+              ],
+              init,
+            );
+          } else if (line.elseb !== null) {
+            this.verifyLocalInitialization(line.elseb, init);
+          }
+          break;
+        }
+        case AST.WHILE: {
+          // Non-do loops have the conditional be in the same block as the current one
+          if (!line.isDo)
+            init = this.verifyLocalInitialization([line.cond], init);
+          // The body is internally put inside a block so it doesn't contribute to line.update and line.cond
+          // This is not true if the body is not put inside a block (eg. binaryen optimizes it out) but then
+          // the handling gets weirder
+          this.verifyLocalInitialization(line.body, init);
+          const arr = [];
+          if (line.update !== null) arr.push(line.update);
+          arr.push(line.cond);
+          this.verifyLocalInitialization(arr, init);
+          break;
+        }
+        case AST.IDENTIFIER: {
+          const val = this.get(line, line.literal);
+          if (val.relative === "local" && !init.has(line.literal))
+            this.errorToken(line, "Local must be initialized in order to use");
+          break;
+        }
+        case AST.ASSIGN:
+          init = this.verifyLocalInitialization([line.body], init);
+          init = new Set(init).add(line.name);
+          break;
+        case AST.ASSIGN_MANY:
+          init = this.verifyLocalInitialization([line.body], init);
+          init = new Set(init);
+          for (const target of line.targets) init.add(target.literal);
+          break;
+        case AST.MEMORY_INDEX:
+          init = this.verifyLocalInitialization([line.index], init);
+          break;
+        case AST.ASSIGN_MEMORY_INDEX:
+          init = this.verifyLocalInitialization([line.index, line.body], init);
+          break;
+        case AST.BINARY_INTEGER_SIGNED:
+        case AST.BINARY_INTEGER:
+        case AST.BINARY_SIGNED:
+        case AST.BINARY:
+          init = this.verifyLocalInitialization([line.left, line.right], init);
+          break;
+        case AST.NOT:
+        case AST.NEGATION:
+          init = this.verifyLocalInitialization([line.body], init);
+          break;
+        case AST.EXPRESSION: {
+          const opt = getOpcode(line.level1, line.level2);
+          if (opt === undefined) {
+            if (line.level1.node === AST.IDENTIFIER) {
+              const val = this.get(line, line.level1.literal);
+              if (val.relative === "local" && !init.has(line.level1.literal))
+                this.errorToken(
+                  line,
+                  "Local must be initialized in order to use",
+                );
+              init = this.verifyLocalInitialization(line.params, init);
+            } else {
+              init = this.verifyLocalInitialization(line.params, init);
+              this.verifyLocalInitialization([line.level1], init);
+            }
+          } else {
+            const params = this.flatValuesResolvable(line.params);
+            for (let i = 0; i < opt.params.length; i++) {
+              const expected = opt.params[i];
+              const given = params[i];
+
+              if (expected === null) continue;
+
+              switch (expected) {
+                case "variable": {
+                  const val = this.get(given, given.name);
+                  if (val.relative === "local") {
+                    if (
+                      line.level2.literal === "set" ||
+                      line.level2.literal === "tee"
+                    ) {
+                      init = new Set(init).add(given.name);
+                    } else if (!init.has(given.name))
+                      this.errorToken(
+                        given,
+                        "Local must be initialized in order to use",
+                      );
+                  }
+                  break;
+                }
+                case "memory":
+                  break;
+                default: {
+                  init = this.verifyLocalInitialization([given], init);
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return init;
+  }
+
   compileFunctionParams(node) {
     const out = [];
-    const func = this.get(node, node.level1);
+    const funcs = this.resolveVariable(this.getType(node.level1));
+    if (funcs.length !== 1) this.errorToken(node, "Can only call one function");
     let funcIdx = 0;
     for (let i = 0; i < node.params.length; i++) {
       const arg = node.params[i];
-      const argType = this.getType(arg);
-      const type = func.params[funcIdx].type;
-      if (Array.isArray(argType.type)) funcIdx += argType.type.length;
-      else funcIdx++;
-      out.push(...this.compileExpression(arg, type).code);
+      const type = funcs[0].params[funcIdx];
+      const res = this.compileExpression(arg, type);
+      funcIdx += res.len;
+      out.push(...res.code);
     }
     return out;
   }
@@ -2803,7 +3341,7 @@ class VerifyCompiler {
     switch (node.node) {
       case AST.NUMBER: {
         // A top level number can't actually be used anywhere
-        if (hint === "")
+        if (hint.type === "void")
           return {
             code: [],
             len: 0,
@@ -2816,6 +3354,17 @@ class VerifyCompiler {
       }
       case AST.IDENTIFIER: {
         const ref = this.get(node, node.literal);
+        if (ref.type.type === "func" && !ref.type.ref) {
+          this.elements.push([
+            ...leb128u32(3),
+            0x00,
+            ...encodevec(leb128u32(ref.ref)),
+          ]);
+          return {
+            code: [0xd2, ...leb128u32(ref.ref)],
+            len: 1,
+          };
+        }
         return {
           code: [ref.relative === "local" ? 0x20 : 0x23, ...leb128u32(ref.ref)],
           len: 1,
@@ -2827,23 +3376,33 @@ class VerifyCompiler {
         return {
           code: [
             ...expr,
-            ref.relative === "local" ? (hint === "" ? 0x21 : 0x22) : 0x24,
+            ref.relative === "local"
+              ? hint.type === "void"
+                ? 0x21
+                : 0x22
+              : 0x24,
             ...leb128u32(ref.ref),
           ],
-          len: ref.relative === "local" && hint !== "" ? 1 : 0,
+          len: ref.relative === "local" && hint.type !== "void" ? 1 : 0,
         };
       }
       case AST.ASSIGN_MANY: {
-        const code = [...this.compileExpression(node.body, "").code];
+        const code = [
+          ...this.compileExpression(node.body, { type: "void" }).code,
+        ];
         let len = 0;
         // Values need to be popped in reverse
         for (const target of node.targets.toReversed()) {
           const ref = this.get(node, target.literal);
           code.push(
-            ref.relative === "local" ? (hint === "" ? 0x21 : 0x22) : 0x24,
+            ref.relative === "local"
+              ? hint.type === "void"
+                ? 0x21
+                : 0x22
+              : 0x24,
             ...leb128u32(ref.ref),
           );
-          if (ref.relative === "local" && hint !== "") len++;
+          if (ref.relative === "local" && hint.type !== "void") len++;
         }
         return {
           code,
@@ -2853,14 +3412,20 @@ class VerifyCompiler {
       case AST.MEMORY_INDEX: {
         const ref = this.get(node, node.memory);
         const type = toRawType(toBigType(ref.index));
-        const size = this.toTypeSize(ref.index);
+        const size = ref.index.size;
         const loadop =
-          size === 32 || size === 64 ? "load" : `load${size}_${ref.index[0]}`;
+          size === 32 || size === 64
+            ? "load"
+            : `load${size}_${ref.type.signed === 1 ? "s" : "u"}`;
         const opcodeLoad = OPCODES[type][loadop].opcode;
         const byteSize = Math.log2(size / 8);
         return {
           code: [
-            ...this.compileExpression(node.index, "u32").code,
+            ...this.compileExpression(node.index, {
+              type: "int",
+              signed: 0,
+              size: 32,
+            }).code,
             // 8 does not need a multiplier since it's 1 byte
             NUM_CONST.i32,
             ...encode("i32", 2 ** byteSize),
@@ -2878,13 +3443,17 @@ class VerifyCompiler {
       case AST.ASSIGN_MEMORY_INDEX: {
         const ref = this.get(node, node.memory);
         const type = toRawType(toBigType(ref.index));
-        const size = this.toTypeSize(ref.index);
+        const size = ref.index.size;
         const storeop = size === 32 || size === 64 ? "store" : `store${size}`;
         const opcodeStore = OPCODES[type][storeop].opcode;
         const byteSize = Math.log2(size / 8);
         return {
           code: [
-            ...this.compileExpression(node.index, "u32").code,
+            ...this.compileExpression(node.index, {
+              type: "int",
+              signed: 0,
+              size: 32,
+            }).code,
             // 8 does not need a multiplier since it's 1 byte
             NUM_CONST.i32,
             ...encode("i32", 2 ** byteSize),
@@ -2908,21 +3477,28 @@ class VerifyCompiler {
             ref.relative === "local" ? 0x20 : 0x23,
             ...leb128u32(ref.ref),
             NUM_CONST[uhint],
-            ...encode(uhint, 1),
+            ...encode(
+              uhint,
+              ref.type.type === "int" && ref.type.size === 64 ? 1n : 1,
+            ),
             OPCODES[uhint][node.type].opcode,
-            ref.relative === "local" ? (hint === "" ? 0x21 : 0x22) : 0x24,
+            ref.relative === "local"
+              ? hint.type === "void"
+                ? 0x21
+                : 0x22
+              : 0x24,
             ...leb128u32(ref.ref),
           ],
-          len: ref.relative === "local" && hint !== "" ? 1 : 0,
+          len: ref.relative === "local" && hint.type !== "void" ? 1 : 0,
         };
       }
       case AST.BINARY_INTEGER:
       case AST.BINARY: {
         const ta = this.resolveVariable(this.getType(node.left));
         const tb = this.resolveVariable(this.getType(node.right));
-        const tOutA = typeNotNumbers(ta, tb)[0].type;
-        const tOut = tOutA === "number" ? hint : tOutA;
-        if (tOut === "") return { code: [], len: 0 };
+        const tOutA = moreSpecific(ta[0], tb[0]);
+        const tOut = tOutA.type === "number" ? hint : tOutA;
+        if (tOut.type === "void") return { code: [], len: 0 };
         return {
           code: [
             ...this.compileExpression(node.left, tOut).code,
@@ -2936,10 +3512,12 @@ class VerifyCompiler {
       case AST.BINARY_SIGNED: {
         const ta = this.resolveVariable(this.getType(node.left));
         const tb = this.resolveVariable(this.getType(node.right));
-        const tOutA = typeNotNumbers(ta, tb)[0].type;
-        const tOut = tOutA === "number" ? hint : tOutA;
-        if (tOut === "") return { code: [], len: 0 };
-        const op = node.type + (tOut[0] !== "f" ? "_" + tOut[0] : "");
+        const tOutA = moreSpecific(ta[0], tb[0]);
+        const tOut = tOutA.type === "number" ? hint : tOutA;
+        if (tOut.type === "void") return { code: [], len: 0 };
+        const op =
+          node.type +
+          (tOut.type === "int" ? "_" + (tOut.signed === 1 ? "s" : "u") : "");
         return {
           code: [
             ...this.compileExpression(node.left, tOut).code,
@@ -2950,9 +3528,12 @@ class VerifyCompiler {
         };
       }
       case AST.NOT: {
-        const typep = this.resolveVariable(this.getType(node.body)).type;
+        const typep = this.resolveVariable(this.getType(node.body));
         // i32.eqz/i64.eqz can't ever return i64, so i32 is more explicit
-        const type = typep === "number" ? "i32" : typep;
+        const type =
+          typep.type === "number"
+            ? { type: "int", signed: 2, size: 32 }
+            : typep;
         return {
           code: [
             ...this.compileExpression(node.body, type).code,
@@ -2962,9 +3543,9 @@ class VerifyCompiler {
         };
       }
       case AST.NEGATION: {
-        const typep = this.resolveVariable(this.getType(node.body)).type;
-        const type = typep === "number" ? hint : typep;
-        if (type === "") return { code: [], len: 0 };
+        const typep = this.resolveVariable(this.getType(node.body));
+        const type = typep.type === "number" ? hint : typep;
+        if (type.type === "void") return { code: [], len: 0 };
         return {
           code: [
             ...this.compileExpression(node.body, type).code,
@@ -2975,27 +3556,27 @@ class VerifyCompiler {
       }
       case AST.EXPRESSION: {
         if (node.level2 === "get") {
-          const opcode = OPCODES[node.level1].get;
+          const opcode = OPCODES[node.level1.literal].get;
           return {
             code: [
               opcode.opcode,
               ...leb128u32(
-                this[node.level1 + "s"].get(node.params[0].literal).ref,
+                this[node.level1.literal + "s"].get(node.params[0].literal).ref,
               ),
             ],
             len: 1,
           };
         } else if (node.level2 === "set" || node.level2 === "tee") {
-          const opcode = OPCODES[node.level1][node.level2].opcode;
+          const opcode = OPCODES[node.level1.literal][node.level2].opcode;
           return {
             code: [
               ...this.compileExpression(
                 node.params[1],
-                this[node.level1 + "s"].get(node.params[0].literal).type,
+                this[node.level1.literal + "s"].get(node.params[0].literal),
               ).code,
               opcode,
               ...leb128u32(
-                this[node.level1 + "s"].get(node.params[0].literal).ref,
+                this[node.level1.literal + "s"].get(node.params[0].literal).ref,
               ),
             ],
             // tee could be optimized with set but this optimization is already done
@@ -3003,39 +3584,52 @@ class VerifyCompiler {
             len: node.level2 === "tee" ? 1 : 0,
           };
         }
-        if (node.level1 === "select") {
-          const opcode = OPCODES.select.opcode;
-          const [paramA, paramB] = node.params;
-          const typeA = this.resolveVariable(this.getType(paramA));
-          const typeB = this.resolveVariable(this.getType(paramB));
-          const tOutA = typeNotNumbers(typeA, typeB)[0].type;
-          const tOut = tOutA === "number" ? hint : tOutA;
+        if (node.level1.literal === "select") {
+          const types = this.flatValues(node.params);
+          const tOutA = moreSpecific(types[0], types[1]);
+          const tOut = tOutA.type === "number" ? hint : tOutA;
           // This means that select is top-level with two number arguments
           // which can be dropped
-          if (tOut === "") return { code: [], len: 0 };
+          if (tOut.type === "void") return { code: [], len: 0 };
+          const paramTypes = [
+            tOut,
+            tOut,
+            {
+              type: "int",
+              signed: 2,
+              size: 32,
+            },
+          ];
+          const code = [];
+          let idx = 0;
+          for (const param of node.params) {
+            const res = this.compileExpression(param, paramTypes[idx]);
+            idx += res.len;
+            code.push(...res.code);
+          }
+          if (tOut.type === "func") {
+            this.defineType(tOut);
+            code.push(0x1c, ...encodevec([this.typeIdx - 1]));
+          } else {
+            code.push(0x1b);
+          }
           return {
-            code: [
-              ...this.compileExpression(paramA, tOut).code,
-              ...this.compileExpression(paramB, tOut).code,
-              ...this.compileExpression(node.params[2], "i32").code,
-              opcode,
-            ],
+            code,
             len: 1,
           };
         }
-        if (node.level1 === "generic") {
+        if (node.level1.literal === "generic") {
           const paramA = node.params[0];
-          const typeA = this.resolveVariable(this.getType(paramA));
-          const tOutA = (
+          const typeA = this.resolveVariable(this.getType(paramA))[0];
+          const tOutA =
             node.params.length === 2
-              ? typeNotNumbers(
+              ? moreSpecific(
                   typeA,
-                  this.resolveVariable(this.getType(node.params[1])),
-                )[0]
-              : typeA
-          ).type;
-          const tOut = tOutA === "number" ? hint : tOutA;
-          if (hint === "") return { code: [], len: 0 };
+                  this.resolveVariable(this.getType(node.params[1]))[0],
+                )
+              : typeA;
+          const tOut = tOutA.type === "number" ? hint : tOutA;
+          if (tOut.type === "void") return { code: [], len: 0 };
 
           const opcode = OPCODES[toRawType(tOut)][node.level2].opcode;
           const code = [...this.compileExpression(paramA, tOut).code];
@@ -3047,14 +3641,14 @@ class VerifyCompiler {
             len: 1,
           };
         }
-        if (node.level1 === "memory") {
+        if (node.level1.literal === "memory") {
           const memidx = this.globals.get(node.params[0].literal).ref;
           const opcode =
             OPCODES.memory[node.level2 === "byteSize" ? "size" : node.level2];
           const out = [];
-          const base = node.level2 === "copy" ? 2 : 1;
+          const base = node.level2 === "copy" || node.level2 === "init" ? 2 : 1;
           for (let i = base; i < opcode.params.length; i++) {
-            const type = opcode.params[i];
+            const type = toLongType(opcode.params[i]);
             const arg = node.params[i];
             out.push(...this.compileExpression(arg, type).code);
           }
@@ -3071,9 +3665,22 @@ class VerifyCompiler {
               ...leb128u32(memidx),
               ...leb128u32(this.globals.get(node.params[1].literal).ref),
             );
-          else if (node.level2 === "fill") out.push(...leb128u32(11), memidx);
+          else if (node.level2 === "fill")
+            out.push(...leb128u32(11), ...leb128u32(memidx));
           else if (node.level2 === "byteSize")
-            out.push(NUM_CONST.i32, ...leb128s32(16), OPCODES.i32.shl.opcode);
+            out.push(
+              NUM_CONST.i32,
+              ...leb128s32(65536),
+              OPCODES.i32.mul.opcode,
+            );
+          else if (node.level2 === "init")
+            out.push(
+              ...leb128u32(8),
+              ...leb128u32(
+                this.get(node.params[1], node.params[1].literal).ref,
+              ),
+              ...leb128u32(memidx),
+            );
           return {
             code: out,
             len: node.level2 === "size" || node.level2 === "grow" ? 1 : 0,
@@ -3084,9 +3691,9 @@ class VerifyCompiler {
           (node.level2.startsWith("load") || node.level2.startsWith("store"))
         ) {
           const out = [];
-          const opcode = OPCODES[node.level1][node.level2];
+          const opcode = OPCODES[node.level1.literal][node.level2];
           for (let i = 1; i < opcode.params.length; i++) {
-            const type = opcode.params[i];
+            const type = toLongType(opcode.params[i]);
             const arg = node.params[i];
             out.push(...this.compileExpression(arg, type).code);
           }
@@ -3102,35 +3709,69 @@ class VerifyCompiler {
           };
         }
 
-        if (node.level1 === "uint" || node.level1 === "sint")
-          return this.compileExpression(node.params[0]);
+        if (node.level1.literal === "data") {
+          return {
+            code: [
+              0xfc,
+              ...leb128u32(9),
+              ...leb128u32(
+                this.get(node.params[0], node.params[0].literal).ref,
+              ),
+            ],
+            len: 0,
+          };
+        }
+
+        if (node.level1.literal === "uint" || node.level1.literal === "sint")
+          return this.compileExpression(node.params[0], { type: "void" });
 
         const out = [];
         const opcode = getOpcode(node.level1, node.level2);
         if (opcode === undefined) {
-          const func = this.get(node, node.level1);
-          const out = this.compileFunctionParams(node);
-          out.push(0x10, ...leb128u32(this.globals.get(node.level1).ref));
-          return {
-            code: out,
-            len: func.output.length,
-          };
+          if (node.level1.node === AST.IDENTIFIER) {
+            const f = this.get(node, node.level1.literal);
+            const func = f.type;
+            const out = this.compileFunctionParams(node);
+            if (func.ref) {
+              out.push(
+                f.relative === "local" ? 0x20 : 0x23,
+                ...leb128u32(f.ref),
+                0x14,
+                ...leb128u32(f.typeRef),
+              );
+            } else out.push(0x10, ...leb128u32(f.ref));
+
+            return {
+              code: out,
+              len: func.output.length,
+            };
+          } else {
+            const functype = this.resolveVariable(this.getType(node.level1))[0];
+            return {
+              code: [
+                ...this.compileFunctionParams(node),
+                ...this.compileExpression(node.level1, functype).code,
+                0x14,
+                ...leb128u32(functype.typeRef),
+              ],
+              len: functype.output.length,
+            };
+          }
         }
 
         let funcIdx = 0;
         for (let i = 0; i < node.params.length; i++) {
           const arg = node.params[i];
-          const argType = this.getType(arg);
-          const type = opcode.params[funcIdx];
-          if (Array.isArray(argType.type)) funcIdx += argType.type.length;
-          else funcIdx++;
-          out.push(...this.compileExpression(arg, type).code);
+          const type = toLongType(opcode.params[funcIdx]);
+          const expr = this.compileExpression(arg, type);
+          funcIdx += expr.len;
+          out.push(...expr.code);
         }
         out.push(opcode.opcode);
         if (node.level2 !== null && node.level2.startsWith("trunc_sat_"))
           out.push(
             ...leb128u32(
-              (node.level1 === "i64" ? 4 : 0) +
+              (node.level1.literal === "i64" ? 4 : 0) +
                 TRUNC_SAT_ORDER.indexOf(node.level2),
             ),
           );
@@ -3177,12 +3818,22 @@ class VerifyCompiler {
             val.node === AST.EXPRESSION &&
             getOpcode(val.level1, val.level2) === undefined
           ) {
-            const func = this.get(val, val.level1).ref;
-            return [
-              ...this.compileFunctionParams(val),
-              0x12,
-              ...leb128u32(func),
-            ];
+            if (val.level1.node === AST.IDENTIFIER) {
+              const func = this.get(val, val.level1.literal).ref;
+              return [
+                ...this.compileFunctionParams(val),
+                0x12,
+                ...leb128u32(func),
+              ];
+            } else {
+              const func = this.resolveVariable(this.getType(val.level1))[0];
+              return [
+                ...this.compileFunctionParams(val),
+                ...this.compileExpression(val.level1, func).code,
+                0x15,
+                ...leb128u32(func.typeRef),
+              ];
+            }
           }
         }
 
@@ -3209,7 +3860,11 @@ class VerifyCompiler {
             });
 
           body.push(
-            ...this.compileExpression(state.cond, "i32").code,
+            ...this.compileExpression(state.cond, {
+              type: "int",
+              signed: 2,
+              size: 32,
+            }).code,
             0x04,
             0x40,
           );
@@ -3230,9 +3885,18 @@ class VerifyCompiler {
       case AST.WHILE: {
         const body = [];
         if (node.init !== null)
-          body.push(...this.compileExpression(node.init, "").code);
+          body.push(
+            ...this.compileExpression(node.init, { type: "void" }).code,
+          );
         if (!node.isDo) {
-          body.push(...this.compileExpression(node.cond, "i32").code, 0x04);
+          body.push(
+            ...this.compileExpression(node.cond, {
+              type: "int",
+              signed: 2,
+              size: 32,
+            }).code,
+            0x04,
+          );
         } else {
           body.push(0x02);
         }
@@ -3255,9 +3919,15 @@ class VerifyCompiler {
           body.push(...this.compileStatement(line, func));
         body.push(0x0b);
         if (node.update !== null)
-          body.push(...this.compileExpression(node.update, "").code);
+          body.push(
+            ...this.compileExpression(node.update, { type: "void" }).code,
+          );
         body.push(
-          ...this.compileExpression(node.cond, "i32").code,
+          ...this.compileExpression(node.cond, {
+            type: "int",
+            signed: 2,
+            size: 32,
+          }).code,
           0x0d,
           ...leb128u32(0),
           0x0b,
@@ -3282,51 +3952,11 @@ class VerifyCompiler {
         return body;
       }
       default: {
-        const res = this.compileExpression(node, "");
+        const res = this.compileExpression(node, { type: "void" });
         for (let i = 0; i < res.len; i++) res.code.push(0x1a);
         return res.code;
       }
     }
-  }
-
-  // Returns a tuple: [hasReturn, causedByBreakContinue]
-  hasReturn(body) {
-    for (const line of body) {
-      if (line.node === AST.RETURN) return [true, false];
-      // Unreachable immediately halts execution, so it technically returns
-      if (line.node === AST.EXPRESSION && line.level1 === "unreachable")
-        return [true, false];
-      if (line.node === AST.BREAK || line.node === AST.CONTINUE)
-        return [false, true];
-      if (line.node === AST.BLOCK) {
-        const res = this.hasReturn(line.body);
-        if (res[0]) return [true, false];
-        if (res[1]) return [false, true];
-      }
-      if (line.node === AST.IF) {
-        // If there is no else all the if conditions could be false
-        let possible = line.elseb !== null;
-        for (const body of line.bodies) {
-          const res = this.hasReturn(body.body);
-          if (!res[0]) possible = false;
-          if (res[1]) return [false, true];
-        }
-        if (line.elseb) {
-          const res = this.hasReturn(line.elseb);
-          if (!res[0]) possible = false;
-          if (res[1]) return [false, true];
-        }
-        if (possible) return [true, false];
-      }
-      // If isDo is false assume the condition is always false, so the loop never runs
-      if (line.node === AST.WHILE && line.isDo) {
-        const res = this.hasReturn(line.body);
-        if (res[0]) return [true, false];
-        if (res[1]) return [false, true];
-      }
-    }
-
-    return [false, false];
   }
 
   validateAndCompileFunction(node) {
@@ -3335,48 +3965,68 @@ class VerifyCompiler {
     const code = [];
     const locals = [];
     let localIdx = 0;
-    let currentParam = "",
+    let currentParam = { type: "fake" },
       currentLen = 0;
 
     for (const arg of [...node.params, ...node.locals]) {
       if (this.locals.has(arg.name))
         this.errorToken(arg, "This local was already declared");
-      this.locals.set(arg.name, {
+      const obj = {
         type: arg.type,
         writable: true,
         relative: "local",
         ref: localIdx++,
         ...toStartEnd(arg, arg),
-      });
+      };
+      // This has to be a ref but check just to be safe
+      if (arg.type.type === "func" && arg.type.ref) {
+        this.defineType(arg.type);
+        obj.typeRef = obj.type.typeRef = this.typeIdx - 1;
+      }
+      this.locals.set(arg.name, obj);
     }
 
     for (const param of node.locals) {
-      if (currentParam === toRawType(param.type)) {
+      if (isSameType(currentParam, param.type)) {
         currentLen++;
       } else {
-        if (currentParam !== "") {
-          locals.push([leb128u32(currentLen), NUM_OPCODE[currentParam]]);
+        if (currentParam.type !== "fake") {
+          locals.push([
+            leb128u32(currentLen),
+            ...this.defineType(currentParam),
+          ]);
         }
-        currentParam = toRawType(param.type);
+        currentParam = param.type;
         currentLen = 1;
       }
     }
-    if (currentParam !== "") {
-      locals.push([leb128u32(currentLen), NUM_OPCODE[currentParam]]);
+    if (currentParam.type !== "fake") {
+      locals.push([leb128u32(currentLen), ...this.defineType(currentParam)]);
     }
     code.push(...encodevec(locals));
 
     for (const line of node.body) {
-      this.verifyStatement(line, node);
-      code.push(...this.compileStatement(line, node));
+      this.verifyStatement(line, node.type);
+      code.push(...this.compileStatement(line, node.type));
     }
 
-    if (node.output.length > 0) {
+    this.verifyLocalInitialization(
+      node.body,
+      new Set(
+        [
+          ...node.params,
+          ...node.locals.filter(
+            (i) => i.type.type === "int" || i.type.type === "float",
+          ),
+        ].map((i) => i.name),
+      ),
+    );
+
+    if (node.type.output.length > 0) {
       if (!this.hasReturn(node.body)[0])
         this.errorToken(node, "Expected a return statement");
-      const last = code.at(-1);
-      // Since there always is a return but there isn't one at the end of the code insert unreachable
-      if (last !== 0x12 && last !== 0x0f) code.push(0x00);
+      // Always insert unreachable because it's just easier
+      code.push(0x00);
     }
 
     code.push(0x0b);
@@ -3399,7 +4049,10 @@ class VerifyCompiler {
       ...encodesection(this.memories, 5),
       ...encodesection(this.globalArr, 6),
       ...encodesection(this.exports, 7),
+      ...encodesection(this.elements, 9),
+      ...encodesection2(leb128u32(this.data.length), 12),
       ...encodesection(this.code, 10),
+      ...encodesection(this.data, 11),
     ]);
   }
 
@@ -3412,10 +4065,10 @@ class VerifyCompiler {
   }
 }
 
-function compileRaw(text) {
+function compileRaw(text, map) {
   const tokens = lex(text);
   const ast = new Parser(tokens, text).parse();
-  return new VerifyCompiler(ast, text).verifyCompile();
+  return new VerifyCompiler(ast, text, map).verifyCompile();
 }
 
 async function optimize(wasm) {
@@ -3423,17 +4076,17 @@ async function optimize(wasm) {
     await import("https://cdn.jsdelivr.net/npm/binaryen@123.0.0")
   ).default;
   const module = binaryen.readBinary(wasm);
-  module.setFeatures(binaryen.Features.BulkMemoryOpt);
+  module.setFeatures(binaryen.Features.All);
   module.optimize();
   const binary = module.emitBinary();
   module.dispose();
   return binary;
 }
 
-function compileCode(text) {
-  return optimize(compileRaw(text));
+function compileCode(text, map) {
+  return optimize(compileRaw(text, map));
 }
 
-export async function compile(emwasm, deps) {
-  return compileWasm(await compileCode(emwasm), deps);
+export async function compile(emwasm, deps, map) {
+  return compileWasm(await compileCode(emwasm, map), deps);
 }

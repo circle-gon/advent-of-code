@@ -27,7 +27,9 @@ fn parse()(idx: u32, outIdx: u32, val: u32, temp: u32, accum: u32) {
       table[outIdx] = 0
       outIdx++
     }
-    idx++
+    if (input[idx] != 0) {
+      idx++
+    }
   }
   table[outIdx] = 0
 }
@@ -67,7 +69,7 @@ export fn part1()(
   idx++
   x = 0
   y = 0
-  distance = 999999999
+  distance = u32.max
   
   // Second round around the board
   while (table[idx] != 0) {
@@ -152,7 +154,7 @@ export fn part2()(
 }
 `;
 
-const compilee = compile(code, {});
+const compilee = compile(code, {}, {});
 
 async function part1(input) {
   const { module, memory } = await compilee;
