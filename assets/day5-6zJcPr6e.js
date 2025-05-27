@@ -1,4 +1,4 @@
-import{a as c,m as t}from"./index-CJx7zTSC.js";const a=`
+import{a as c,m as t}from"./index-DDLFNhiI.js";const a=`
 (import "js" "raw" (memory $raw 1))
 (memory $order 1)
 (memory $reports 1)

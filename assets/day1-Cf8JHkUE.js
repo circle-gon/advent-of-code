@@ -1,4 +1,4 @@
-import{c as r}from"./emwasm-DmUaIWip.js";import{m as o}from"./index-CJx7zTSC.js";const a=`
+import{c as r}from"./emwasm-WyPGHS4b.js";import{m as o}from"./index-DDLFNhiI.js";const a=`
 export input = import js.raw(memory<u8>(1))
 export clean = memory<u32>(1)
 let count = u32(0)
@@ -50,4 +50,4 @@ export fn part2()() -> u32 {
   parse()
   return getResult2()
 }
-`,n=r(a,{});async function c(u){const{module:t,memory:e}=await n;return o(u,e),t.part1()}async function i(u){const{module:t,memory:e}=await n;return o(u,e),t.part2()}const p=[c,i];export{p as default};
+`,n=r(a,{},{});async function c(u){const{module:t,memory:e}=await n;return o(u,e),t.part1()}async function i(u){const{module:t,memory:e}=await n;return o(u,e),t.part2()}const p=[c,i];export{p as default};

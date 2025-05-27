@@ -1,4 +1,4 @@
-import{c as p}from"./emwasm-DmUaIWip.js";import{m as s}from"./index-CJx7zTSC.js";const n=`
+import{c as p}from"./emwasm-WyPGHS4b.js";import{m as s}from"./index-DDLFNhiI.js";const n=`
 input = import js.raw(memory<u8>(1))
 export table = memory<u16>(1)
 export wires = memory<u16>(30000)
@@ -24,7 +24,9 @@ fn parse()(idx: u32, outIdx: u32, val: u32, temp: u32, accum: u32) {
       table[outIdx] = 0
       outIdx++
     }
-    idx++
+    if (input[idx] != 0) {
+      idx++
+    }
   }
   table[outIdx] = 0
 }
@@ -64,7 +66,7 @@ export fn part1()(
   idx++
   x = 0
   y = 0
-  distance = 999999999
+  distance = u32.max
   
   // Second round around the board
   while (table[idx] != 0) {
@@ -147,4 +149,4 @@ export fn part2()(
   }
   return distance
 }
-`,o=p(n,{});async function d(t){const{module:e,memory:i}=await o;return s(t,i),e.part1()}async function r(t){const{module:e,memory:i}=await o;return s(t,i),e.part2()}const a=[d,r];export{a as default};
+`,o=p(n,{},{});async function d(t){const{module:e,memory:i}=await o;return s(t,i),e.part1()}async function r(t){const{module:e,memory:i}=await o;return s(t,i),e.part2()}const a=[d,r];export{a as default};
