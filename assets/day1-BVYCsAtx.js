@@ -1,10 +1,10 @@
-import{c as r}from"./emwasm-WyPGHS4b.js";import{m as o}from"./index-DDLFNhiI.js";const a=`
+import{c as r}from"./emwasm-BAYlZ7aM.js";import{m as o}from"./index-DJW6-bui.js";const a=`
 export input = import js.raw(memory<u8>(1))
-export clean = memory<u32>(1)
+clean = memory<u32>(1)
 let count = u32(0)
 
 fn inRange(m: u32)() -> u32 {
-  return (m >= 48) & (m <= 57)
+  return m >= 48 & m <= 57
 }
 
 fn parse()(idx: u32, val: u32, accum: u32, outIdx: u32) {
@@ -50,4 +50,4 @@ export fn part2()() -> u32 {
   parse()
   return getResult2()
 }
-`,n=r(a,{},{});async function c(u){const{module:t,memory:e}=await n;return o(u,e),t.part1()}async function i(u){const{module:t,memory:e}=await n;return o(u,e),t.part2()}const p=[c,i];export{p as default};
+`,n=r(a,{},{});async function c(u){const{module:t,memory:e}=await n;return o(u,e),t.part1()}async function i(u){const{module:t,memory:e}=await n;return o(u,e),t.part2()}const s=[c,i];export{s as default};

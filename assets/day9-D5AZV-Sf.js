@@ -1,4 +1,4 @@
-import{c as a}from"./emwasm-WyPGHS4b.js";import{m as o}from"./index-DDLFNhiI.js";import{i as c}from"./intcode-CHldCGIl.js";const s=`
+import{c as a}from"./emwasm-BAYlZ7aM.js";import{m as o}from"./index-DJW6-bui.js";import{i as c}from"./intcode-BRTvzTo6.js";const s=`
 ${c}
 let c = u32(0)
 let out = s64(0)
@@ -19,7 +19,7 @@ fn set(v: s64)() {
 export fn part1()() -> s64 {
   c = 0
   parse()
-  evalIntcode(0, get, set)
+  evalIntcode(0, 0, get, set)
   if (c != 1) { unreachable() }
   return out
 }
@@ -27,7 +27,7 @@ export fn part1()() -> s64 {
 export fn part2()() -> s64 {
   c = 0
   parse()
-  evalIntcode(0, get2, set)
+  evalIntcode(0, 0, get2, set)
   if (c != 1) { unreachable() }
   return out
 }

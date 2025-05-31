@@ -1,7 +1,7 @@
-import{c as n}from"./emwasm-WyPGHS4b.js";import{m as a}from"./index-DDLFNhiI.js";const u=`
+import{c as n}from"./emwasm-BAYlZ7aM.js";import{m as t}from"./index-DJW6-bui.js";const u=`
 input = import js.raw(memory<u8>(1))
-export chain = memory<u16>(2) // Max hash code is ~46k and each element takes up 2 bytes
-export revChain = memory<u16>(5)
+chain = memory<u16>(2) // Max hash code is ~46k and each element takes up 2 bytes
+revChain = memory<u16>(5)
 items = memory<u16>(1)
 seen = memory<u8>(1)
 queue = memory<u16>(1)
@@ -10,13 +10,13 @@ let end = u32(0)
 const chainCount = u32(3)
 
 fn code(char: u32)() -> u32 {
-  if ((char >= 48) & (char <= 57)) { return char - 48 }
-  if ((char >= 65) & (char <= 90)) { return char - 55 }
+  if (char >= 48 & char <= 57) { return char - 48 }
+  if (char >= 65 & char <= 90) { return char - 55 }
   unreachable()
 }
 
 fn inRange(char: u32)() -> u32 {
-  return ((char >= 48) & (char <= 57)) | ((char >= 65) & (char <= 90))
+  return (char >= 48 & char <= 57) | (char >= 65 & char <= 90)
 }
 
 fn addc(idx: u32, val: u32)(i: u32) {
@@ -93,10 +93,12 @@ export fn part2()(start: u32, dest: u32, dist: u32, iter: u32) -> u32 {
     if (dest == chain[36671]) { return dist }
     if (chain[dest] != 0) { add(chain[dest], dist + 1) }
     for (iter = 0; iter < chainCount; iter++) {
-      if (revChain[dest * chainCount + iter] != 0) { add(revChain[dest * chainCount + iter], dist + 1) }
+      if (revChain[dest * chainCount + iter] != 0) {
+        add(revChain[dest * chainCount + iter], dist + 1)
+      }
       else { break }
     }
   }
   unreachable()
 }
-`,r=n(u,{},{});async function c(e){const{module:i,memory:t}=await r;return a(e,t),i.part1()}async function m(e){const{module:i,memory:t}=await r;return a(e,t),i.part2()}const h=[c,m];export{h as default};
+`,r=n(u,{},{});async function c(e){const{module:i,memory:a}=await r;return t(e,a),i.part1()}async function m(e){const{module:i,memory:a}=await r;return t(e,a),i.part2()}const o=[c,m];export{o as default};

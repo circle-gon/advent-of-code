@@ -1,4 +1,4 @@
-import{a as r,m as s}from"./index-DDLFNhiI.js";const u=`
+import{a as r,m as s}from"./index-DJW6-bui.js";const u=`
 ;; Memory
 (import "js" "raw" (memory $raw 1))
 (import "js" "sort" (func $sort))

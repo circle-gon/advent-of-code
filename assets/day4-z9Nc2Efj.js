@@ -1,4 +1,4 @@
-import{c as r}from"./emwasm-WyPGHS4b.js";import{m as n}from"./index-DDLFNhiI.js";const m=`
+import{c as r}from"./emwasm-BAYlZ7aM.js";import{m as n}from"./index-DJW6-bui.js";const m=`
 input = import js.raw(memory<u8>(1))
 let begin = u32(0)
 let end = u32(0)
@@ -50,7 +50,7 @@ fn valid2(num: u32)(prev: u32, same: u32, digit: u32, len: u32) -> u32 {
     if (prev < digit) { return 0 }
     prev = digit
   }
-  return same | (len == 2)
+  return same | len == 2
 }
 
 export fn part1()(i: u32, count: u32) -> u32 {

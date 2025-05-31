@@ -1,7 +1,7 @@
-import{c as g}from"./emwasm-WyPGHS4b.js";import{m as i}from"./index-DDLFNhiI.js";import{i as r}from"./intcode-CHldCGIl.js";const E=`
-${r}
+import{c as a}from"./emwasm-BAYlZ7aM.js";import{m as i}from"./index-DJW6-bui.js";import{i as g}from"./intcode-BRTvzTo6.js";const r=`
+${g}
 fives = data<active>(temp, 0)
-export temp = memory<u8>(1)
+temp = memory<u8>(1)
 state = memory<u32>(1)
 let range = u32(0)
 let signal = u64(0)
@@ -26,7 +26,7 @@ fn getOutput(ph: u32, sig: u64)() -> u64 {
   signal = sig
   phase = i64.extend_i32_u(ph)
   time = 0
-  evalIntcode(0, get, set)
+  evalIntcode(0, 0, get, set)
   return out
 }
 
@@ -52,12 +52,13 @@ fn getSuspend()() -> s64 {
   return 1347376211 // STOP
 }
 
-fn runAmplified(idx: u32, val: u64)(base: u32) -> u32 {
+fn runAmplified(idx: u32, val: u64)(base: u32, fake: u32, fake2: s32) -> u32 {
   phase = val
   time = 0
   base = idx * (range + 1)
   memory.copy(program, state, 0, i64.size * base + i32.size, i64.size * range)
-  state[2 * base] = evalIntcode(state[2 * base], getSuspend, set)
+  fake, fake2 = evalIntcode(state[2 * base], 0, getSuspend, set)
+  state[2 * base] = fake
   memory.copy(state, program, i64.size * base + i32.size, 0, i64.size * range)
   return state[2 * base]
 }
@@ -76,7 +77,7 @@ export fn part2()(idx: u32, max: u64, status: u32, i: u32) -> u64 {
     runAmplified(2, i64.extend_i32_u(temp[idx + 2] + 5))
     runAmplified(3, i64.extend_i32_u(temp[idx + 3] + 5))
     runAmplified(4, i64.extend_i32_u(temp[idx + 4] + 5))
-    do while (status != 0) {
+    do while (status != 1347376211) {
       for (i = 0; i < 5; i++) {
         status = runAmplified(i, out)
       }
@@ -85,4 +86,4 @@ export fn part2()(idx: u32, max: u64, status: u32, i: u32) -> u64 {
   }
   return max
 }
-`,u=g(E,{},{fives:new TextEncoder().encode(atob("AAECAwQAAQIEAwABAwIEAAEDBAIAAQQCAwABBAMCAAIBAwQAAgEEAwACAwEEAAIDBAEAAgQBAwACBAMBAAMBAgQAAwEEAgADAgEEAAMCBAEAAwQBAgADBAIBAAQBAgMABAEDAgAEAgEDAAQCAwEABAMBAgAEAwIBAQACAwQBAAIEAwEAAwIEAQADBAIBAAQCAwEABAMCAQIAAwQBAgAEAwECAwAEAQIDBAABAgQAAwECBAMAAQMAAgQBAwAEAgEDAgAEAQMCBAABAwQAAgEDBAIAAQQAAgMBBAADAgEEAgADAQQCAwABBAMAAgEEAwIAAgABAwQCAAEEAwIAAwEEAgADBAECAAQBAwIABAMBAgEAAwQCAQAEAwIBAwAEAgEDBAACAQQAAwIBBAMAAgMAAQQCAwAEAQIDAQAEAgMBBAACAwQAAQIDBAEAAgQAAQMCBAADAQIEAQADAgQBAwACBAMAAQIEAwEAAwABAgQDAAEEAgMAAgEEAwACBAEDAAQBAgMABAIBAwEAAgQDAQAEAgMBAgAEAwECBAADAQQAAgMBBAIAAwIAAQQDAgAEAQMCAQAEAwIBBAADAgQAAQMCBAEAAwQAAQIDBAACAQMEAQACAwQBAgADBAIAAQMEAgEABAABAgMEAAEDAgQAAgEDBAACAwEEAAMBAgQAAwIBBAEAAgMEAQADAgQBAgADBAECAwAEAQMAAgQBAwIABAIAAQMEAgADAQQCAQADBAIBAwAEAgMAAQQCAwEABAMAAQIEAwACAQQDAQACBAMBAgAEAwIAAQQDAgEA"))});async function B(A){const{module:e,memory:t}=await u;return i(A,t),e.part1()}async function Q(A){const{module:e,memory:t}=await u;return i(A,t),e.part2()}const s=[B,Q];export{s as default};
+`,u=a(r,{},{fives:new TextEncoder().encode(atob("AAECAwQAAQIEAwABAwIEAAEDBAIAAQQCAwABBAMCAAIBAwQAAgEEAwACAwEEAAIDBAEAAgQBAwACBAMBAAMBAgQAAwEEAgADAgEEAAMCBAEAAwQBAgADBAIBAAQBAgMABAEDAgAEAgEDAAQCAwEABAMBAgAEAwIBAQACAwQBAAIEAwEAAwIEAQADBAIBAAQCAwEABAMCAQIAAwQBAgAEAwECAwAEAQIDBAABAgQAAwECBAMAAQMAAgQBAwAEAgEDAgAEAQMCBAABAwQAAgEDBAIAAQQAAgMBBAADAgEEAgADAQQCAwABBAMAAgEEAwIAAgABAwQCAAEEAwIAAwEEAgADBAECAAQBAwIABAMBAgEAAwQCAQAEAwIBAwAEAgEDBAACAQQAAwIBBAMAAgMAAQQCAwAEAQIDAQAEAgMBBAACAwQAAQIDBAEAAgQAAQMCBAADAQIEAQADAgQBAwACBAMAAQIEAwEAAwABAgQDAAEEAgMAAgEEAwACBAEDAAQBAgMABAIBAwEAAgQDAQAEAgMBAgAEAwECBAADAQQAAgMBBAIAAwIAAQQDAgAEAQMCAQAEAwIBBAADAgQAAQMCBAEAAwQAAQIDBAACAQMEAQACAwQBAgADBAIAAQMEAgEABAABAgMEAAEDAgQAAgEDBAACAwEEAAMBAgQAAwIBBAEAAgMEAQADAgQBAgADBAECAwAEAQMAAgQBAwIABAIAAQMEAgADAQQCAQADBAIBAwAEAgMAAQQCAwEABAMAAQIEAwACAQQDAQACBAMBAgAEAwIAAQQDAgEA"))});async function E(A){const{module:e,memory:t}=await u;return i(A,t),e.part1()}async function B(A){const{module:e,memory:t}=await u;return i(A,t),e.part2()}const s=[E,B];export{s as default};

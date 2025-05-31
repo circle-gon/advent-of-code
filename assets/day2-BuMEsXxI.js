@@ -1,4 +1,4 @@
-import{c as m}from"./emwasm-WyPGHS4b.js";import{m as t}from"./index-DDLFNhiI.js";import{i as n}from"./intcode-CHldCGIl.js";const p=`
+import{c as m}from"./emwasm-BAYlZ7aM.js";import{m as t}from"./index-DJW6-bui.js";import{i as n}from"./intcode-BRTvzTo6.js";const p=`
 ${n}
 
 temp = memory(1)
@@ -8,7 +8,7 @@ export fn part1()() -> s64 {
   parse()
   program[1] = 12
   program[2] = 2
-  evalIntcode(0, get, set)
+  evalIntcode(0, 0, get, set)
   return program[0]
 }
 
@@ -29,7 +29,7 @@ export fn part2()(i: u64, j: u64) -> u32 {
       memory.copy(program, temp, 0, 0, range)
       program[1] = sint(i)
       program[2] = sint(j)
-      evalIntcode(0, get, set)
+      evalIntcode(0, 0, get, set)
       if (program[0] == 19690720) {
         return i32.wrap_i64(100 * i + j)
       }
