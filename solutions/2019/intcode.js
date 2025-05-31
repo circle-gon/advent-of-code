@@ -55,12 +55,13 @@ fn writeFromMode(addr: s64, val: s64, mode: u32, rel: s32)() {
   if (mode == 2) {
     program[uint(i32.wrap_i64(addr) + rel)] = val
   } else {
-   program[uint(i32.wrap_i64(addr))] = val
+    program[uint(i32.wrap_i64(addr))] = val
   }
 }
 
 fn evalIntcode(
   ip: u32,
+  rel: s32,
   getInput: func<s64>(),
   getOutput: func(s64)
 )(
@@ -68,9 +69,8 @@ fn evalIntcode(
   val1: s64,
   val2: s64,
   mode: u32,
-  tmp: s64,
-  rel: s32
-) -> u32 {
+  tmp: s64
+) -> u32, s32 {
   while (true) {
     instr = i32.wrap_i64(uint(program[ip] % 100))
     mode = i32.wrap_i64(uint(program[ip] / 100))
@@ -88,7 +88,7 @@ fn evalIntcode(
       tmp = getInput()
       // STOP in little-endian binary encoding
       if (tmp == 1347376211) {
-        return ip
+        return ip, rel
       }
       writeFromMode(program[ip + 1], tmp, getMode(mode, 0), rel)
       ip += 2
@@ -124,7 +124,7 @@ fn evalIntcode(
     } else if (instr == 9) {
       rel += i32.wrap_i64(valFromMode(program[ip + 1], getMode(mode, 0), rel))
       ip += 2
-    } else if (instr == 99) { return 0 }
+    } else if (instr == 99) { return 1347376211, 1347376211 } // STOP
     else { unreachable() }
   }
   unreachable()

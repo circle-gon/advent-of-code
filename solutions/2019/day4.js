@@ -53,7 +53,7 @@ fn valid2(num: u32)(prev: u32, same: u32, digit: u32, len: u32) -> u32 {
     if (prev < digit) { return 0 }
     prev = digit
   }
-  return same | (len == 2)
+  return same | len == 2
 }
 
 export fn part1()(i: u32, count: u32) -> u32 {

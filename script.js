@@ -9,6 +9,7 @@ const fileUpload = document.getElementById("file-upload");
 const errorDiv = document.getElementById("error");
 const dataInput = document.getElementById("data");
 const runBtn = document.getElementById("run");
+const runintBtn = document.getElementById("runint");
 const runexBtn = document.getElementById("runex");
 const runallBtn = document.getElementById("runall");
 const runexallBtn = document.getElementById("runexall");
@@ -65,7 +66,8 @@ function loadYear() {
   for (let i = 1; i <= AOC.days; i++) {
     const select = document.createElement("option");
     const d = data[toSave.year][i - 1];
-    select.textContent = `day ${i} (${d.name})${d.special ? " (slow)" : ""}`;
+    const label = d.special ? "slow" : d.interactive ? "interactive" : "";
+    select.textContent = `day ${i} (${d.name})${label ? ` (${label})` : ""}`;
     daySelector.append(select);
   }
 
@@ -77,6 +79,14 @@ function loadDay() {
   const data = forDay();
   dataInput.value = data.input;
   partSelector.selectedIndex = data.part;
+  loadPart();
+}
+
+function loadPart() {
+  runintBtn.style.display =
+    data[toSave.year][getDay()].interactive === forDay().part
+      ? "inline-block"
+      : "none";
 }
 
 function getDay() {
@@ -143,7 +153,10 @@ function clearTable() {
 }
 
 function getType(solution) {
-  if (Array.isArray(solution) && solution.every((i) => i instanceof Node)) {
+  if (
+    Array.isArray(solution) &&
+    solution.every((i) => i instanceof Node || typeof i === "string")
+  ) {
     return "dom";
   }
   return "";
@@ -159,6 +172,82 @@ function trimInput(input, year, day) {
   if (year === "2017" && day === 18) return input;
   if (year === "2018" && day === 12) return input;
   return input.trim();
+}
+
+async function runManual(interactive) {
+  if (dataInput.value !== "") {
+    errorDiv.textContent = "";
+    resultSpan.textContent = "Generating solution...";
+    resultSpan.className = "maybe";
+    timeSpan.className = "maybe";
+    timeSpan.textContent = "???";
+    runBtn.disabled = true;
+    runintBtn.disabled = true;
+    runexBtn.disabled = true;
+    runallBtn.disabled = true;
+    runexallBtn.disabled = true;
+    multiTable.style.display = "none";
+    await wait();
+
+    let solution;
+    let name;
+    const start = performance.now();
+
+    try {
+      const solver = (await getSolution(getDay()))?.[forDay().part];
+      if (solver) {
+        solution = await solver(
+          trimInput(forDay().input, toSave.year, getDay()),
+          (value) => {
+            if (getType(value) === "dom") addNodes(resultSpan, value);
+            else updateSpan.textContent = value;
+          },
+          false,
+          interactive,
+        );
+        name = "success";
+      } else {
+        solution = "No solution created";
+        name = "skipped";
+      }
+    } catch (e) {
+      solution = "Failed to get a result";
+      name = "failed";
+      console.error(e);
+    }
+
+    const isNumber = typeof solution === "number";
+    const isNumberLike = isNumber || typeof solution === "bigint";
+
+    if (isNumber && solution > Number.MAX_SAFE_INTEGER) {
+      errorDiv.textContent =
+        "The answer is beyond the precision limit, so it is most likely wrong.";
+      name = "failed";
+    }
+
+    const type = getType(solution);
+    if (type === "dom") addNodes(resultSpan, solution);
+    else
+      resultSpan.textContent = `${solution}${
+        isNumberLike && solution >= 1000 ? ` (${format(solution)})` : ""
+      }`;
+    resultSpan.className = name;
+    timeSpan.className = name;
+    timeSpan.textContent = formatTime(start);
+    updateSpan.textContent = "";
+    runBtn.disabled = false;
+    runintBtn.disabled = false;
+    runexBtn.disabled = false;
+    runallBtn.disabled = false;
+    runexallBtn.disabled = false;
+  } else {
+    errorDiv.textContent = "No problem data.";
+    resultSpan.textContent = "???";
+    resultSpan.className = "skipped";
+    timeSpan.className = "skipped";
+    timeSpan.textContent = "???";
+    updateSpan.textContent = "";
+  }
 }
 
 function main() {
@@ -193,75 +282,8 @@ function main() {
     save();
   });
 
-  runBtn.addEventListener("click", async () => {
-    if (dataInput.value !== "") {
-      errorDiv.textContent = "";
-      resultSpan.textContent = "Generating solution...";
-      resultSpan.className = "maybe";
-      timeSpan.className = "maybe";
-      timeSpan.textContent = "???";
-      runBtn.disabled = true;
-      runexBtn.disabled = true;
-      runallBtn.disabled = true;
-      runexallBtn.disabled = true;
-      multiTable.style.display = "none";
-      await wait();
-
-      let solution;
-      let name;
-      const start = performance.now();
-
-      try {
-        const solver = (await getSolution(getDay()))?.[forDay().part];
-        if (solver) {
-          solution = await solver(
-            trimInput(forDay().input, toSave.year, getDay()),
-            (value) => (updateSpan.textContent = value),
-            false,
-          );
-          name = "success";
-        } else {
-          solution = "No solution created";
-          name = "skipped";
-        }
-      } catch (e) {
-        solution = "Failed to get a result";
-        name = "failed";
-        console.error(e);
-      }
-
-      const isNumber = typeof solution === "number";
-      const isNumberLike = isNumber || typeof solution === "bigint";
-
-      if (isNumber && solution > Number.MAX_SAFE_INTEGER) {
-        errorDiv.textContent =
-          "The answer is beyond the precision limit, so it is most likely wrong.";
-        name = "failed";
-      }
-
-      const type = getType(solution);
-      if (type === "dom") addNodes(resultSpan, solution);
-      else
-        resultSpan.textContent = `${solution}${
-          isNumberLike && solution >= 1000 ? ` (${format(solution)})` : ""
-        }`;
-      resultSpan.className = name;
-      timeSpan.className = name;
-      timeSpan.textContent = formatTime(start);
-      updateSpan.textContent = "";
-      runBtn.disabled = false;
-      runexBtn.disabled = false;
-      runallBtn.disabled = false;
-      runexallBtn.disabled = false;
-    } else {
-      errorDiv.textContent = "No problem data.";
-      resultSpan.textContent = "???";
-      resultSpan.className = "skipped";
-      timeSpan.className = "skipped";
-      timeSpan.textContent = "???";
-      updateSpan.textContent = "";
-    }
-  });
+  runBtn.addEventListener("click", () => runManual(false));
+  runintBtn.addEventListener("click", () => runManual(true));
 
   runexBtn.addEventListener("click", async () => {
     errorDiv.textContent = "";
@@ -270,6 +292,7 @@ function main() {
     timeSpan.className = "maybe";
     timeSpan.textContent = "???";
     runBtn.disabled = true;
+    runintBtn.disabled = true;
     runexBtn.disabled = true;
     runallBtn.disabled = true;
     runexallBtn.disabled = true;
@@ -289,6 +312,7 @@ function main() {
             trimInput(input, toSave.year, getDay()),
             (value) => (updateSpan.textContent = value),
             true,
+            false,
           );
           if (result !== expected) {
             console.error(
@@ -323,6 +347,7 @@ function main() {
     timeSpan.className = name;
     updateSpan.textContent = "";
     runBtn.disabled = false;
+    runintBtn.disabled = false;
     runexBtn.disabled = false;
     runallBtn.disabled = false;
     runexallBtn.disabled = false;
@@ -335,6 +360,7 @@ function main() {
     timeSpan.className = "maybe";
     timeSpan.textContent = "???";
     runBtn.disabled = true;
+    runintBtn.disabled = true;
     runexBtn.disabled = true;
     runallBtn.disabled = true;
     runexallBtn.disabled = true;
@@ -377,6 +403,7 @@ function main() {
                   trimInput(input, toSave.year, i),
                   (i) => (elements[1].textContent = i),
                   false,
+                  false,
                 ),
               ),
             )
@@ -417,6 +444,7 @@ function main() {
     resultSpan.className = failed ? "failed" : "success";
     timeSpan.className = failed ? "failed" : "success";
     runBtn.disabled = false;
+    runintBtn.disabled = false;
     runexBtn.disabled = false;
     runallBtn.disabled = false;
     runexallBtn.disabled = false;
@@ -439,6 +467,7 @@ function main() {
     timeSpan.textContent = "???";
     timeSpan.className = "maybe";
     runBtn.disabled = true;
+    runintBtn.disabled = true;
     runexBtn.disabled = true;
     runallBtn.disabled = true;
     runexallBtn.disabled = true;
@@ -464,7 +493,7 @@ function main() {
         for (const [t, see] of test) {
           waiting.push(
             new Promise((r) =>
-              r(solver(trimInput(t, toSave.year, i), () => {}, true)),
+              r(solver(trimInput(t, toSave.year, i), () => {}, true, false)),
             )
               .then((r) => {
                 if (r !== see) {
@@ -511,6 +540,7 @@ function main() {
     resultSpan.className = failed.length === 0 ? "success" : "failed";
     timeSpan.className = failed.length === 0 ? "success" : "failed";
     runBtn.disabled = false;
+    runintBtn.disabled = false;
     runexBtn.disabled = false;
     runallBtn.disabled = false;
     runexallBtn.disabled = false;
@@ -538,6 +568,7 @@ function main() {
   partSelector.addEventListener("change", () => {
     errorDiv.textContent = "";
     forDay().part = partSelector.selectedIndex;
+    loadPart();
     save();
   });
 

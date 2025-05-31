@@ -3,8 +3,9 @@ import { memstr } from "/utils.js";
 
 const code = `
 input = import js.raw(memory<u8>(1))
-export table = memory<u16>(1)
-export wires = memory<u16>(30000)
+table = memory<u16>(1)
+wires = memory(100)
+const size = u32(1000000)
 
 fn parse()(idx: u32, outIdx: u32, val: u32, temp: u32, accum: u32) {
   while (input[idx] != 0) {
@@ -16,7 +17,7 @@ fn parse()(idx: u32, outIdx: u32, val: u32, temp: u32, accum: u32) {
     
     idx++
     accum = 0
-    while ((input[idx] != 44) & (input[idx] != 0) & (input[idx] != 10)) {
+    while (input[idx] != 44 & input[idx] != 0 & input[idx] != 10) {
       accum = 10 * accum + (input[idx] - 48)
       idx++
     }
@@ -37,6 +38,39 @@ fn parse()(idx: u32, outIdx: u32, val: u32, temp: u32, accum: u32) {
 fn getIndex(x: s32, y: s32)() -> u32 {
   // -15000 to 15000 for both x and y
   return uint((y + 15000) * 30001 + (x + 15000))
+}
+
+fn hash(key: u32)() -> u32 {
+  return key % size
+}
+
+fn get(key: u32)(idx: u32, base: u32, addr: u32) -> u32 {
+  base = hash(key)
+  for (; idx < size; idx++) {
+    addr = 6 * ((idx + base) % size)
+    if (i32.load(wires, addr) == key + 1) {
+      return i32.load16_u(wires, addr + 4)
+    }
+    if (i32.load(wires, addr) == 0) { return 0 }
+  }
+  unreachable()
+}
+
+fn set(key: u32, val: u32)(idx: u32, base: u32, addr: u32) {
+  base = hash(key)
+  for (; idx < size; idx++) {
+    addr = 6 * ((idx + base) % size)
+    if (i32.load(wires, addr) == key + 1) {
+      i32.store16(wires, addr + 4, val)
+      return
+    }
+    if (i32.load(wires, addr) == 0) {
+      i32.store(wires, addr, key + 1)
+      i32.store16(wires, addr + 4, val)
+      return
+    }
+  }
+  unreachable()
 }
 
 export fn part1()(
@@ -62,7 +96,7 @@ export fn part1()(
       else if (type == 1) { x++ }
       else if (type == 2) { y++ }
       else if (type == 3) { y-- }
-      wires[getIndex(x, y)] = 1
+      set(getIndex(x, y), 1)
     }
     idx++
   }
@@ -81,7 +115,7 @@ export fn part1()(
       else if (type == 1) { x++ }
       else if (type == 2) { y++ }
       else if (type == 3) { y-- }
-      if (wires[getIndex(x, y)] == 1) {
+      if (get(getIndex(x, y)) == 1) {
         tmpdst = 0
         if (x < 0) { tmpdst -= uint(x) }
         else { tmpdst += uint(x) }
@@ -120,8 +154,8 @@ export fn part2()(
       else if (type == 2) { y++ }
       else if (type == 3) { y-- }
       steps++
-      if (wires[getIndex(x, y)] == 0) {
-        wires[getIndex(x, y)] = steps
+      if (get(getIndex(x, y)) == 0) {
+        set(getIndex(x, y), steps)
       }
     }
     idx++
@@ -143,8 +177,8 @@ export fn part2()(
       else if (type == 2) { y++ }
       else if (type == 3) { y-- }
       steps++
-      if (wires[getIndex(x, y)] != 0) {
-        tmpdst = wires[getIndex(x, y)] + steps
+      if (get(getIndex(x, y)) != 0) {
+        tmpdst = get(getIndex(x, y)) + steps
         if (tmpdst < distance) { distance = tmpdst }
       }
     }

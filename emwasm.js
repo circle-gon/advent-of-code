@@ -796,14 +796,13 @@ const AST = Object.freeze({
   BINARY: 12, // a binary operator that acts on two values of the same type and returns a value of that type
   NOT: 13, // special unary operator that works on ints
   BINARY_INTEGER: 14, // a binary operator that acts on two integers of the same type and returns a value of that type
-  POSTFIX_VARIABLE: 15, // special postfix operators that work on variables
-  NEGATION: 16, // special unary operator that works on floats
-  BINARY_SIGNED: 17, // same as BINARY, but the compiled operators depend on the signedness of the operands
-  BINARY_INTEGER_SIGNED: 18, // same as BINARY_INTEGER, but the compiled operators depend on the signedness of the operands
-  BLOCK: 19,
-  MEMORY_INDEX: 20,
-  ASSIGN_MEMORY_INDEX: 21,
-  ASSIGN_MANY: 22,
+  NEGATION: 15, // special unary operator that works on floats
+  BINARY_SIGNED: 16, // same as BINARY, but the compiled operators depend on the signedness of the operands
+  BINARY_INTEGER_SIGNED: 17, // same as BINARY_INTEGER, but the compiled operators depend on the signedness of the operands
+  BLOCK: 18,
+  MEMORY_INDEX: 19,
+  ASSIGN_MEMORY_INDEX: 20,
+  ASSIGN_MANY: 21,
 });
 
 function looseInteger(val) {
@@ -1301,8 +1300,8 @@ class Parser {
       this.errorToken(node, "invalid assignment target");
   }
 
-  compactAssignment(name, type, node) {
-    const expr = this.expression();
+  compactAssignmentRaw(name, type, node, expr) {
+    this.assertAssignment(name);
     const se = toStartEnd(name, expr);
     if (name.node === AST.MEMORY_INDEX)
       return {
@@ -1330,6 +1329,10 @@ class Parser {
       },
       ...se,
     };
+  }
+
+  compactAssignment(name, type, node) {
+    return this.compactAssignmentRaw(name, type, node, this.expression());
   }
 
   matchTargets() {
@@ -1387,43 +1390,34 @@ class Parser {
         this.idx = left.idx;
         left = left.targets[0];
         if (this.match(TOKENS.PLUS_EQUAL)) {
-          this.assertAssignment(left);
           return this.compactAssignment(left, "add", AST.BINARY);
         }
         if (this.match(TOKENS.DASH_EQUAL)) {
-          this.assertAssignment(left);
           return this.compactAssignment(left, "sub", AST.BINARY);
         }
+        ``;
         if (this.match(TOKENS.ASTERISK_EQUAL)) {
-          this.assertAssignment(left);
           return this.compactAssignment(left, "mul", AST.BINARY);
         }
         if (this.match(TOKENS.SLASH_EQUAL)) {
-          this.assertAssignment(left);
           return this.compactAssignment(left, "div", AST.BINARY_SIGNED);
         }
         if (this.match(TOKENS.PERCENT_EQUAL)) {
-          this.assertAssignment(left);
           return this.compactAssignment(left, "rem", AST.BINARY_INTEGER_SIGNED);
         }
         if (this.match(TOKENS.LEFT_ARROW_ARROW_EQUAL)) {
-          this.assertAssignment(left);
           return this.compactAssignment(left, "shl", AST.BINARY_INTEGER);
         }
         if (this.match(TOKENS.RIGHT_ARROW_ARROW_EQUAL)) {
-          this.assertAssignment(left);
           return this.compactAssignment(left, "shr", AST.BINARY_INTEGER_SIGNED);
         }
         if (this.match(TOKENS.AMPERSAND_EQUAL)) {
-          this.assertAssignment(left);
           return this.compactAssignment(left, "and", AST.BINARY_INTEGER);
         }
         if (this.match(TOKENS.CARET_EQUAL)) {
-          this.assertAssignment(left);
           return this.compactAssignment(left, "xor", AST.BINARY_INTEGER);
         }
         if (this.match(TOKENS.PIPE_EQUAL)) {
-          this.assertAssignment(left);
           return this.compactAssignment(left, "or", AST.BINARY_INTEGER);
         }
         return left;
@@ -1450,9 +1444,25 @@ class Parser {
         return cond;
       }
       case 2: {
-        const left = this.expr(3);
+        let body = this.expr(3);
+        while (true) {
+          const find = this.match(TOKENS.AMPERSAND) ?? this.match(TOKENS.PIPE);
+          if (!find) break;
+          const expr = this.expr(3);
+          body = {
+            node: AST.BINARY_INTEGER,
+            type: find.token === TOKENS.AMPERSAND ? "and" : "or",
+            left: body,
+            right: expr,
+            ...toStartEnd(body, expr),
+          };
+        }
+        return body;
+      }
+      case 3: {
+        const left = this.expr(4);
         if (this.match(TOKENS.EQUAL_EQUAL)) {
-          const right = this.expr(3);
+          const right = this.expr(4);
           return {
             node: AST.BINARY,
             type: "eq",
@@ -1463,7 +1473,7 @@ class Parser {
           };
         }
         if (this.match(TOKENS.BANG_EQUAL)) {
-          const right = this.expr(3);
+          const right = this.expr(4);
           return {
             node: AST.BINARY,
             type: "ne",
@@ -1474,7 +1484,7 @@ class Parser {
           };
         }
         if (this.match(TOKENS.LEFT_ARROW)) {
-          const right = this.expr(3);
+          const right = this.expr(4);
           return {
             node: AST.BINARY_SIGNED,
             type: "lt",
@@ -1485,7 +1495,7 @@ class Parser {
           };
         }
         if (this.match(TOKENS.LEFT_ARROW_EQUAL)) {
-          const right = this.expr(3);
+          const right = this.expr(4);
           return {
             node: AST.BINARY_SIGNED,
             type: "le",
@@ -1496,7 +1506,7 @@ class Parser {
           };
         }
         if (this.match(TOKENS.RIGHT_ARROW)) {
-          const right = this.expr(3);
+          const right = this.expr(4);
           return {
             node: AST.BINARY_SIGNED,
             type: "gt",
@@ -1507,7 +1517,7 @@ class Parser {
           };
         }
         if (this.match(TOKENS.RIGHT_ARROW_EQUAL)) {
-          const right = this.expr(3);
+          const right = this.expr(4);
           return {
             node: AST.BINARY_SIGNED,
             type: "ge",
@@ -1519,12 +1529,12 @@ class Parser {
         }
         return left;
       }
-      case 3: {
-        let body = this.expr(4);
+      case 4: {
+        let body = this.expr(5);
         while (true) {
           const find = this.match(TOKENS.PLUS) ?? this.match(TOKENS.DASH);
           if (!find) break;
-          const expr = this.expr(4);
+          const expr = this.expr(5);
           body = {
             node: AST.BINARY,
             type: find.token === TOKENS.PLUS ? "add" : "sub",
@@ -1535,15 +1545,15 @@ class Parser {
         }
         return body;
       }
-      case 4: {
-        let body = this.expr(5);
+      case 5: {
+        let body = this.expr(6);
         while (true) {
           const find =
             this.match(TOKENS.ASTERISK) ??
             this.match(TOKENS.SLASH) ??
             this.match(TOKENS.PERCENT);
           if (!find) break;
-          const expr = this.expr(5);
+          const expr = this.expr(6);
           if (find.token === TOKENS.ASTERISK) {
             body = {
               node: AST.BINARY,
@@ -1572,17 +1582,15 @@ class Parser {
         }
         return body;
       }
-      case 5: {
-        let body = this.expr(6);
+      case 6: {
+        let body = this.expr(7);
         while (true) {
           const find =
-            this.match(TOKENS.AMPERSAND) ??
-            this.match(TOKENS.PIPE) ??
             this.match(TOKENS.CARET) ??
             this.match(TOKENS.LEFT_ARROW_ARROW) ??
             this.match(TOKENS.RIGHT_ARROW_ARROW);
           if (!find) break;
-          const expr = this.expr(6);
+          const expr = this.expr(7);
           if (find.token === TOKENS.RIGHT_ARROW_ARROW) {
             body = {
               node: AST.BINARY_INTEGER_SIGNED,
@@ -1594,14 +1602,7 @@ class Parser {
           } else {
             body = {
               node: AST.BINARY_INTEGER,
-              type:
-                find.token === TOKENS.AMPERSAND
-                  ? "and"
-                  : find.token === TOKENS.CARET
-                    ? "xor"
-                    : find.token === TOKENS.LEFT_ARROW_ARROW
-                      ? "shl"
-                      : "or",
+              type: find.token === TOKENS.CARET ? "xor" : "shl",
               left: body,
               right: expr,
               ...toStartEnd(body, expr),
@@ -1610,10 +1611,10 @@ class Parser {
         }
         return body;
       }
-      case 6: {
+      case 7: {
         const tk1 = this.match(TOKENS.BANG);
         if (tk1) {
-          const expr = this.expr(6);
+          const expr = this.expr(7);
           return {
             node: AST.NOT,
             body: expr,
@@ -1622,41 +1623,41 @@ class Parser {
         }
         const tk2 = this.match(TOKENS.DASH);
         if (tk2) {
-          const expr = this.expr(6);
+          const expr = this.expr(7);
           return {
             node: AST.NEGATION,
             body: expr,
             ...toStartEnd(tk2, expr),
           };
         }
-        return this.expr(7);
+        return this.expr(8);
       }
-      case 7: {
-        const ident = this.expr(8);
+      case 8: {
+        const ident = this.expr(9);
         const tk1 = this.match(TOKENS.PLUS_PLUS);
         if (tk1) {
-          this.assertAssignment(ident);
-          return {
-            node: AST.POSTFIX_VARIABLE,
-            ident: ident.literal,
-            type: "add",
+          return this.compactAssignmentRaw(ident, "add", AST.BINARY, {
+            node: AST.NUMBER,
+            integer: "1",
+            fractional: "",
+            negative: false,
             ...toStartEnd(ident, tk1),
-          };
+          });
         }
         const tk2 = this.match(TOKENS.DASH_DASH);
         if (tk2) {
-          this.assertAssignment(ident);
-          return {
-            node: AST.POSTFIX_VARIABLE,
-            ident: ident.literal,
-            type: "sub",
+          return this.compactAssignmentRaw(ident, "sub", AST.BINARY, {
+            node: AST.NUMBER,
+            integer: "1",
+            fractional: "",
+            negative: false,
             ...toStartEnd(ident, tk2),
-          };
+          });
         }
         return ident;
       }
-      case 8: {
-        const left = this.expr(9);
+      case 9: {
+        const left = this.expr(10);
         if (this.match(TOKENS.LEFT_BRACKET)) {
           this.assertAssignment(left);
           const index = this.expression();
@@ -1670,8 +1671,8 @@ class Parser {
         }
         return left;
       }
-      case 9: {
-        let level1 = this.expr(10);
+      case 10: {
+        let level1 = this.expr(11);
         while (this.is(TOKENS.DOT) || this.is(TOKENS.LEFT_PAREN)) {
           let level2 = null;
           let level2t = null;
@@ -1712,17 +1713,20 @@ class Parser {
             const constant = CONSTANTS[level1.literal]?.[level2];
             if (constant === undefined)
               this.errorToken(toStartEnd(level1, level2t), "Invalid constant");
+            const cs = constant.toString();
+            const negative = cs.startsWith("-");
             level1 = {
               node: AST.NUMBER,
-              integer: constant.toString(),
+              integer: negative ? cs.slice(1) : cs,
               fractional: "",
+              negative,
               ...toStartEnd(level1, level2t),
             };
           }
         }
         return level1;
       }
-      case 10: {
+      case 11: {
         const tk1 = this.match(TOKENS.LEFT_PAREN);
         if (tk1) {
           const body = this.expression();
@@ -1740,6 +1744,7 @@ class Parser {
             node: AST.NUMBER,
             integer: number.integer,
             fractional: number.fractional,
+            negative: number.negative,
             ...toStartEnd(number, number),
           };
         }
@@ -1752,6 +1757,7 @@ class Parser {
               node: AST.NUMBER,
               integer: "1",
               fractional: "",
+              negative: false,
               ...toStartEnd(identifier, identifier),
             };
           if (id === "false")
@@ -1759,6 +1765,7 @@ class Parser {
               node: AST.NUMBER,
               integer: "0",
               fractional: "",
+              negative: false,
               ...toStartEnd(identifier, identifier),
             };
           return {
@@ -2766,22 +2773,6 @@ class VerifyCompiler {
           },
         ];
       }
-      case AST.POSTFIX_VARIABLE: {
-        const ident = this.get(node, node.ident);
-        if (ident.relative !== "local")
-          return [
-            {
-              type: "void",
-              ...toStartEnd(node, node),
-            },
-          ];
-        return [
-          {
-            ...ident.type,
-            ...toStartEnd(node, node),
-          },
-        ];
-      }
       case AST.BINARY_INTEGER_SIGNED:
       case AST.BINARY_INTEGER: {
         const a = this.resolveVariable(this.getType(node.left));
@@ -3039,6 +3030,13 @@ class VerifyCompiler {
             ],
             [type],
           );
+          if (type.type === "number")
+            return [
+              {
+                ...type,
+                isNegative: to === 1,
+              },
+            ];
           return [
             {
               type: "int",
@@ -3191,7 +3189,6 @@ class VerifyCompiler {
         case AST.NUMBER:
         case AST.BREAK:
         case AST.CONTINUE:
-        case AST.POSTFIX_VARIABLE:
           break;
         case AST.RETURN:
           this.verifyLocalInitialization(line.values, init);
@@ -3416,7 +3413,7 @@ class VerifyCompiler {
         const loadop =
           size === 32 || size === 64
             ? "load"
-            : `load${size}_${ref.type.signed === 1 ? "s" : "u"}`;
+            : `load${size}_${ref.index.signed === 1 ? "s" : "u"}`;
         const opcodeLoad = OPCODES[type][loadop].opcode;
         const byteSize = Math.log2(size / 8);
         return {
@@ -3469,29 +3466,6 @@ class VerifyCompiler {
           len: 0,
         };
       }
-      case AST.POSTFIX_VARIABLE: {
-        const ref = this.get(node, node.ident);
-        const uhint = toRawType(ref.type);
-        return {
-          code: [
-            ref.relative === "local" ? 0x20 : 0x23,
-            ...leb128u32(ref.ref),
-            NUM_CONST[uhint],
-            ...encode(
-              uhint,
-              ref.type.type === "int" && ref.type.size === 64 ? 1n : 1,
-            ),
-            OPCODES[uhint][node.type].opcode,
-            ref.relative === "local"
-              ? hint.type === "void"
-                ? 0x21
-                : 0x22
-              : 0x24,
-            ...leb128u32(ref.ref),
-          ],
-          len: ref.relative === "local" && hint.type !== "void" ? 1 : 0,
-        };
-      }
       case AST.BINARY_INTEGER:
       case AST.BINARY: {
         const ta = this.resolveVariable(this.getType(node.left));
@@ -3528,7 +3502,7 @@ class VerifyCompiler {
         };
       }
       case AST.NOT: {
-        const typep = this.resolveVariable(this.getType(node.body));
+        const typep = this.resolveVariable(this.getType(node.body))[0];
         // i32.eqz/i64.eqz can't ever return i64, so i32 is more explicit
         const type =
           typep.type === "number"
@@ -3543,7 +3517,7 @@ class VerifyCompiler {
         };
       }
       case AST.NEGATION: {
-        const typep = this.resolveVariable(this.getType(node.body));
+        const typep = this.resolveVariable(this.getType(node.body))[0];
         const type = typep.type === "number" ? hint : typep;
         if (type.type === "void") return { code: [], len: 0 };
         return {
@@ -3722,8 +3696,9 @@ class VerifyCompiler {
           };
         }
 
-        if (node.level1.literal === "uint" || node.level1.literal === "sint")
-          return this.compileExpression(node.params[0], { type: "void" });
+        if (node.level1.literal === "uint" || node.level1.literal === "sint") {
+          return this.compileExpression(node.params[0], hint);
+        }
 
         const out = [];
         const opcode = getOpcode(node.level1, node.level2);

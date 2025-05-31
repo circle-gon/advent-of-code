@@ -3,8 +3,8 @@ import { memstr } from "/utils.js";
 
 const code = `
 input = import js.raw(memory<u8>(1))
-export chain = memory<u16>(2) // Max hash code is ~46k and each element takes up 2 bytes
-export revChain = memory<u16>(5)
+chain = memory<u16>(2) // Max hash code is ~46k and each element takes up 2 bytes
+revChain = memory<u16>(5)
 items = memory<u16>(1)
 seen = memory<u8>(1)
 queue = memory<u16>(1)
@@ -13,13 +13,13 @@ let end = u32(0)
 const chainCount = u32(3)
 
 fn code(char: u32)() -> u32 {
-  if ((char >= 48) & (char <= 57)) { return char - 48 }
-  if ((char >= 65) & (char <= 90)) { return char - 55 }
+  if (char >= 48 & char <= 57) { return char - 48 }
+  if (char >= 65 & char <= 90) { return char - 55 }
   unreachable()
 }
 
 fn inRange(char: u32)() -> u32 {
-  return ((char >= 48) & (char <= 57)) | ((char >= 65) & (char <= 90))
+  return (char >= 48 & char <= 57) | (char >= 65 & char <= 90)
 }
 
 fn addc(idx: u32, val: u32)(i: u32) {
@@ -96,7 +96,9 @@ export fn part2()(start: u32, dest: u32, dist: u32, iter: u32) -> u32 {
     if (dest == chain[36671]) { return dist }
     if (chain[dest] != 0) { add(chain[dest], dist + 1) }
     for (iter = 0; iter < chainCount; iter++) {
-      if (revChain[dest * chainCount + iter] != 0) { add(revChain[dest * chainCount + iter], dist + 1) }
+      if (revChain[dest * chainCount + iter] != 0) {
+        add(revChain[dest * chainCount + iter], dist + 1)
+      }
       else { break }
     }
   }
@@ -115,8 +117,7 @@ async function part1(input) {
 async function part2(input) {
   const { module, memory } = await compilee;
   memstr(input, memory);
-  const res = module.part2();
-  return res;
+  return module.part2();
 }
 
 export default [part1, part2];

@@ -23,13 +23,13 @@ fn set(val: s64)() {
 export fn part1()() -> s64 {
   parse()
   nz = 0
-  evalIntcode(0, get, set)
+  evalIntcode(0, 0, get, set)
   if (nz != 1) { unreachable() }
   return out
 }
 export fn part2()() -> s64 {
   parse()
-  evalIntcode(0, get2, set)
+  evalIntcode(0, 0, get2, set)
   return out
 }
 `;

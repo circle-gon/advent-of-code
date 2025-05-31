@@ -2,7 +2,6 @@ export default {
   2015: [
     {
       name: "Not Quite Lisp",
-      special: false,
       examples: [
         [
           ["(())", 0],
@@ -23,7 +22,6 @@ export default {
     },
     {
       name: "I Was Told There Would Be No Math",
-      special: false,
       examples: [
         [
           ["2x3x4", 58],
@@ -37,7 +35,6 @@ export default {
     },
     {
       name: "Perfectly Spherical Houses in a Vacuum",
-      special: false,
       examples: [
         [
           [">", 2],
@@ -53,7 +50,6 @@ export default {
     },
     {
       name: "The Ideal Stocking Stuffer",
-      special: false,
       examples: [
         [
           ["abcdef", 609043],
@@ -64,7 +60,6 @@ export default {
     },
     {
       name: "Doesn't He Have Intern-Elves For This?",
-      special: false,
       examples: [
         [
           ["ugknbfddgicrmopn", 1],
@@ -83,17 +78,14 @@ export default {
     },
     {
       name: "Probably a Fire Hazard",
-      special: false,
       examples: [[], []],
     },
     {
       name: "Some Assembly Required",
-      special: false,
       examples: [[], []],
     },
     {
       name: "Matchsticks",
-      special: false,
       examples: [
         [[`""\n"abc"\n"aaa\\"aaa"\n"\\x27"`, 12]],
         [[`""\n"abc"\n"aaa\\"aaa"\n"\\x27"`, 19]],
@@ -101,7 +93,6 @@ export default {
     },
     {
       name: "All in a Single Night",
-      special: false,
       examples: [
         [
           [
@@ -119,7 +110,6 @@ export default {
     },
     {
       name: "Elves Look, Elves Say",
-      special: false,
       examples: [
         [
           ["1", 2],
@@ -133,7 +123,6 @@ export default {
     },
     {
       name: "Corporate Policy",
-      special: false,
       examples: [
         [
           ["abcdefgh", "abcdffaa"],
@@ -144,7 +133,6 @@ export default {
     },
     {
       name: "JSAbacusFramework.io",
-      special: false,
       examples: [
         [
           ["[1,2,3]", 6],
@@ -166,7 +154,6 @@ export default {
     },
     {
       name: "Knights of the Dinner Table",
-      special: false,
       examples: [
         [
           [
@@ -179,7 +166,6 @@ export default {
     },
     {
       name: "Reindeer Olympics",
-      special: false,
       examples: [
         [
           [
@@ -197,7 +183,6 @@ export default {
     },
     {
       name: "Science for Hungry People",
-      special: false,
       examples: [
         [
           [
@@ -215,17 +200,14 @@ export default {
     },
     {
       name: "Aunt Sue",
-      special: false,
       examples: [[], []],
     },
     {
       name: "No Such Thing as Too Much",
-      special: false,
       examples: [[["20\n15\n10\n5\n5", 4]], [["20\n15\n10\n5\n5", 3]]],
     },
     {
       name: "Like a GIF For Your Yard",
-      special: false,
       examples: [
         [[".#.#.#\n...##.\n#....#\n..#...\n#.#..#\n####..", 4]],
         [[".#.#.#\n...##.\n#....#\n..#...\n#.#..#\n####..", 17]],
@@ -233,7 +215,6 @@ export default {
     },
     {
       name: "Medicine for Rudolph",
-      special: false,
       examples: [
         [
           ["H => HO\nH => OH\nO => HH\n\nHOH", 4],
@@ -247,27 +228,22 @@ export default {
     },
     {
       name: "Infinite Elves and Infinite Houses",
-      special: false,
       examples: [[["100", 6]], []],
     },
     {
       name: "RPG Simulator 20XX",
-      special: false,
       examples: [[], []],
     },
     {
       name: "Wizard Simulator 20XX",
-      special: false,
       examples: [[], []],
     },
     {
       name: "Opening the Turing Lock",
-      special: false,
       examples: [[["inc a\njio a, +2\ntpl a\ninc a", 2]], []],
     },
     {
       name: "It Hangs in the Balance",
-      special: false,
       examples: [
         [["1\n2\n3\n4\n5\n7\n8\n9\n10\n11\n", 99]],
         [["1\n2\n3\n4\n5\n7\n8\n9\n10\n11\n", 44]],
@@ -275,7 +251,6 @@ export default {
     },
     {
       name: "Let It Snow",
-      special: false,
       examples: [
         [
           [
@@ -290,7 +265,6 @@ export default {
   2016: [
     {
       name: "No Time for a Taxicab",
-      special: false,
       examples: [
         [
           ["R2, L3", 5],
@@ -302,7 +276,6 @@ export default {
     },
     {
       name: "Bathroom Security",
-      special: false,
       examples: [
         [["ULL\nRRDDD\nLURDL\nUUUUD", "1985"]],
         [["ULL\nRRDDD\nLURDL\nUUUUD", "5DB3"]],
@@ -310,12 +283,10 @@ export default {
     },
     {
       name: "Squares With Three Sides",
-      special: false,
       examples: [[["5 10 25", 0]], []],
     },
     {
       name: "Security Through Obscurity",
-      special: false,
       examples: [
         [
           [
@@ -333,7 +304,6 @@ export default {
     },
     {
       name: "Signals and Noise",
-      special: false,
       examples: [
         [
           [
@@ -351,7 +321,6 @@ export default {
     },
     {
       name: "Internet Protocol Version 7",
-      special: false,
       examples: [
         [
           [
@@ -364,7 +333,6 @@ export default {
     },
     {
       name: "Two-Factor Authentication",
-      special: false,
       examples: [
         [
           [
@@ -377,7 +345,6 @@ export default {
     },
     {
       name: "Explosives in Cyberspace",
-      special: false,
       examples: [
         [
           ["ADVENT", 6],
@@ -397,7 +364,6 @@ export default {
     },
     {
       name: "Balance Bots",
-      special: false,
       examples: [
         [
           [
@@ -410,7 +376,6 @@ export default {
     },
     {
       name: "Radioisotope Thermoelectric Generators",
-      special: false,
       examples: [
         [
           [
@@ -423,12 +388,10 @@ export default {
     },
     {
       name: "Leonardo's Monorail",
-      special: false,
       examples: [[["cpy 41 a\ninc a\ninc a\ndec a\njnz a 2\ndec a", 42]], []],
     },
     {
       name: "A Maze of Twisty Little Cubicles",
-      special: false,
       examples: [[["10", 11]], []],
     },
     {
@@ -438,7 +401,6 @@ export default {
     },
     {
       name: "Timing is Everything",
-      special: false,
       examples: [
         [
           [
@@ -451,12 +413,10 @@ export default {
     },
     {
       name: "Dragon Checksum",
-      special: false,
       examples: [[["10000", "01100"]], []],
     },
     {
       name: "Two Steps Forward",
-      special: false,
       examples: [
         [
           ["ihgpwlah", "DDRRRD"],
@@ -472,22 +432,18 @@ export default {
     },
     {
       name: "Like a Rogue",
-      special: false,
       examples: [[[".^^.^.^^^^", 38]], []],
     },
     {
       name: "An Elephant Named Joseph",
-      special: false,
       examples: [[["5", 3]], [["5", 2]]],
     },
     {
       name: "Firewall Rules",
-      special: false,
       examples: [[["5-8\n0-2\n4-7", 3]], [["5-8\n0-2\n4-7", 2]]],
     },
     {
       name: "Scrambled Letters and Hash",
-      special: false,
       examples: [
         [
           [
@@ -505,12 +461,10 @@ export default {
     },
     {
       name: "Grid Computing",
-      special: false,
       examples: [[], []],
     },
     {
       name: "Safe Cracking",
-      special: false,
       examples: [
         [["cpy 2 a\ntgl a\ntgl a\ntgl a\ncpy 1 a\ndec a\ndec a", 3]],
         [],
@@ -518,7 +472,6 @@ export default {
     },
     {
       name: "Air Duct Spelunking",
-      special: false,
       examples: [
         [
           [
@@ -531,14 +484,12 @@ export default {
     },
     {
       name: "Clock Signal",
-      special: false,
       examples: [[], []],
     },
   ],
   2017: [
     {
       name: "Inverse Captcha",
-      special: false,
       examples: [
         [
           ["1122", 3],
@@ -557,7 +508,6 @@ export default {
     },
     {
       name: "Corruption Checksum",
-      special: false,
       examples: [
         [["5 1 9 5\n7 5 3\n2 4 6 8", 18]],
         [["5 9 2 8\n9 4 7 3\n3 8 6 5", 9]],
@@ -565,7 +515,6 @@ export default {
     },
     {
       name: "Spiral Memory",
-      special: false,
       examples: [
         [
           ["1", 0],
@@ -578,7 +527,6 @@ export default {
     },
     {
       name: "High-Entropy Passphrases",
-      special: false,
       examples: [
         [["aa bb cc dd ee\naa bb cc dd aa\naa bb cc dd aaa", 2]],
         [
@@ -591,17 +539,14 @@ export default {
     },
     {
       name: "A Maze of Twisty Trampolines, All Alike",
-      special: false,
       examples: [[["0\n3\n0\n1\n-3", 5]], [["0\n3\n0\n1\n-3", 10]]],
     },
     {
       name: "Memory Reallocation",
-      special: false,
       examples: [[["0 2 7 0", 5]], [["0 2 7 0", 4]]],
     },
     {
       name: "Recursive Circus",
-      special: false,
       examples: [
         [
           [
@@ -619,7 +564,6 @@ export default {
     },
     {
       name: "I Heard You Like Registers",
-      special: false,
       examples: [
         [
           [
@@ -637,7 +581,6 @@ export default {
     },
     {
       name: "Stream Processing",
-      special: false,
       examples: [
         [
           [
@@ -650,7 +593,6 @@ export default {
     },
     {
       name: "Knot Hash",
-      special: false,
       examples: [
         [["3,4,1,5", 12]],
         [
@@ -663,7 +605,6 @@ export default {
     },
     {
       name: "Hex Ed",
-      special: false,
       examples: [
         [
           ["ne,ne,ne", 3],
@@ -676,7 +617,6 @@ export default {
     },
     {
       name: "Digital Plumber",
-      special: false,
       examples: [
         [
           [
@@ -694,7 +634,6 @@ export default {
     },
     {
       name: "Packet Scanners",
-      special: false,
       examples: [
         [["0: 3\n1: 2\n4: 4\n6: 4", 24]],
         [["0: 3\n1: 2\n4: 4\n6: 4", 10]],
@@ -702,12 +641,10 @@ export default {
     },
     {
       name: "Disk Defragmentation",
-      special: false,
       examples: [[["flqrgnkx", 8108]], [["flqrgnkx", 1242]]],
     },
     {
       name: "Dueling Generators",
-      special: false,
       examples: [
         [["Generator A starts with 65\nGenerator B starts with 8921", 588]],
         [["Generator A starts with 65\nGenerator B starts with 8921", 309]],
@@ -715,17 +652,14 @@ export default {
     },
     {
       name: "Permutation Promenade",
-      special: false,
       examples: [[["s1,x3/4,pe/b", "baedc"]], []],
     },
     {
       name: "Spinlock",
-      special: false,
       examples: [[["3", 638]], []],
     },
     {
       name: "Duet",
-      special: false,
       examples: [
         [
           [
@@ -738,7 +672,6 @@ export default {
     },
     {
       name: "A Series of Tubes",
-      special: false,
       examples: [
         [
           [
@@ -756,7 +689,6 @@ export default {
     },
     {
       name: "Particle Swarm",
-      special: false,
       examples: [
         [
           [
@@ -774,7 +706,6 @@ export default {
     },
     {
       name: "Fractal Art",
-      special: false,
       examples: [
         [["../.# => ##./#../...\n.#./..#/### => #..#/..../..../#..#", 12]],
         [],
@@ -782,17 +713,14 @@ export default {
     },
     {
       name: "Sporifica Virus",
-      special: false,
       examples: [[["..#\n#..\n...", 5587]], [["..#\n#..\n...", 2511944]]],
     },
     {
       name: "Coprocessor Conflagration",
-      special: false,
       examples: [[], []],
     },
     {
       name: "Electromagnetic Moat",
-      special: false,
       examples: [
         [["0/2\n2/2\n2/3\n3/4\n3/5\n0/1\n10/1\n9/10", 31]],
         [["0/2\n2/2\n2/3\n3/4\n3/5\n0/1\n10/1\n9/10", 19]],
@@ -800,7 +728,6 @@ export default {
     },
     {
       name: "The Halting Problem",
-      special: false,
       examples: [
         [
           [
@@ -815,7 +742,6 @@ export default {
   2018: [
     {
       name: "Chronal Calibration",
-      special: false,
       examples: [
         [
           ["+1\n-2\n+3\n+1", 3],
@@ -834,7 +760,6 @@ export default {
     },
     {
       name: "Inventory Management System",
-      special: false,
       examples: [
         [["abcdef\nbababc\nabbcde\nabcccd\naabcdd\nabcdee\nababab", 12]],
         [["abcde\nfghij\nklmno\npqrst\nfguij\naxcye\nwvxyz", "fgij"]],
@@ -842,7 +767,6 @@ export default {
     },
     {
       name: "No Matter How You Slice It",
-      special: false,
       examples: [
         [["#1 @ 1,3: 4x4\n#2 @ 3,1: 4x4\n#3 @ 5,5: 2x2", 4]],
         [["#1 @ 1,3: 4x4\n#2 @ 3,1: 4x4\n#3 @ 5,5: 2x2", 3]],
@@ -850,7 +774,6 @@ export default {
     },
     {
       name: "Repose Record",
-      special: false,
       examples: [
         [
           [
@@ -868,7 +791,6 @@ export default {
     },
     {
       name: "Alchemical Reduction",
-      special: false,
       examples: [
         [
           ["aA", 0],
@@ -882,7 +804,6 @@ export default {
     },
     {
       name: "Chronal Coordinates",
-      special: false,
       examples: [
         [["1, 1\n1, 6\n8, 3\n3, 4\n5, 5\n8, 9", 17]],
         [["1, 1\n1, 6\n8, 3\n3, 4\n5, 5\n8, 9", 16]],
@@ -890,7 +811,6 @@ export default {
     },
     {
       name: "The Sum of Its Parts",
-      special: false,
       examples: [
         [
           [
@@ -908,7 +828,6 @@ export default {
     },
     {
       name: "Memory Maneuver",
-      special: false,
       examples: [
         [["2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2", 138]],
         [["2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2", 66]],
@@ -916,7 +835,6 @@ export default {
     },
     {
       name: "Marble Mania",
-      special: false,
       examples: [
         [
           ["9 players; last marble is worth 25 points", 32],
@@ -931,12 +849,10 @@ export default {
     },
     {
       name: "The Stars Align",
-      special: false,
       examples: [[], []],
     },
     {
       name: "Chronal Charge",
-      special: false,
       examples: [
         [
           ["18", "33,45"],
@@ -950,7 +866,6 @@ export default {
     },
     {
       name: "Subterranean Sustainability",
-      special: false,
       examples: [
         [
           [
@@ -963,7 +878,6 @@ export default {
     },
     {
       name: "Mine Cart Madness",
-      special: false,
       examples: [
         [
           [
@@ -981,7 +895,6 @@ export default {
     },
     {
       name: "Chocolate Charts",
-      special: false,
       examples: [
         [
           ["9", "5158916779"],
@@ -999,7 +912,6 @@ export default {
     },
     {
       name: "Beverage Bandits",
-      special: false,
       examples: [
         [
           [
@@ -1053,7 +965,6 @@ export default {
     },
     {
       name: "Chronal Classification",
-      special: false,
       examples: [
         [["Before: [3, 2, 1, 1]\n9 2 1 2\nAfter:  [3, 2, 2, 1]\n\n\n\n1", 1]],
         [],
@@ -1061,7 +972,6 @@ export default {
     },
     {
       name: "Reservoir Research",
-      special: false,
       examples: [
         [
           [
@@ -1079,7 +989,6 @@ export default {
     },
     {
       name: "Settlers of The North Pole",
-      special: false,
       examples: [
         [
           [
@@ -1092,7 +1001,6 @@ export default {
     },
     {
       name: "Go With The Flow",
-      special: false,
       examples: [
         [
           [
@@ -1105,7 +1013,6 @@ export default {
     },
     {
       name: "A Regular Map",
-      special: false,
       examples: [
         [
           ["^WNE$", 3],
@@ -1127,7 +1034,6 @@ export default {
     },
     {
       name: "Mode Maze",
-      special: false,
       examples: [
         [["depth: 510\ntarget: 10,10", 114]],
         [["depth: 510\ntarget: 10,10", 45]],
@@ -1135,7 +1041,6 @@ export default {
     },
     {
       name: "Experimental Emergency Teleportation",
-      special: false,
       examples: [
         [
           [
@@ -1153,7 +1058,6 @@ export default {
     },
     {
       name: "Immune System Simulator 20XX",
-      special: false,
       examples: [
         [
           [
@@ -1166,7 +1070,6 @@ export default {
     },
     {
       name: "Four-Dimensional Adventure",
-      special: false,
       examples: [
         [
           [
@@ -1193,7 +1096,6 @@ export default {
   2019: [
     {
       name: "The Tyranny of the Rocket Equation",
-      special: false,
       examples: [
         [
           ["12", 2],
@@ -1210,12 +1112,10 @@ export default {
     },
     {
       name: "1202 Program Alarm",
-      special: false,
       examples: [[], []],
     },
     {
       name: "Crossed Wires",
-      special: false,
       examples: [
         [
           ["R8,U5,L5,D3\nU7,R6,D4,L4", 6],
@@ -1243,7 +1143,6 @@ export default {
     },
     {
       name: "Secure Container",
-      special: false,
       examples: [
         [
           ["111111-111111", 1],
@@ -1259,12 +1158,10 @@ export default {
     },
     {
       name: "Sunny with a Chance of Asteroids",
-      special: false,
       examples: [[], []],
     },
     {
       name: "Universal Orbit Map",
-      special: false,
       examples: [
         [["COM)B\nB)C\nC)D\nD)E\nE)F\nB)G\nG)H\nD)I\nE)J\nJ)K\nK)L", 42]],
         [
@@ -1277,7 +1174,6 @@ export default {
     },
     {
       name: "Amplification Circuit",
-      special: false,
       examples: [
         [
           ["3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0", 43210n],
@@ -1304,12 +1200,10 @@ export default {
     },
     {
       name: "Space Image Format",
-      special: false,
       examples: [[], []],
     },
     {
       name: "Sensor Boost",
-      special: false,
       examples: [
         [
           // 64bit is represented as BigInts in js
@@ -1320,83 +1214,106 @@ export default {
       ],
     },
     {
-      name: "",
-      special: false,
+      name: "Monitoring Station",
+      examples: [
+        [
+          [".#..#\n.....\n#####\n....#\n...##", 8],
+          [
+            "......#.#.\n#..#.#....\n..#######.\n.#.#.###..\n.#..#.....\n..#....#.#\n#..#....#.\n.##.#..###\n##...#..#.\n.#....####",
+            33,
+          ],
+          [
+            "#.#...#.#.\n.###....#.\n.#....#...\n##.#.#.#.#\n....#.#.#.\n.##..###.#\n..#...##..\n..##....##\n......#...\n.####.###.",
+            35,
+          ],
+          [
+            ".#..#..###\n####.###.#\n....###.#.\n..###.##.#\n##.##.#.#.\n....###..#\n..#.#..#.#\n#..#.#.###\n.##...##.#\n.....#.#..",
+            41,
+          ],
+          [
+            ".#..##.###...#######\n##.############..##.\n.#.######.########.#\n.###.#######.####.#.\n#####.##.#.##.###.##\n..#####..#.#########\n####################\n#.####....###.#.#.##\n##.#################\n#####.##.###..####..\n..######..##.#######\n####.##.####...##..#\n.#####..#.######.###\n##...#.##########...\n#.##########.#######\n.####.#.###.###.#.##\n....##.##.###..#####\n.#.#.###########.###\n#.#.#.#####.####.###\n###.##.####.##.#..##",
+            210,
+          ],
+        ],
+        [
+          [
+            ".#..##.###...#######\n##.############..##.\n.#.######.########.#\n.###.#######.####.#.\n#####.##.#.##.###.##\n..#####..#.#########\n####################\n#.####....###.#.#.##\n##.#################\n#####.##.###..####..\n..######..##.#######\n####.##.####...##..#\n.#####..#.######.###\n##...#.##########...\n#.##########.#######\n.####.#.###.###.#.##\n....##.##.###..#####\n.#.#.###########.###\n#.#.#.#####.####.###\n###.##.####.##.#..##",
+            802,
+          ],
+        ],
+      ],
+    },
+    {
+      name: "Space Police",
+      examples: [[], []],
+    },
+    {
+      name: "The N-Body Problem",
+      examples: [
+        [],
+        [
+          [
+            "<x=-1, y=0, z=2>\n<x=2, y=-10, z=-7>\n<x=4, y=-8, z=8>\n<x=3, y=5, z=-1>",
+            2772n,
+          ],
+          [
+            "<x=-8, y=-10, z=0>\n<x=5, y=5, z=10>\n<x=2, y=-7, z=3>\n<x=9, y=-8, z=-3>",
+            4686774924n,
+          ],
+        ],
+      ],
+    },
+    {
+      name: "Care Package",
+      interactive: 1,
       examples: [[], []],
     },
     {
       name: "",
-      special: false,
       examples: [[], []],
     },
     {
       name: "",
-      special: false,
       examples: [[], []],
     },
     {
       name: "",
-      special: false,
       examples: [[], []],
     },
     {
       name: "",
-      special: false,
       examples: [[], []],
     },
     {
       name: "",
-      special: false,
       examples: [[], []],
     },
     {
       name: "",
-      special: false,
       examples: [[], []],
     },
     {
       name: "",
-      special: false,
       examples: [[], []],
     },
     {
       name: "",
-      special: false,
       examples: [[], []],
     },
     {
       name: "",
-      special: false,
       examples: [[], []],
     },
     {
       name: "",
-      special: false,
       examples: [[], []],
     },
     {
       name: "",
-      special: false,
       examples: [[], []],
     },
     {
       name: "",
-      special: false,
-      examples: [[], []],
-    },
-    {
-      name: "",
-      special: false,
-      examples: [[], []],
-    },
-    {
-      name: "",
-      special: false,
-      examples: [[], []],
-    },
-    {
-      name: "",
-      special: false,
       examples: [[], []],
     },
   ],
@@ -1404,7 +1321,6 @@ export default {
   2023: [
     {
       name: "Trebuchet?!",
-      special: false,
       examples: [
         [["1abc2\npqr3stu8vwx\na1b2c3d4e5f\ntreb7uchet", 142]],
         [
@@ -1417,7 +1333,6 @@ export default {
     },
     {
       name: "Cube Conundrum",
-      special: false,
       examples: [
         [
           [
@@ -1435,7 +1350,6 @@ export default {
     },
     {
       name: "Gear Ratios",
-      special: false,
       examples: [
         [
           [
@@ -1453,7 +1367,6 @@ export default {
     },
     {
       name: "Scratchcards",
-      special: false,
       examples: [
         [
           [
@@ -1489,7 +1402,6 @@ export default {
     },
     {
       name: "Wait For It",
-      special: false,
       examples: [
         [["Time:      7  15   30\nDistance:  9  40  200\n", 288]],
         [["Time:      7  15   30\nDistance:  9  40  200\n", 71503]],
@@ -1497,7 +1409,6 @@ export default {
     },
     {
       name: "Camel Cards",
-      special: false,
       examples: [
         [["32T3K 765\nT55J5 684\nKK677 28\nKTJJT 220\nQQQJA 483\n", 6440]],
         [["32T3K 765\nT55J5 684\nKK677 28\nKTJJT 220\nQQQJA 483\n", 5905]],
@@ -1505,7 +1416,6 @@ export default {
     },
     {
       name: "Haunted Wasteland",
-      special: false,
       examples: [
         [
           [
@@ -1524,7 +1434,6 @@ export default {
     },
     {
       name: "Mirage Maintenance",
-      special: false,
       examples: [
         [["0 3 6 9 12 15\n1 3 6 10 15 21\n10 13 16 21 30 45\n", 114]],
         [["0 3 6 9 12 15\n1 3 6 10 15 21\n10 13 16 21 30 45\n", 2]],
@@ -1532,7 +1441,6 @@ export default {
     },
     {
       name: "Pipe Maze",
-      special: false,
       examples: [
         [
           [".....\n.S-7.\n.|.|.\n.L-J.\n.....\n", 4],
@@ -1556,7 +1464,6 @@ export default {
     },
     {
       name: "Cosmic Expansion",
-      special: false,
       examples: [
         [
           [
@@ -1569,7 +1476,6 @@ export default {
     },
     {
       name: "Hot Springs",
-      special: false,
       examples: [
         [
           [
@@ -1587,7 +1493,6 @@ export default {
     },
     {
       name: "Point of Incidence",
-      special: false,
       examples: [
         [
           [
@@ -1605,7 +1510,6 @@ export default {
     },
     {
       name: "Parabolic Reflector Dish",
-      special: false,
       examples: [
         [
           [
@@ -1623,7 +1527,6 @@ export default {
     },
     {
       name: "Lens Library",
-      special: false,
       examples: [
         [["rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7", 1320]],
         [["rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7", 145]],
@@ -1631,7 +1534,6 @@ export default {
     },
     {
       name: "The Floor Will Be Lava",
-      special: false,
       examples: [
         [
           [
@@ -1671,7 +1573,6 @@ export default {
     },
     {
       name: "Lavaduct Lagoon",
-      special: false,
       examples: [
         [
           [
@@ -1689,7 +1590,6 @@ export default {
     },
     {
       name: "Aplenty",
-      special: false,
       examples: [
         [
           [
@@ -1707,7 +1607,6 @@ export default {
     },
     {
       name: "Pulse Propagation",
-      special: false,
       examples: [
         [
           [
@@ -1773,7 +1672,6 @@ export default {
     },
     {
       name: "Never Tell Me The Odds",
-      special: false,
       examples: [
         [
           [
@@ -1807,7 +1705,6 @@ export default {
   2024: [
     {
       name: "Historian Hysteria",
-      special: false,
       examples: [
         [["3   4\n4   3\n2   5\n1   3\n3   9\n3   3\n", 11]],
         [["3   4\n4   3\n2   5\n1   3\n3   9\n3   3\n", 31]],
@@ -1815,7 +1712,6 @@ export default {
     },
     {
       name: "Red-Nosed Reports",
-      special: false,
       examples: [
         [
           [
@@ -1833,7 +1729,6 @@ export default {
     },
     {
       name: "Mull It Over",
-      special: false,
       examples: [
         [
           [
@@ -1851,7 +1746,6 @@ export default {
     },
     {
       name: "Ceres Search",
-      special: false,
       examples: [
         [
           [
@@ -1869,7 +1763,6 @@ export default {
     },
     {
       name: "Print Queue",
-      special: false,
       examples: [
         [
           [
@@ -1887,7 +1780,6 @@ export default {
     },
     {
       name: "Guard Gallivant",
-      special: false,
       examples: [
         [
           [
@@ -1905,7 +1797,6 @@ export default {
     },
     {
       name: "Bridge Repair",
-      special: false,
       examples: [
         [
           [
@@ -1923,7 +1814,6 @@ export default {
     },
     {
       name: "Resonant Collinearity",
-      special: false,
       examples: [
         [
           [
@@ -1941,7 +1831,6 @@ export default {
     },
     {
       name: "Disk Fragmenter",
-      special: false,
       examples: [
         [["2333133121414131402", 1928]],
         [["2333133121414131402", 2858]],
@@ -1949,7 +1838,6 @@ export default {
     },
     {
       name: "Hoof It",
-      special: false,
       examples: [
         [
           [
@@ -1967,12 +1855,10 @@ export default {
     },
     {
       name: "Plutonian Pebbles",
-      special: false,
       examples: [[["125 17", 55312]], []],
     },
     {
       name: "Garden Groups",
-      special: false,
       examples: [
         [
           ["AAAA\nBBCD\nBBCC\nEEEC\n", 140],
@@ -1996,7 +1882,6 @@ export default {
     },
     {
       name: "Claw Contraption",
-      special: false,
       examples: [
         [
           [
@@ -2009,7 +1894,6 @@ export default {
     },
     {
       name: "Restroom Redoubt",
-      special: false,
       examples: [
         [
           [
@@ -2022,7 +1906,6 @@ export default {
     },
     {
       name: "Warehouse Woes",
-      special: false,
       examples: [
         [
           [
@@ -2044,7 +1927,6 @@ export default {
     },
     {
       name: "Reindeer Maze",
-      special: false,
       examples: [
         [
           [
@@ -2070,7 +1952,6 @@ export default {
     },
     {
       name: "Chronospatial Computer",
-      special: false,
       examples: [
         [
           [
@@ -2088,7 +1969,6 @@ export default {
     },
     {
       name: "RAM Run",
-      special: false,
       examples: [
         [
           [
@@ -2106,7 +1986,6 @@ export default {
     },
     {
       name: "Linen Layout",
-      special: false,
       examples: [
         [
           [
@@ -2124,7 +2003,6 @@ export default {
     },
     {
       name: "Race Condition",
-      special: false,
       examples: [
         [
           [
@@ -2142,17 +2020,14 @@ export default {
     },
     {
       name: "Keypad Conundrum",
-      special: false,
       examples: [[["029A\n980A\n179A\n456A\n379A", 126384]], []],
     },
     {
       name: "Monkey Market",
-      special: false,
       examples: [[["1\n10\n100\n2024\n", 37327623]], [["1\n2\n3\n2024\n", 23]]],
     },
     {
       name: "LAN Party",
-      special: false,
       examples: [
         [
           [
@@ -2170,7 +2045,6 @@ export default {
     },
     {
       name: "Crossed Wires",
-      special: false,
       examples: [
         [
           [
@@ -2187,7 +2061,6 @@ export default {
     },
     {
       name: "Code Chronicle",
-      special: false,
       examples: [
         [
           [

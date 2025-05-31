@@ -3,11 +3,11 @@ import { memstr } from "/utils.js";
 
 const code = `
 export input = import js.raw(memory<u8>(1))
-export clean = memory<u32>(1)
+clean = memory<u32>(1)
 let count = u32(0)
 
 fn inRange(m: u32)() -> u32 {
-  return (m >= 48) & (m <= 57)
+  return m >= 48 & m <= 57
 }
 
 fn parse()(idx: u32, val: u32, accum: u32, outIdx: u32) {
