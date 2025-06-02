@@ -22,7 +22,7 @@ fn get()() -> s64 {
   return i64.extend_i32_u(drawn[hash(x, y)] & 1)
 }
 
-fn set(v: s64)() {
+fn set(v: s64)() -> u32 {
   if (instr == 0) {
     if ((drawn[hash(x, y)] & 2) == 0) { count++ }
     drawn[hash(x, y)] = 2 | uint(i32.wrap_i64(v))
@@ -39,6 +39,7 @@ fn set(v: s64)() {
     else if (dir == 3) { x-- }
     else { unreachable() }
   }
+  return 0
 }
 
 fn resolveOutput()(minx: s32, maxx: s32, miny: s32, maxy: s32, x: s32, y: s32, size: s32) {

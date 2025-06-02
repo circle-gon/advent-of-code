@@ -15,9 +15,10 @@ fn get2()() -> s64 {
   return 2
 }
 
-fn set(v: s64)() {
+fn set(v: s64)() -> u32 {
   c++
   out = v
+  return 0
 }
 
 export fn part1()() -> s64 {

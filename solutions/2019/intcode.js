@@ -63,7 +63,7 @@ fn evalIntcode(
   ip: u32,
   rel: s32,
   getInput: func<s64>(),
-  getOutput: func(s64)
+  getOutput: func<u32>(s64)
 )(
   instr: u32,
   val1: s64,
@@ -93,8 +93,12 @@ fn evalIntcode(
       writeFromMode(program[ip + 1], tmp, getMode(mode, 0), rel)
       ip += 2
     } else if (instr == 4) {
-      getOutput(valFromMode(program[ip + 1], getMode(mode, 0), rel))
       ip += 2
+      // This one doesn't need to be special because returning is the only thing
+      // the output value does
+      if (getOutput(valFromMode(program[ip - 1], getMode(mode, 0), rel))) {
+        return ip, rel
+      }
     } else if (instr == 5) {
       if (valFromMode(program[ip + 1], getMode(mode, 0), rel) != 0) {
         ip = i32.wrap_i64(uint(valFromMode(program[ip + 2], getMode(mode, 1), rel)))

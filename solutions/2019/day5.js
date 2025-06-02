@@ -15,9 +15,10 @@ fn get2()() -> s64 {
   return 5
 }
 
-fn set(val: s64)() {
+fn set(val: s64)() -> u32 {
   if (val != 0) { nz++ }
   out = val
+  return 0
 }
 
 export fn part1()() -> s64 {

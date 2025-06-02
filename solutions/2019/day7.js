@@ -4,6 +4,7 @@ import intcode from "./intcode.js";
 
 const code = `
 ${intcode}
+log = import js.log(func(u32))
 fives = data<active>(temp, 0)
 temp = memory<u8>(1)
 state = memory<u32>(1)
@@ -18,23 +19,24 @@ fn get()() -> s64 {
     time = 1
     return sint(phase)
   }
+  time = 0
   return sint(signal)
 }
 
-fn set(v: s64)() {
+fn set(v: s64)() -> u32 {
   out = uint(v)
+  return 0
 }
 
 fn getOutput(ph: u32, sig: u64)() -> u64 {
   memory.copy(program, temp, 0, 600, range)
   signal = sig
   phase = i64.extend_i32_u(ph)
-  time = 0
   evalIntcode(0, 0, get, set)
   return out
 }
 
-export fn part1()(idx: u32, max: u64, out: u64) -> u64 {
+export fn part1()(idx: u32, max: u64, out: u64) -> u32 {
   range = parse() * i64.size
   memory.copy(temp, program, 600, 0, range)
   for (; idx < 600; idx += 5) {
@@ -45,7 +47,7 @@ export fn part1()(idx: u32, max: u64, out: u64) -> u64 {
     out = getOutput(temp[idx + 4], out)
     if (out > max) { max = out }
   }
-  return max
+  return i32.wrap_i64(max)
 }
 
 fn getSuspend()() -> s64 {
@@ -67,7 +69,7 @@ fn runAmplified(idx: u32, val: u64)(base: u32, fake: u32, fake2: s32) -> u32 {
   return state[2 * base]
 }
 
-export fn part2()(idx: u32, max: u64, status: u32, i: u32) -> u64 {
+export fn part2()(idx: u32, max: u64, status: u32, i: u32) -> u32 {
   range = parse()
   memory.copy(temp, program, 600, 0, range * i64.size)
   for (; idx < 600; idx += 5) {
@@ -88,7 +90,7 @@ export fn part2()(idx: u32, max: u64, status: u32, i: u32) -> u64 {
     }
     if (out > max) { max = out }
   }
-  return max
+  return i32.wrap_i64(max)
 }
 `;
 

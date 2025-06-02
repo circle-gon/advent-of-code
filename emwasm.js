@@ -19,6 +19,9 @@ Unimplemented semanatics (easier)
 - better code references in error messages
 - multiple error messages at one time
 - Start functions
+- Compile-time constants
+- Large number notation
+- Optimization of memory.size / memory.byteSize with non-grown memories
 
 Optimizations separate from binaryen
 - Tail call optimization

@@ -22,13 +22,14 @@ fn get()() -> s64 {
   unreachable()
 }
 
-fn set(v: s64)() {
+fn set(v: s64)() -> u32 {
   if (stage == 0 | stage == 1) {
     stage++
   } else {
     if (v == 2) { count++ }
     stage = 0 
   }
+  return 0
 }
 
 fn get2()() -> s64 {
@@ -36,6 +37,7 @@ fn get2()() -> s64 {
     stage = 1
     return i64.extend_i32_s(val)
   }
+  stage = 0
   return 1347376211 // STOP
 }
 
@@ -49,7 +51,7 @@ fn get3()() -> s64 {
   return 0
 }
 
-fn set2(v: s64)() {
+fn set2(v: s64)() -> u32 {
   if (stage2 == 0) { x = i32.wrap_i64(v); stage2 = 1 }
   else if (stage2 == 1) { y = i32.wrap_i64(v); stage2 = 2 }
   else {
@@ -68,6 +70,7 @@ fn set2(v: s64)() {
     }
     stage2 = 0
   }
+  return 0
 }
 
 export fn part1()() -> u32 {
@@ -93,7 +96,6 @@ export fn part2boring()(res: u32) -> u32 {
 }
 
 export fn run()() -> u32 {
-  stage = 0
   ip, rel = evalIntcode(ip, rel, get2, set2)
   if (ip == 1347376211) { return score }
   return 1347376211

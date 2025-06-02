@@ -20,7 +20,7 @@ fn get()() -> s64 {
   unreachable()
 }
 
-fn set(a: s64)() {
+fn set(a: s64)() -> u32 {
   unreachable()
 }
 
