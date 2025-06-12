@@ -24,7 +24,7 @@ fn parse()(idx: u32, accum: u32) {
 fn valid(num: u32)(prev: u32, same: u32, digit: u32) -> u32 {
   prev = num % 10
   num /= 10
-  while (num > 0) {
+  while (num != 0) {
     digit = num % 10
     num /= 10
 
@@ -38,22 +38,21 @@ fn valid(num: u32)(prev: u32, same: u32, digit: u32) -> u32 {
 fn valid2(num: u32)(prev: u32, same: u32, digit: u32, len: u32) -> u32 {
   prev = num % 10
   num /= 10
-  len = 1
-  while (num > 0) {
+  while (num != 0) {
     digit = num % 10
     num /= 10
 
     if (digit == prev) { len++ }
     else {
-      if (len == 2) { same = 1 }
-      // It is always off by 1 because it counts consecutive groups, which is one less
-      // than the matching digit count
-      len = 1
+      if (len == 1) { same = 1 }
+      len = 0
     }
     if (prev < digit) { return 0 }
     prev = digit
   }
-  return same | len == 2
+  // It is always off by 1 because it counts consecutive groups, which is one less
+  // than the matching digit count
+  return same | len == 1
 }
 
 export fn part1()(i: u32, count: u32) -> u32 {

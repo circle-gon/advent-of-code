@@ -5,7 +5,7 @@ import intcode from "./intcode.js";
 const code = `
 ${intcode}
 let nz = u32(0)
-let out = s64(0)
+let out = u32(0)
 
 fn get()() -> s64 {
   return 1
@@ -17,18 +17,18 @@ fn get2()() -> s64 {
 
 fn set(val: s64)() -> u32 {
   if (val != 0) { nz++ }
-  out = val
+  out = i32.wrap_i64(val)
   return 0
 }
 
-export fn part1()() -> s64 {
+export fn part1()() -> u32 {
   parse()
   nz = 0
   evalIntcode(0, 0, get, set)
   if (nz != 1) { unreachable() }
   return out
 }
-export fn part2()() -> s64 {
+export fn part2()() -> u32 {
   parse()
   evalIntcode(0, 0, get2, set)
   return out

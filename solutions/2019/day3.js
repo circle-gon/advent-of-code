@@ -18,10 +18,10 @@ fn parse()(idx: u32, outIdx: u32, val: u32, temp: u32, accum: u32) {
     idx++
     accum = 0
     while (input[idx] != 44 & input[idx] != 0 & input[idx] != 10) {
-      accum = 10 * accum + (input[idx] - 48)
+      accum = 10 * accum + input[idx] - 48
       idx++
     }
-    temp += accum << 2
+    temp |= accum << 2
     table[outIdx] = temp
     outIdx++
     if (input[idx] == 10) {

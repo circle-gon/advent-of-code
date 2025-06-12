@@ -4,17 +4,8 @@ import intcode from "./intcode.js";
 
 const code = `
 ${intcode}
-
 temp = memory(1)
 let range = u32(0)
-
-export fn part1()() -> s64 {
-  parse()
-  program[1] = 12
-  program[2] = 2
-  evalIntcode(0, 0, get, set)
-  return program[0]
-}
 
 fn get()() -> s64 {
   unreachable()
@@ -22,6 +13,14 @@ fn get()() -> s64 {
 
 fn set(a: s64)() -> u32 {
   unreachable()
+}
+
+export fn part1()() -> u32 {
+  parse()
+  program[1] = 12
+  program[2] = 2
+  evalIntcode(0, 0, get, set)
+  return i32.wrap_i64(program[0])
 }
 
 export fn part2()(i: u64, j: u64) -> u32 {

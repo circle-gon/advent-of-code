@@ -85,6 +85,10 @@ export async function compileWasm(wasm, deps) {
       log(...args) {
         console.log(...args);
       },
+      debugger() {
+        // eslint-disable-next-line no-debugger
+        debugger;
+      },
       ...deps,
     },
   };

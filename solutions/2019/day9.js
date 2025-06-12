@@ -29,12 +29,12 @@ export fn part1()() -> s64 {
   return out
 }
 
-export fn part2()() -> s64 {
+export fn part2()() -> u32 {
   c = 0
   parse()
   evalIntcode(0, 0, get2, set)
   if (c != 1) { unreachable() }
-  return out
+  return i32.wrap_i64(out)
 }
 `;
 

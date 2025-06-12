@@ -82,7 +82,7 @@ fn computeReq(count: u64)(
   items[2 * fuel + 1] = 0
   height++
   
-  while (height > 0) {
+  while (height != 0) {
     top = stack[height - 1]
     height--
     amt = items[top * 2] - items[top * 2 + 1]
@@ -110,7 +110,7 @@ export fn part2()(low: u64, high: u64, mid: u64) -> u32 {
   memory.fill(reactions, 0, 0, memory.byteSize(reactions))
   parse()
  
-  low = (1000000000000 * 1000000) / computeReq(1000000)
+  low = 1000000000000000000 / computeReq(1000000)
   high = max()
 
   while (low < high) {
@@ -136,7 +136,7 @@ fn max()(
   items2[fuel] = 1
   height++
   
-  while (height > 0) {
+  while (height != 0) {
     top = stack[height - 1]
     height--
     amt = items2[top]

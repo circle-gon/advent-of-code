@@ -2,7 +2,7 @@ import { compile } from "/emwasm.js";
 import { memstr } from "/utils.js";
 
 const code = `
-export input = import js.raw(memory<u8>(1))
+input = import js.raw(memory<u8>(1))
 clean = memory<u32>(1)
 let count = u32(0)
 

@@ -89,6 +89,7 @@ export fn part1()(t: u32, idx: u32, j: u32, sum: u32, f1: u32, f2: u32, tmp: s32
   return sum
 }
 
+// Binary GCD algorithm from https://en.wikipedia.org/wiki/Binary_GCD_algorithm#Implementation
 fn gcd(a: u64, b: u64)(i: u64, j: u64, k: u64, tmp: u64) -> u64 {
   if (b == 0) { return a }
   if (a == 0) { return b }

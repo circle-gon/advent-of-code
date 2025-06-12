@@ -22,6 +22,8 @@ Unimplemented semanatics (easier)
 - Compile-time constants
 - Large number notation
 - Optimization of memory.size / memory.byteSize with non-grown memories
+- JS-like let/const variables that basically automagically create a local with initializer
+- Structs (possibly only memory, possibly others) and boolean memory type
 
 Optimizations separate from binaryen
 - Tail call optimization
@@ -762,6 +764,12 @@ const OPCODES = Object.freeze({
 });
 const CONSTANTS = Object.freeze({
   __proto__: null,
+  i8: {
+    size: 1,
+  },
+  i16: {
+    size: 2,
+  },
   i32: {
     size: 4,
   },
@@ -769,9 +777,11 @@ const CONSTANTS = Object.freeze({
     size: 8,
   },
   u32: {
+    min: 0,
     max: 2 ** 32 - 1,
   },
   u64: {
+    min: 0,
     max: 2n ** 64n - 1n,
   },
   s32: {
@@ -781,6 +791,17 @@ const CONSTANTS = Object.freeze({
   s64: {
     min: -(2n ** 63n),
     max: 2n ** 63n - 1n,
+  },
+  // https://en.wikipedia.org/wiki/IEEE_754
+  // https://math.stackexchange.com/questions/2607697/the-upper-and-lower-limits-of-ieee-754-standard
+  f32: {
+    min: 2 ** -149,
+    max: (1 - 2 ** -24) * 2 ** 128,
+  },
+  f64: {
+    min: 2 ** -1074,
+    // Not 2 ** 1024 because that would turn into Infinity
+    max: (1 - 2 ** -53) * 2 * 2 ** 1023,
   },
 });
 const AST = Object.freeze({
@@ -2053,6 +2074,10 @@ function leb128s32(num) {
 }
 
 function leb128s64(num) {
+  // BigInt's don't automatically sign integers like regular Numbers do,
+  // so this conversion is required to encode integers that exceed the 64-bit
+  // signed integer limit correctly
+  num = BigInt.asIntN(64, num);
   const bytes = [];
   while (true) {
     let val = Number(num & 127n);
@@ -2174,9 +2199,19 @@ function matchesType(expected, val) {
   if (val.type === "number") {
     if (expected.type === "number") return true;
     if (expected.type !== "int" && expected.type !== "float") return false;
+    const kind =
+      (expected.type === "float" ? "f" : expected.signed === 0 ? "u" : "s") +
+      expected.size;
+    const minSize = CONSTANTS[kind].min;
+    const maxSize = CONSTANTS[kind].max;
+    const valReal = formatToReal(val, toRawType(expected));
+    // Not Math.abs here because that doesn't work on BigInts
+    const val2 = valReal < 0 ? -valReal : valReal;
     return (
       (expected.type === "float" || !val.isDecimal) &&
-      (expected.type === "float" || expected.signed !== 0 || !val.isNegative)
+      (expected.type === "float" || expected.signed !== 0 || !val.isNegative) &&
+      // Bounds are inclusive
+      ((val2 >= minSize && val2 <= maxSize) || val2 === 0)
     );
   }
 
@@ -2199,32 +2234,15 @@ function matchesType(expected, val) {
   throw new Error("missing type check?");
 }
 
-function matchesTypes(expected, val) {
-  if (expected.length !== val.length) return false;
-  for (let i = 0; i < expected.length; i++) {
-    if (!matchesType(expected[i], val[i])) return false;
-  }
-  return true;
-}
-
-function typesToString(types) {
-  const out = [];
-  for (const type of types) {
-    if (type.type === "int")
-      out.push(
-        `${type.signed === 2 ? "i" : type.signed === 1 ? "s" : "u"}${type.size}`,
-      );
-    else if (type.type === "float") out.push("f" + type.size);
-    else if (type.type === "number" || type.type === "memory")
-      out.push(type.type);
-    else if (type.type === "func")
-      out.push(
-        `${typesToString(type.params)} -> ${typesToString(type.output)}`,
-      );
-    else if (type.type !== "void")
-      throw new Error("missing type? " + type.type);
-  }
-  return `[${out.join(", ")}]`;
+function typeToString(type) {
+  if (type.type === "int")
+    return `${type.signed === 2 ? "i" : type.signed === 1 ? "s" : "u"}${type.size}`;
+  if (type.type === "float") return "f" + type.size;
+  if (type.type === "number" || type.type === "memory" || type.type === "void")
+    return type.type;
+  if (type.type === "func")
+    return `func${type.output.length > 0 ? `<${type.output.map((i) => typeToString(i)).join(", ")}>` : ""}(${type.params.map((i) => typeToString(i)).join(", ")})`;
+  throw new Error("missing type ? " + type.type);
 }
 
 function skipSame(a, b, check) {
@@ -2481,11 +2499,36 @@ class VerifyCompiler {
   }
 
   shouldMatchTypes(expected, val) {
-    if (!matchesTypes(expected, val))
+    if (expected.length !== val.length)
       this.errorToken(
         toStartEnd(val[0], val[val.length - 1]),
-        `Got types ${typesToString(val)} but expected ${typesToString(expected)}`,
+        `Got ${val.length} values but expected ${expected.length} values`,
       );
+    for (let i = 0; i < expected.length; i++) {
+      const was = val[i];
+      const should = expected[i];
+      if (!matchesType(should, was)) {
+        if (should.type === "number" || was.type === "number") {
+          if (
+            should.type === "int" ||
+            should.type === "float" ||
+            was.type === "int" ||
+            was.type === "float"
+          ) {
+            const num = should.type === "number" ? should : was;
+            const other = should.type !== "number" ? should : was;
+            this.errorToken(
+              toStartEnd(num, num),
+              `Number does not fit in a ${typeToString(other)}`,
+            );
+          }
+        }
+        this.errorToken(
+          toStartEnd(was, was),
+          `Got types ${typeToString(was)} but expected ${typeToString(should)}`,
+        );
+      }
+    }
   }
 
   resolveVariable(node) {
@@ -2539,7 +2582,7 @@ class VerifyCompiler {
     if ((type.type !== "number" || type.isDecimal) && type.type !== "int")
       this.errorToken(
         type,
-        `Expected a number or int but got ${typesToString(types)}`,
+        `Expected a number or int but got ${typeToString(type)}`,
       );
   }
 
@@ -2553,7 +2596,7 @@ class VerifyCompiler {
     if (type.type !== "number" && type.type !== "float")
       this.errorToken(
         type,
-        `Expected an number or float but got ${typesToString(types)}`,
+        `Expected an number or float but got ${typeToString(type)}`,
       );
   }
 
@@ -2567,7 +2610,7 @@ class VerifyCompiler {
     if (type.type !== "number" && type.type !== "int" && type.type !== "float")
       this.errorToken(
         type,
-        `Expected a number, float, or int but got ${typesToString(types)}`,
+        `Expected a number, float, or int but got ${typeToString(type)}`,
       );
   }
 
@@ -2663,6 +2706,8 @@ class VerifyCompiler {
             type: "number",
             isDecimal: node.fractional.length > 0,
             isNegative: node.negative,
+            integer: node.integer,
+            fractional: node.fractional,
             ...toStartEnd(node, node),
           },
         ];
@@ -2799,6 +2844,8 @@ class VerifyCompiler {
           return [
             {
               type: "number",
+              integer: "3",
+              fractional: "",
               isDecimal: false,
               ...toStartEnd(node, node),
             },
@@ -2818,15 +2865,66 @@ class VerifyCompiler {
         this.typeIsNumberLike(a);
         this.typeIsNumberLike(b);
         this.shouldMatchTypes(a, b);
-        if (node.comparison)
+        if (node.comparison) {
+          let aa = a[0];
+          let bb = b[0];
+          if (
+            ((aa.type === "number" &&
+              aa.integer === "0" &&
+              !aa.isDecimal &&
+              bb.type === "int" &&
+              bb.signed === 0) ||
+              (bb.type === "number" &&
+                bb.integer === "0" &&
+                !bb.isDecimal &&
+                aa.type === "int" &&
+                aa.signed === 0)) &&
+            node.type !== "ne" &&
+            node.type !== "eq"
+          ) {
+            let type = node.type;
+            if (aa.type === "number") {
+              if (node.type === "lt") type = "gt";
+              else if (node.type === "le") type = "ge";
+              else if (node.type === "gt") type = "lt";
+              else if (node.type === "ge") type = "le";
+            }
+            // x < 0
+            if (type === "lt")
+              this.errorToken(
+                toStartEnd(node, node),
+                "Comparison is always false",
+              );
+            // x <= 0
+            else if (type === "le")
+              this.errorToken(
+                toStartEnd(node, node),
+                "Comparison can be replaced with ==",
+              );
+            // x > 0
+            else if (type === "gt")
+              this.errorToken(
+                toStartEnd(node, node),
+                "Comparison can be replaced with !=",
+              );
+            // x >= 0
+            else if (type === "ge")
+              this.errorToken(
+                toStartEnd(node, node),
+                "Comparison is always true",
+              );
+          }
           return [
             { type: "int", signed: 2, size: 32, ...toStartEnd(node, node) },
           ];
+        }
         const specific = moreSpecific(a[0], b[0]);
         if (specific.type === "number") {
           return [
             {
               type: "number",
+              integer: "3",
+              fractional: "",
               isDecimal: a[0].isDecimal || b[0].isDecimal,
               ...toStartEnd(node, node),
             },
@@ -2858,6 +2956,8 @@ class VerifyCompiler {
           return [
             {
               type: "number",
+              integer: "3",
+              fractional: "",
               // technically it should be float but having isDecimal be true
               // is good enough to satisfy the invariant that negation can't return ints
               isDecimal: true,
@@ -2929,6 +3029,8 @@ class VerifyCompiler {
             return [
               {
                 type: "number",
+                integer: "3",
+                fractional: "",
                 isDecimal: a.isDecimal || b.isDecimal,
                 ...toStartEnd(node, node),
               },
@@ -2973,6 +3075,8 @@ class VerifyCompiler {
               return [
                 {
                   type: "number",
+                  integer: "3",
+                  fractional: "",
                   isDecimal: false,
                   ...toStartEnd(node, node),
                 },
@@ -3005,6 +3109,8 @@ class VerifyCompiler {
             return [
               {
                 type: "number",
+                integer: "3",
+                fractional: "",
                 isDecimal: true,
                 ...toStartEnd(node, node),
               },
@@ -3027,7 +3133,7 @@ class VerifyCompiler {
             [
               {
                 type: "int",
-                size: type.size,
+                size: type.size ?? 64,
                 signed: want,
               },
             ],

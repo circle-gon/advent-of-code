@@ -76,7 +76,7 @@ fn findRobot()(y: u32, x: u32) -> u32, u32 {
 fn computePath(x: u32, y: u32)(dir: u32, len: u32, out: u32, idx: u32, dn: u32, picked: u32) {
   while (true) {
     picked = false
-    if (dir == 0 & y > 0) {
+    if (dir == 0 & y != 0) {
       if (chars[y - line + x] == 35) { y -= line; len++; picked = true }
     }
     else if (dir == 1 & x < line - 2) {
@@ -85,22 +85,22 @@ fn computePath(x: u32, y: u32)(dir: u32, len: u32, out: u32, idx: u32, dn: u32, 
     else if (dir == 2 & y < index - line) {
       if (chars[y + line + x] == 35) { y += line; len++; picked = true }
     }
-    else if (dir == 3 & x > 0) {
+    else if (dir == 3 & x != 0) {
       if (chars[y + x - 1] == 35) { x--; len++; picked = true }
     }
     if (!picked) {
-      if (len > 0) { path[out] = len; len = 0; out++ }
+      if (len != 0) { path[out] = len; len = 0; out++ }
       picked = 4
       for (idx = 1; idx <= 3; idx += 2) {
         dn = dir + idx
         if (dn >= 4) { dn -= 4 }
-        if (dn == 0 & y > 0) {
+        if (dn == 0 & y != 0) {
           if (chars[y - line + x] == 35) { picked = dn; break }
         } else if (dn == 1 & x < line - 2) {
           if (chars[y + x + 1] == 35) { picked = dn; break }
         } else if (dn == 2 & y < index - line) {
           if (chars[y + line + x] == 35) { picked = dn; break }
-        } else if (dn == 3 & x > 0) {
+        } else if (dn == 3 & x != 0) {
           if (chars[y + x - 1] == 35) { picked = dn; break }
         }
       }
@@ -187,17 +187,17 @@ fn couldMatch(a: u32, b: u32, c: u32, d: u32)(
   idx = 0
   while (idx < pathLen) {
     if (doesMatch(idx, idx + b - a, a, b)) {
-      if (out > 0) { text[out] = 44; out++ }
+      if (out != 0) { text[out] = 44; out++ }
       text[out] = 65
       out++
       idx += b - a + 1
     } else if (doesMatch(idx, idx + d - c, c, d)) {
-      if (out > 0) { text[out] = 44; out++ }
+      if (out != 0) { text[out] = 44; out++ }
       text[out] = 67
       out++
       idx += d - c + 1
     } else if (doesMatch(idx, idx + r2 - r1, r1, r2)) {
-      if (out > 0) { text[out] = 44; out++ }
+      if (out != 0) { text[out] = 44; out++ }
       text[out] = 66
       out++
       idx += r2 - r1 + 1
@@ -218,7 +218,7 @@ fn couldMatch(a: u32, b: u32, c: u32, d: u32)(
 
 fn getRoutine()(idx: u32, len: u32, idx2: u32, len2: u32, a: u32, b: u32) {
   while (true) {
-    if (idx > 0) {
+    if (idx != 0) {
       len++ // comma
     }
     len += numLen(path[idx])
