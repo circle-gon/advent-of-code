@@ -1,0 +1,1 @@
+import{s as n}from"./index-vH6bm6Wv.js";const o=""+new URL("worker-DaAZb3s3.js",import.meta.url).href,s=n(o);function a(t,r){let e=0;return s(t,0,()=>{e++,e<=3?r(`(Finding used edge ${e})`):r("Finding result...")})}const d=[a];export{d as default};
