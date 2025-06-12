@@ -14,7 +14,8 @@ let x = s32(0)
 let y = s32(0)
 queue = memory<s8>(1)
 queue2 = memory<s8>(1)
-seen = memory<u8>(1)
+seen = memory<bool>(1)
+seen3 = memory<bool>(1)
 seen2 = memory<u16>(1)
 
 fn get()() -> s64 {
@@ -63,7 +64,7 @@ fn poke(dist: u32)(idx: u32, status: u32) -> s32, s32 {
       return x, y
     }
     else if (status == 1) {
-      if (seen[hash(x, y)] != 1) {
+      if (seen[hash(x, y)] == 0) {
         // x, y, and distance
         queue[end] = x
         queue[end + 1] = y
@@ -85,7 +86,7 @@ fn moveTo(xd: s32, yd: s32)(
   start: u32, end: u32, s: u32, nx: s32, ny: s32, h: u32, dx: s32, dy: s32,
   ox: s32, oy: s32, idx: u32, ix: s32, iy: s32
 ) {
-  memory.fill(seen2, 0, 0, memory.byteSize(seen2))
+  memory.clear(seen2)
   queue2[0] = x
   queue2[1] = y
   ox = x
@@ -139,7 +140,7 @@ fn solve()(start: u32, tmp: s32, tmp2: s32, ox: s32, oy: s32) -> s32, s32 {
   ip = 0
   rel = 0
   end = 0
-  memory.fill(seen, 0, 0, memory.byteSize(seen))
+  memory.clear(seen)
 
   poke(0)
   while (start < end) {
@@ -153,7 +154,7 @@ fn solve()(start: u32, tmp: s32, tmp2: s32, ox: s32, oy: s32) -> s32, s32 {
 
 export fn part1()(x: s32, y: s32, start: u32, end: u32, nx: s32, ny: s32, s: u32, dist: u32) -> u32 {
   x, y = solve()
-  memory.fill(seen2, 0, 0, memory.byteSize(seen2))
+  memory.clear(seen3)
   queue[0] = x
   queue[1] = y
   i32.store8(queue, 2, 0)
@@ -165,13 +166,13 @@ export fn part1()(x: s32, y: s32, start: u32, end: u32, nx: s32, ny: s32, s: u32
     for (s = 0; s < 4; s++) {
       nx = queue[start] + sint(s < 2 ? 0 : 2 * (s - 2) - 1)
       ny = queue[start + 1] + sint(s >= 2 ? 0 : 2 * s - 1)
-      if (seen2[hash(nx, ny)] == 0 & seen[hash(nx, ny)] == 1) {
+      if (seen3[hash(nx, ny)] == 0 & seen[hash(nx, ny)] == 1) {
         // add
         queue[end] = nx
         queue[end + 1] = ny
         i32.store8(queue, end + 2, dist + 1)
         end += 3
-        seen2[hash(nx, ny)] = 1
+        seen3[hash(nx, ny)] = 1
       }
     }
     start += 3
@@ -182,7 +183,7 @@ export fn part1()(x: s32, y: s32, start: u32, end: u32, nx: s32, ny: s32, s: u32
 
 export fn part2()(x: s32, y: s32, start: u32, end: u32, nx: s32, ny: s32, s: u32, dist: u32, dn: u32) -> u32 {
   x, y = solve()
-  memory.fill(seen2, 0, 0, memory.byteSize(seen2))
+  memory.clear(seen3)
   queue[0] = x
   queue[1] = y
   i32.store16(queue, 2, 0)
@@ -194,13 +195,13 @@ export fn part2()(x: s32, y: s32, start: u32, end: u32, nx: s32, ny: s32, s: u32
     for (s = 0; s < 4; s++) {
       nx = queue[start] + sint(s < 2 ? 0 : 2 * (s - 2) - 1)
       ny = queue[start + 1] + sint(s >= 2 ? 0 : 2 * s - 1)
-      if (seen2[hash(nx, ny)] == 0 & seen[hash(nx, ny)] == 1) {
+      if (seen3[hash(nx, ny)] == 0 & seen[hash(nx, ny)] == 1) {
         // add
         queue[end] = nx
         queue[end + 1] = ny
         i32.store16(queue, end + 2, dn + 1)
         end += 4
-        seen2[hash(nx, ny)] = 1
+        seen3[hash(nx, ny)] = 1
       }
     }
     start += 4

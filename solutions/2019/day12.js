@@ -19,7 +19,7 @@ fn parse()(idx: u32, outIdx: u32, accum: s32, neg: u32, checked: u32) {
       accum = 10 * accum + sint(input[idx] - 48) 
       checked = true
     } else if (checked) {
-      if (neg) { moons[outIdx] = 0 - accum }
+      if (neg) { moons[outIdx] = -accum }
       else { moons[outIdx] = accum }
       accum = 0
       neg = false
@@ -35,7 +35,7 @@ fn parse()(idx: u32, outIdx: u32, accum: s32, neg: u32, checked: u32) {
     idx++
   }
   if (accum != 0) {
-    if (neg) { moons[outIdx] = 0 - accum }
+    if (neg) { moons[outIdx] = -accum }
     else { moons[outIdx] = accum }
     outIdx++
     if ((outIdx % 3) == 0) {

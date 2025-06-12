@@ -9,8 +9,7 @@ Unimplemented features
 Typed function reference goodies
 - Type aliases
 
-Unimplemented semanatics (difficult)
-- Hash tables
+- Store the utils (open addressing hash table, atan2, GCD, priority queue, modular exponentation)
 
 Unimplemented semanatics (easier)
 - Branch hinting
@@ -23,7 +22,7 @@ Unimplemented semanatics (easier)
 - Large number notation
 - Optimization of memory.size / memory.byteSize with non-grown memories
 - JS-like let/const variables that basically automagically create a local with initializer
-- Structs (possibly only memory, possibly others) and boolean memory type
+- Structs (possibly only memory, possibly others)
 
 Optimizations separate from binaryen
 - Tail call optimization
@@ -93,6 +92,7 @@ const TOKENS = Object.freeze({
   PIPE_EQUAL: 43,
   LEFT_BRACKET: 44,
   RIGHT_BRACKET: 45,
+  TILDE: 46,
 });
 
 const DIGITS = "0123456789";
@@ -139,6 +139,7 @@ const CHARACTER_TABLE = Object.freeze({
   "--": TOKENS.DASH_DASH,
   "[": TOKENS.LEFT_BRACKET,
   "]": TOKENS.RIGHT_BRACKET,
+  "~": TOKENS.TILDE,
 });
 const MAX_SIZE = Object.keys(CHARACTER_TABLE)
   .map((i) => i.length)
@@ -324,7 +325,14 @@ function lex(text) {
 }
 
 const VALUE_TYPES = Object.freeze(["u32", "s32", "u64", "s64", "f32", "f64"]);
-const MEMORY_TYPES = Object.freeze([...VALUE_TYPES, "u8", "s8", "u16", "s16"]);
+const MEMORY_TYPES = Object.freeze([
+  ...VALUE_TYPES,
+  "u8",
+  "s8",
+  "u16",
+  "s16",
+  "bool",
+]);
 // eslint-disable-next-line no-unused-vars
 const RESERVED = Object.freeze([
   ...VALUE_TYPES,
@@ -611,9 +619,14 @@ const OPCODES = Object.freeze({
       output: ["i32"],
     },
     byteSize: {
-      opcode: null,
+      opcode: 0x3f,
       params: ["memory"],
       output: ["i32"],
+    },
+    clear: {
+      opcode: 0xfc,
+      params: ["memory"],
+      output: [],
     },
     grow: {
       opcode: 0x40,
@@ -827,6 +840,7 @@ const AST = Object.freeze({
   MEMORY_INDEX: 19,
   ASSIGN_MEMORY_INDEX: 20,
   ASSIGN_MANY: 21,
+  FULL_NOT: 22,
 });
 
 function looseInteger(val) {
@@ -841,7 +855,7 @@ function getOpcode(level1, level2) {
 }
 
 function toLongType(token) {
-  const size = Number(token.slice(1));
+  const size = token === "bool" ? 1 : Number(token.slice(1));
   if (token[0] === "f") {
     return {
       type: "float",
@@ -983,7 +997,7 @@ class Parser {
     if (!MEMORY_TYPES.includes(token.identifier))
       this.errorToken(
         token,
-        "Expected u8, s8, u16, s16, u32, s32, u64, s64, f32, or f64",
+        "Expected u8, s8, u16, s16, u32, s32, u64, s64, f32, f64, or bool",
       );
     return toLongType(token.identifier);
   }
@@ -1654,6 +1668,15 @@ class Parser {
             ...toStartEnd(tk2, expr),
           };
         }
+        const tk3 = this.match(TOKENS.TILDE);
+        if (tk3) {
+          const expr = this.expr(7);
+          return {
+            node: AST.FULL_NOT,
+            body: expr,
+            ...toStartEnd(tk3, expr),
+          };
+        }
         return this.expr(8);
       }
       case 8: {
@@ -2264,6 +2287,8 @@ class VerifyCompiler {
     Object.setPrototypeOf(this.dataMap, null);
 
     this.typeIdx = 0;
+    this.boolRegisterIndex = 0;
+    this.boolFunctionIndex = 0;
     this.labels = [];
     this.types = [];
     this.imports = [];
@@ -2460,7 +2485,7 @@ class VerifyCompiler {
                 ...leb128u32(2),
                 ...leb128u32(this.get(node.mem, node.mem.identifier).ref),
                 NUM_CONST.i32,
-                ...encode("i32", node.offset),
+                ...leb128s32(node.offset),
                 0x0b,
                 ...bytevec,
               ]);
@@ -2496,6 +2521,33 @@ class VerifyCompiler {
           throw new Error("bad code");
       }
     }
+
+    this.defineType({
+      type: "func",
+      params: [
+        // index value
+        {
+          type: "int",
+          signed: 0,
+          size: 32,
+        },
+        // bitmask
+        {
+          type: "int",
+          signed: 0,
+          size: 32,
+        },
+      ],
+      output: [
+        // output value
+        {
+          type: "int",
+          signed: 0,
+          size: 32,
+        },
+      ],
+    });
+    this.boolFunctionIndex = this.typeIdx - 1;
   }
 
   shouldMatchTypes(expected, val) {
@@ -2949,18 +3001,28 @@ class VerifyCompiler {
           },
         ];
       }
+      case AST.FULL_NOT: {
+        const type = this.resolveVariable(this.getType(node.body));
+        this.typeIsIntegerLike(type);
+        return [
+          {
+            type: "int",
+            signed: 2,
+            size: type[0].size,
+            ...toStartEnd(node, node),
+          },
+        ];
+      }
       case AST.NEGATION: {
         const type = this.resolveVariable(this.getType(node.body));
-        this.typeIsFloatLike(type);
+        this.typeIsNumberLike(type);
         if (type[0].type === "number") {
           return [
             {
               type: "number",
-              integer: "3",
-              fractional: "",
-              // technically it should be float but having isDecimal be true
-              // is good enough to satisfy the invariant that negation can't return ints
-              isDecimal: true,
+              integer: type[0].integer,
+              fractional: type[0].fractional,
+              isDecimal: type[0].isDecimal,
               ...toStartEnd(node, node),
             },
           ];
@@ -3472,7 +3534,12 @@ class VerifyCompiler {
           };
         }
         return {
-          code: [ref.relative === "local" ? 0x20 : 0x23, ...leb128u32(ref.ref)],
+          code: [
+            ref.relative === "local"
+              ? OPCODES.local.get.opcode
+              : OPCODES.global.get.opcode,
+            ...leb128u32(ref.ref),
+          ],
           len: 1,
         };
       }
@@ -3484,9 +3551,9 @@ class VerifyCompiler {
             ...expr,
             ref.relative === "local"
               ? hint.type === "void"
-                ? 0x21
-                : 0x22
-              : 0x24,
+                ? OPCODES.local.set.opcode
+                : OPCODES.local.tee.opcode
+              : OPCODES.global.set.opcode,
             ...leb128u32(ref.ref),
           ],
           len: ref.relative === "local" && hint.type !== "void" ? 1 : 0,
@@ -3503,9 +3570,9 @@ class VerifyCompiler {
           code.push(
             ref.relative === "local"
               ? hint.type === "void"
-                ? 0x21
-                : 0x22
-              : 0x24,
+                ? OPCODES.local.set.opcode
+                : OPCODES.local.tee.opcode
+              : OPCODES.global.set.opcode,
             ...leb128u32(ref.ref),
           );
           if (ref.relative === "local" && hint.type !== "void") len++;
@@ -3522,27 +3589,48 @@ class VerifyCompiler {
         const loadop =
           size === 32 || size === 64
             ? "load"
-            : `load${size}_${ref.index.signed === 1 ? "s" : "u"}`;
+            : `load${Math.max(size, 8)}_${ref.index.signed === 1 ? "s" : "u"}`;
         const opcodeLoad = OPCODES[type][loadop].opcode;
         const byteSize = Math.log2(size / 8);
-        return {
-          code: [
-            ...this.compileExpression(node.index, {
-              type: "int",
-              signed: 0,
-              size: 32,
-            }).code,
-            // 8 does not need a multiplier since it's 1 byte
+        const code = [
+          ...this.compileExpression(node.index, {
+            type: "int",
+            signed: 0,
+            size: 32,
+          }).code,
+          OPCODES.local.tee.opcode,
+          ...leb128u32(this.boolRegisterIndex),
+          NUM_CONST.i32,
+        ];
+        if (byteSize >= 0)
+          code.push(...leb128s32(byteSize), OPCODES.i32.shl.opcode);
+        else code.push(...leb128s32(-byteSize), OPCODES.i32.shr_u.opcode);
+        code.push(
+          opcodeLoad,
+          // This alignment optimization is valid here but not in general load/store
+          // because MEMORY_INDEX is always size-aligned, but general load/store is only byte-aligned
+          ...leb128u32(64 + Math.max(byteSize, 0)),
+          ...leb128u32(ref.ref),
+          ...leb128u32(0),
+        );
+        // arr[x] -> arr[x >> 3] & (1 << (x & 7))
+        if (byteSize < 0)
+          code.push(
             NUM_CONST.i32,
-            ...encode("i32", 2 ** byteSize),
-            OPCODES.i32.mul.opcode,
-            opcodeLoad,
-            // This alignment optimization is valid here but not in general load/store
-            // because MEMORY_INDEX is always size-aligned, but general load/store is only byte-aligned
-            ...leb128u32(64 + byteSize),
-            ...leb128u32(ref.ref),
-            ...leb128u32(0),
-          ],
+            ...leb128s32(1),
+            OPCODES.local.get.opcode,
+            ...leb128u32(this.boolRegisterIndex),
+            NUM_CONST.i32,
+            ...leb128s32(7),
+            OPCODES.i32.and.opcode,
+            OPCODES.i32.shl.opcode,
+            OPCODES.i32.and.opcode,
+            NUM_CONST.i32,
+            ...leb128s32(0),
+            OPCODES.i32.ne.opcode,
+          );
+        return {
+          code,
           len: 1,
         };
       }
@@ -3550,20 +3638,25 @@ class VerifyCompiler {
         const ref = this.get(node, node.memory);
         const type = toRawType(toBigType(ref.index));
         const size = ref.index.size;
-        const storeop = size === 32 || size === 64 ? "store" : `store${size}`;
+        const storeop =
+          size === 32 || size === 64 ? "store" : `store${Math.max(size, 8)}`;
         const opcodeStore = OPCODES[type][storeop].opcode;
         const byteSize = Math.log2(size / 8);
-        return {
-          code: [
-            ...this.compileExpression(node.index, {
-              type: "int",
-              signed: 0,
-              size: 32,
-            }).code,
-            // 8 does not need a multiplier since it's 1 byte
-            NUM_CONST.i32,
-            ...encode("i32", 2 ** byteSize),
-            OPCODES.i32.mul.opcode,
+        const code = [
+          ...this.compileExpression(node.index, {
+            type: "int",
+            signed: 0,
+            size: 32,
+          }).code,
+          OPCODES.local.tee.opcode,
+          ...leb128u32(this.boolRegisterIndex),
+          NUM_CONST.i32,
+        ];
+        if (byteSize >= 0)
+          code.push(...leb128s32(byteSize), OPCODES.i32.shl.opcode);
+        else code.push(...leb128s32(-byteSize), OPCODES.i32.shr_u.opcode);
+        if (byteSize >= 0)
+          code.push(
             ...this.compileExpression(node.body, toBigType(ref.index)).code,
             opcodeStore,
             // This alignment optimization is valid here but not in general load/store
@@ -3571,7 +3664,54 @@ class VerifyCompiler {
             ...leb128u32(64 + byteSize),
             ...leb128u32(ref.ref),
             ...leb128u32(0),
-          ],
+          );
+        else {
+          const loadop =
+            size === 32 || size === 64
+              ? "load"
+              : `load${Math.max(size, 8)}_${ref.index.signed === 1 ? "s" : "u"}`;
+          const opcodeLoad = OPCODES[type][loadop].opcode;
+          // arr[x] = 1 -> arr[x >> 3] |= 1 << (x & 7)
+          // arr[x] = 0 -> arr[x >> 3] &= ~(1 << (x & 7))
+          code.push(
+            // index value
+            OPCODES.local.get.opcode,
+            ...leb128u32(this.boolRegisterIndex),
+            NUM_CONST.i32,
+            ...leb128s32(-byteSize),
+            OPCODES.i32.shr_u.opcode,
+            opcodeLoad,
+            ...leb128u32(64),
+            ...leb128u32(ref.ref),
+            ...leb128u32(0),
+            // bitmask
+            NUM_CONST.i32,
+            ...leb128s32(1),
+            OPCODES.local.get.opcode,
+            ...leb128u32(this.boolRegisterIndex),
+            NUM_CONST.i32,
+            ...leb128s32(7),
+            OPCODES.i32.and.opcode,
+            OPCODES.i32.shl.opcode,
+            ...this.compileExpression(node.body, toBigType(ref.index)).code,
+            OPCODES.i32.eqz.opcode,
+            0x04,
+            ...leb128s32(this.boolFunctionIndex),
+            NUM_CONST.i32,
+            ...leb128s32(-1),
+            OPCODES.i32.xor.opcode,
+            OPCODES.i32.and.opcode,
+            0x05,
+            OPCODES.i32.or.opcode,
+            0x0b,
+            OPCODES.i32.store8.opcode,
+            ...leb128u32(64),
+            ...leb128u32(ref.ref),
+            ...leb128u32(0),
+          );
+        }
+        return {
+          code,
           len: 0,
         };
       }
@@ -3625,15 +3765,42 @@ class VerifyCompiler {
           len: 1,
         };
       }
+      case AST.FULL_NOT: {
+        const typep = this.resolveVariable(this.getType(node.body))[0];
+        // i32.eqz/i64.eqz can't ever return i64, so i32 is more explicit
+        const type =
+          typep.type === "number"
+            ? { type: "int", signed: 2, size: 64 }
+            : typep;
+        const raw = toRawType(type);
+        return {
+          code: [
+            ...this.compileExpression(node.body, type).code,
+            NUM_CONST[raw],
+            ...encode(raw, type.size === 64 ? -1n : -1),
+            OPCODES[raw].xor.opcode,
+          ],
+          len: 1,
+        };
+      }
       case AST.NEGATION: {
         const typep = this.resolveVariable(this.getType(node.body))[0];
         const type = typep.type === "number" ? hint : typep;
         if (type.type === "void") return { code: [], len: 0 };
+        const raw = toRawType(type);
         return {
-          code: [
-            ...this.compileExpression(node.body, type).code,
-            OPCODES[toRawType(type)].neg.opcode,
-          ],
+          code:
+            type.type === "int"
+              ? [
+                  NUM_CONST[raw],
+                  ...encode(raw, type.size === 64 ? 0n : 0),
+                  ...this.compileExpression(node.body, type).code,
+                  OPCODES[raw].sub.opcode,
+                ]
+              : [
+                  ...this.compileExpression(node.body, type).code,
+                  OPCODES[raw].neg.opcode,
+                ],
           len: 1,
         };
       }
@@ -3726,14 +3893,29 @@ class VerifyCompiler {
         }
         if (node.level1.literal === "memory") {
           const memidx = this.globals.get(node.params[0].literal).ref;
-          const opcode =
-            OPCODES.memory[node.level2 === "byteSize" ? "size" : node.level2];
+          const opcode = OPCODES.memory[node.level2];
           const out = [];
           const base = node.level2 === "copy" || node.level2 === "init" ? 2 : 1;
           for (let i = base; i < opcode.params.length; i++) {
             const type = toLongType(opcode.params[i]);
             const arg = node.params[i];
             out.push(...this.compileExpression(arg, type).code);
+          }
+          if (node.level2 === "clear") {
+            out.push(
+              // start
+              NUM_CONST.i32,
+              ...leb128s32(0),
+              // value
+              NUM_CONST.i32,
+              ...leb128s32(0),
+              // size
+              OPCODES.memory.size.opcode,
+              ...leb128u32(memidx),
+              NUM_CONST.i32,
+              ...leb128s32(65536),
+              OPCODES.i32.mul.opcode,
+            );
           }
           out.push(opcode.opcode);
           if (
@@ -3748,7 +3930,7 @@ class VerifyCompiler {
               ...leb128u32(memidx),
               ...leb128u32(this.globals.get(node.params[1].literal).ref),
             );
-          else if (node.level2 === "fill")
+          else if (node.level2 === "fill" || node.level2 === "clear")
             out.push(...leb128u32(11), ...leb128u32(memidx));
           else if (node.level2 === "byteSize")
             out.push(
@@ -3818,7 +4000,9 @@ class VerifyCompiler {
             const out = this.compileFunctionParams(node);
             if (func.ref) {
               out.push(
-                f.relative === "local" ? 0x20 : 0x23,
+                f.relative === "local"
+                  ? OPCODES.local.get.opcode
+                  : OPCODES.global.get.opcode,
                 ...leb128u32(f.ref),
                 0x14,
                 ...leb128u32(f.typeRef),
@@ -4070,7 +4254,11 @@ class VerifyCompiler {
       this.locals.set(arg.name, obj);
     }
 
-    for (const param of node.locals) {
+    for (const param of [
+      ...node.locals,
+      // This is a register used for boolean memories
+      { type: { type: "int", signed: 0, size: 32 } },
+    ]) {
       if (isSameType(currentParam, param.type)) {
         currentLen++;
       } else {
@@ -4088,6 +4276,7 @@ class VerifyCompiler {
       locals.push([leb128u32(currentLen), ...this.defineType(currentParam)]);
     }
     code.push(...encodevec(locals));
+    this.boolRegisterIndex = localIdx;
 
     for (const line of node.body) {
       this.verifyStatement(line, node.type);

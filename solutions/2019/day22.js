@@ -20,7 +20,7 @@ fn parse()(idx: u32, outIdx: u32, accum: u32, neg: u32) {
         idx++
       }
       instrs[outIdx] = 0
-      instrs[outIdx + 1] = sint(neg ? (0 - accum) : accum)
+      instrs[outIdx + 1] = sint(neg ? -accum : accum)
       outIdx += 2
       if (input[idx] == 10) { idx++ }
     } else if (input[idx] == 100) { // d

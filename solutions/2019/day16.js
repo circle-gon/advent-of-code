@@ -26,7 +26,7 @@ fn fft()(idx: u32, sum: s32, idx2: u32) {
     for (idx2 = 0; idx2 < len; idx2++) {
       sum += getPattern(idx2, idx) * sint(clean[idx2])
     }
-    clean[idx + len] = sum > 0 ? uint(sum % 10) : uint((0 - sum) % 10)
+    clean[idx + len] = sum > 0 ? uint(sum % 10) : uint(-sum % 10)
     sum = 0
   }
   memory.copy(clean, clean, 0, len, len)

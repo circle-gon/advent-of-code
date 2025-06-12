@@ -84,7 +84,7 @@ export fn part1()(
   distance: u32,
   tmpdst: u32
 ) -> u32 {
-  memory.fill(wires, 0, 0, memory.byteSize(wires))
+  memory.clear(wires)
   parse()
   // One round around the board
   while (table[idx] != 0) {
@@ -141,7 +141,7 @@ export fn part2()(
   tmpdst: u32,
   steps: u32
 ) -> u32 {
-  memory.fill(wires, 0, 0, memory.byteSize(wires))
+  memory.clear(wires)
   parse()
   // One round around the board
   while (table[idx] != 0) {

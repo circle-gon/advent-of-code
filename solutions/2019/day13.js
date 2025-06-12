@@ -85,7 +85,7 @@ export fn part2fun()() {
   ip = 0
   rel = 0
   my = 0
-  memory.fill(output, 0, 0, memory.byteSize(output))
+  memory.clear(output)
   program[0] = 2
 }
 

@@ -6,7 +6,7 @@ input = import js.raw(memory<u8>(1))
 chain = memory<u16>(2) // Max hash code is ~46k and each element takes up 2 bytes
 revChain = memory<u16>(5)
 items = memory<u16>(1)
-seen = memory<u8>(1)
+seen = memory<bool>(1)
 queue = memory<u16>(1)
 let size = u32(0)
 let end = u32(0)
@@ -58,8 +58,8 @@ fn parse()(idx: u32, outIdx: u32, accum: u32, pair1: u32, itemIdx: u32) {
 }
 
 export fn part1()(idx: u32, count: u32, item: u32) -> u32 {
-  memory.fill(chain, 0, 0, memory.byteSize(chain))
-  memory.fill(revChain, 0, 0, memory.byteSize(revChain))
+  memory.clear(chain)
+  memory.clear(revChain)
   parse()
   for (; idx < size; idx++) {
     item = items[idx]
@@ -81,9 +81,9 @@ fn add(dest: u32, dist: u32)() {
 }
 
 export fn part2()(start: u32, dest: u32, dist: u32, iter: u32) -> u32 {
-  memory.fill(chain, 0, 0, memory.byteSize(chain))
-  memory.fill(revChain, 0, 0, memory.byteSize(revChain))
-  memory.fill(seen, 0, 0, memory.byteSize(seen))
+  memory.clear(chain)
+  memory.clear(revChain)
+  memory.clear(seen)
   end = 0
   parse()
   // YOU

@@ -2,9 +2,9 @@ import { compile } from "/emwasm.js";
 import { memstr } from "/utils.js";
 
 const code = `
-// No parse because it's not difficult to work with this
 input = import js.raw(memory<u8>(1))
-export parsed = memory<u8>(1)
+// todo swap
+export parsed = memory<bool>(1)
 hash = memory<u32>(1)
 const BEGIN_INDEX = u32(500)
 
@@ -17,7 +17,7 @@ fn update()(i: u32, j: u32, bcount: u32) {
       if (j != 0) { bcount += input[i * 6 + j - 1] == 35 }
       if (j < 4) { bcount += input[i * 6 + j + 1] == 35 }
       input[i * 6 + j + 30] = 
-        (input[i * 6 + j] == 35 ? bcount == 1 : (bcount == 1 | bcount == 2)) ? 35 : 46
+        bcount == 1 | (input[i * 6 + j] != 35 & bcount == 2) ? 35 : 46
     }
     input[i * 6 + 35] = 10
   }
@@ -52,10 +52,10 @@ export fn part2(example: u32)(
   _: u32, i: u32, j: u32, k: u32, sum: u32, low: u32, high: u32,
   checked: u32, arg: u32, bcount: u32, checked2: u32
 ) -> u32 {
-  memory.fill(parsed, 0, 0, memory.byteSize(parsed))
+  memory.clear(parsed)
   for (; i < 5; i++) {
     for (j = 0; j < 5; j++) {
-      parsed[BEGIN_INDEX * 50 + i * 5 + j] = input[i * 6 + j] == 35
+      parsed[BEGIN_INDEX * 64 + i * 5 + j] = input[i * 6 + j] == 35
     }
   }
 
@@ -65,29 +65,29 @@ export fn part2(example: u32)(
     checked2 = false
     // Check if the board needs to be expanded in the low direction
     if (
-      parsed[low * 50 + 7] | parsed[low * 50 + 11] |
-      parsed[low * 50 + 13] | parsed[low * 50 + 17]
+      parsed[low * 64 + 7] | parsed[low * 64 + 11] |
+      parsed[low * 64 + 13] | parsed[low * 64 + 17]
     ) {
       if (low == 0) { unreachable() }
       checked2 = true
-      if (parsed[low * 50 + 7]) {
+      if (parsed[low * 64 + 7]) {
         for (i = 0; i < 5; i++) {
-          parsed[(low - 1) * 50 + i + 25] = 1
+          parsed[(low - 1) * 64 + i + 32] = 1
         }
       }
-      if (parsed[low * 50 + 11]) {
+      if (parsed[low * 64 + 11]) {
         for (i = 0; i < 5; i++) {
-          parsed[(low - 1) * 50 + i * 5 + 25] = 1
+          parsed[(low - 1) * 64 + i * 5 + 32] = 1
         }
       }
-      if (parsed[low * 50 + 13]) {
+      if (parsed[low * 64 + 13]) {
         for (i = 0; i < 5; i++) {
-          parsed[(low - 1) * 50 + i * 5 + 4 + 25] = 1
+          parsed[(low - 1) * 64 + i * 5 + 4 + 32] = 1
         }
       }
-      if (parsed[low * 50 + 17]) {
+      if (parsed[low * 64 + 17]) {
         for (i = 0; i < 5; i++) {
-          parsed[(low - 1) * 50 + 20 + i + 25] = 1
+          parsed[(low - 1) * 64 + 20 + i + 32] = 1
         }
       }
     }
@@ -95,34 +95,34 @@ export fn part2(example: u32)(
     checked = false
     sum = 0
     for (i = 0; i < 5; i++) {
-      if (parsed[high * 50 + i]) { sum++ }
+      if (parsed[high * 64 + i]) { sum++ }
     }
     if (sum == 1 | sum == 2) {
-      parsed[(high + 1) * 50 + 7 + 25] = 1
+      parsed[(high + 1) * 64 + 7 + 32] = 1
       checked = true
     }
     sum = 0
     for (i = 0; i < 5; i++) {
-      if (parsed[high * 50 + 5 * i]) { sum++ }
+      if (parsed[high * 64 + 5 * i]) { sum++ }
     }
     if (sum == 1 | sum == 2) {
-      parsed[(high + 1) * 50 + 11 + 25] = 1
+      parsed[(high + 1) * 64 + 11 + 32] = 1
       checked = true
     }
     sum = 0
     for (i = 0; i < 5; i++) {
-      if (parsed[high * 50 + 5 * i + 4]) { sum++ }
+      if (parsed[high * 64 + 5 * i + 4]) { sum++ }
     }
     if (sum == 1 | sum == 2) {
-      parsed[(high + 1) * 50 + 13 + 25] = 1
+      parsed[(high + 1) * 64 + 13 + 32] = 1
       checked = true
     }
     sum = 0
     for (i = 0; i < 5; i++) {
-      if (parsed[high * 50 + 20 + i]) { sum++ }
+      if (parsed[high * 64 + 20 + i]) { sum++ }
     }
     if (sum == 1 | sum == 2) {
-      parsed[(high + 1) * 50 + 17 + 25] = 1
+      parsed[(high + 1) * 64 + 17 + 32] = 1
       checked = true
     }
     for (arg = low; arg <= high; arg++) {
@@ -135,55 +135,55 @@ export fn part2(example: u32)(
             if (i == 3 & j == 2) {
               if (arg != low) {
                 for (k = 0; k < 5; k++) {
-                  if (parsed[(arg - 1) * 50 + 20 + k]) { bcount++ }
+                  if (parsed[(arg - 1) * 64 + 20 + k]) { bcount++ }
                 }
               }
             } else {
-              bcount += parsed[arg * 50 + (i - 1) * 5 + j]
+              bcount += parsed[arg * 64 + (i - 1) * 5 + j]
             }
           } else if (arg != high) {
-              bcount += parsed[(arg + 1) * 50 + 7] 
+              bcount += parsed[(arg + 1) * 64 + 7] 
           }
           if (i < 4) {
             if (i == 1 & j == 2) {
               if (arg != low) {
                 for (k = 0; k < 5; k++) {
-                  if (parsed[(arg - 1) * 50 + k]) { bcount++ }
+                  if (parsed[(arg - 1) * 64 + k]) { bcount++ }
                 }
               }
             } else {
-              bcount += parsed[arg * 50 + (i + 1) * 5 + j]
+              bcount += parsed[arg * 64 + (i + 1) * 5 + j]
             }
           } else if (arg != high) {
-            bcount += parsed[(arg + 1) * 50 + 17] 
+            bcount += parsed[(arg + 1) * 64 + 17] 
           }
           if (j != 0) {
             if (j == 3 & i == 2) {
               if (arg != low) {
                 for (k = 0; k < 5; k++) {
-                  if (parsed[(arg - 1) * 50 + k * 5 + 4]) { bcount++ }
+                  if (parsed[(arg - 1) * 64 + k * 5 + 4]) { bcount++ }
                 }
               }
             } else {
-              bcount += parsed[arg * 50 + i * 5 + j - 1]
+              bcount += parsed[arg * 64 + i * 5 + j - 1]
             }
           } else if (arg != high) {
-            bcount += parsed[(arg + 1) * 50 + 11] 
+            bcount += parsed[(arg + 1) * 64 + 11] 
           }
           if (j < 4) {
             if (j == 1 & i == 2) {
               if (arg != low) {
                 for (k = 0; k < 5; k++) {
-                  if (parsed[(arg - 1) * 50 + k * 5]) { bcount++ }
+                  if (parsed[(arg - 1) * 64 + k * 5]) { bcount++ }
                 } 
               }
             } else {
-              bcount += parsed[arg * 50 + i * 5 + j + 1]
+              bcount += parsed[arg * 64 + i * 5 + j + 1]
             }
           } else if (arg != high) {
-            bcount += parsed[(arg + 1) * 50 + 13] 
+            bcount += parsed[(arg + 1) * 64 + 13] 
           }
-          parsed[arg * 50 + i * 5 + j + 25] = parsed[arg * 50 + i * 5 + j] ? (bcount == 1) : (bcount == 1 | bcount == 2)
+          parsed[arg * 64 + i * 5 + j + 32] = bcount == 1 | (!parsed[arg * 64 + i * 5 + j] & bcount == 2)
         }
       }
     }
@@ -191,13 +191,13 @@ export fn part2(example: u32)(
     if (checked2) { low-- }
     if (checked) { high++ }
     for (arg = low; arg <= high; arg++) {
-      memory.copy(parsed, parsed, arg * 50, arg * 50 + 25, 25)
+      memory.copy(parsed, parsed, arg * 8, arg * 8 + 4, 4)
     }
   }
   sum = 0
   for (arg = low; arg <= high; arg++) {
     for (i = 0; i < 25; i++) {
-      if (parsed[arg * 50 + i]) { sum++ }
+      if (parsed[arg * 64 + i]) { sum++ }
     }
   }
   return sum

@@ -69,7 +69,7 @@ fn resolveOutput()(minx: s32, maxx: s32, miny: s32, maxy: s32, x: s32, y: s32, s
 }
 
 export fn part1()() -> u32 {
-  memory.fill(drawn, 0, 0, memory.byteSize(drawn))
+  memory.clear(drawn)
   x = 0
   y = 0
   dir = 0
@@ -80,7 +80,7 @@ export fn part1()() -> u32 {
 }
 
 export fn part2()() {
-  memory.fill(drawn, 0, 0, memory.byteSize(drawn))
+  memory.clear(drawn)
   x = 0
   y = 0
   dir = 0

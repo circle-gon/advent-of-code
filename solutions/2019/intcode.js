@@ -8,7 +8,7 @@ fn inRange(m: u32)() -> u32 {
 
 fn parse()(idx: u32, val: u32, accum: s64, outIdx: u32, neg: u32) -> u32 {
   // Outside items are supposed to be 0 so fill them in
-  memory.fill(program, 0, 0, memory.byteSize(program))
+  memory.clear(program)
   while (input[idx] != 0) {
     val = input[idx]
     if (inRange(val)) {
@@ -16,7 +16,7 @@ fn parse()(idx: u32, val: u32, accum: s64, outIdx: u32, neg: u32) -> u32 {
     } else if (val == 45) {
       neg = true
     } else {
-      if (neg) { program[outIdx] = 0 - accum }
+      if (neg) { program[outIdx] = -accum }
       else { program[outIdx] = accum }
       accum = 0
       neg = false
@@ -25,7 +25,7 @@ fn parse()(idx: u32, val: u32, accum: s64, outIdx: u32, neg: u32) -> u32 {
     idx++
   }
   if (accum != 0) {
-    if (neg) { program[outIdx] = 0 - accum }
+    if (neg) { program[outIdx] = -accum }
     else { program[outIdx] = accum }
     outIdx++
   }

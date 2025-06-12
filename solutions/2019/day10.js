@@ -4,7 +4,7 @@ import { memstr } from "/utils.js";
 const code = `
 input = import js.raw(memory<u8>(1))
 clean = memory<u8>(1)
-table = memory<u8>(8)
+table = memory<bool>(1)
 let len = u32(0)
 const pi = f32(3.14159265)
 
@@ -28,7 +28,7 @@ fn parse()(idx: u32, outIdx: u32, x: u32, y: u32) {
 }
 
 fn see(x: u32, y: u32)(idx: u32, count: u32, an: u32) -> u32 {
-  memory.fill(table, 0, 0, memory.byteSize(table))
+  memory.clear(table)
   for (; idx < len; idx += 3) {
     if (clean[idx] == x & clean[idx + 1] == y) { continue }
     // This is definitely a very great hash key

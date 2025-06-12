@@ -3,7 +3,7 @@ import { memstr } from "/utils.js";
 
 const code = `
 input = import js.raw(memory<u8>(1))
-seen = memory<u8>(1)
+seen = memory<bool>(1)
 queue = memory<u32>(20)
 let len = u32(0)
 dist = memory<u32>(1)
@@ -37,7 +37,7 @@ fn bfs(x: u32, y: u32, k: u32)(
   start: u32, end: u32, s: u32, nx: u32, ny: u32, key: u32, in: u32,
   bmask: u32
 ) -> u32 {
-  memory.fill(seen, 0, 0, memory.byteSize(seen))
+  memory.clear(seen)
   queue[0] = x
   queue[1] = y
   queue[2] = 0
@@ -181,8 +181,8 @@ fn push()(pi: u32, ci: u32) {
 fn dijkstra(target: u32, keystart: u32, begin: u32)(
   base: u32, k: u32, bitmask: u32, bitmask2: u32, bkey: u32, bm: u32, tdist: u32
 ) -> u32 {
-  memory.fill(queue, 0, 0, memory.byteSize(queue))
-  memory.fill(wires, 0, 0, memory.byteSize(wires))
+  memory.clear(queue)
+  memory.clear(wires)
   heapsize = 0
   for (; base < 26; base++) {
     k = (begin * 26 + base) * 2
@@ -218,7 +218,7 @@ fn dijkstra(target: u32, keystart: u32, begin: u32)(
 }
 
 export fn part1()(x: u32, y: u32, target: u32) -> u32 {
-  memory.fill(dist, 0, 0, memory.byteSize(dist))
+  memory.clear(dist)
   parse()
   while (true) {
     // The last character is a newline
@@ -237,7 +237,7 @@ export fn part1()(x: u32, y: u32, target: u32) -> u32 {
 }
 
 export fn part2()(x: u32, y: u32, a: u32, j: u32, out: u32, r: u32) -> u32 {
-  memory.fill(dist, 0, 0, memory.byteSize(dist))
+  memory.clear(dist)
   parse()
 
   while (true) t {
@@ -277,7 +277,7 @@ export fn part2()(x: u32, y: u32, a: u32, j: u32, out: u32, r: u32) -> u32 {
 
   r = robots[0] | robots[1] | robots[2] | robots[3]
   for (; j < 4; j++) {
-    out += dijkstra(r, r & (robots[j] ^ uint(-1)), 26 + j)
+    out += dijkstra(r, r & ~robots[j], 26 + j)
   }
   return out
 }

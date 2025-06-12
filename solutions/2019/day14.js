@@ -73,7 +73,7 @@ fn computeReq(count: u64)(
   height: u32, top: u32, amt: u64, addr: u32, req: u64, idx: u32, base: u64,
   fuel: u32, ore: u32
 ) -> u64 {
-  memory.fill(items, 0, 0, memory.byteSize(items))
+  memory.clear(items)
   fuel = getKey(133554) // FUEL
   ore = getKey(11426) // ORE
 
@@ -101,13 +101,13 @@ fn computeReq(count: u64)(
 }
 
 export fn part1()() -> u32 {
-  memory.fill(reactions, 0, 0, memory.byteSize(reactions))
+  memory.clear(reactions)
   parse()
   return i32.wrap_i64(computeReq(1))
 }
 
 export fn part2()(low: u64, high: u64, mid: u64) -> u32 {
-  memory.fill(reactions, 0, 0, memory.byteSize(reactions))
+  memory.clear(reactions)
   parse()
  
   low = 1000000000000000000 / computeReq(1000000)
@@ -128,7 +128,7 @@ fn max()(
   height: u32, top: u32, amt: f64, addr: u32, req: f64, idx: u32,
   fuel: u32, ore: u32
 ) -> u64 {
-  memory.fill(items2, 0, 0, memory.byteSize(items2))
+  memory.clear(items2)
   fuel = getKey(133554) // FUEL
   ore = getKey(11426) // ORE
 

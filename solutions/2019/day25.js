@@ -109,9 +109,7 @@ fn takeItem(num: u64)(c: u32, d: u32, j: u32, e: u64) -> u32 {
   }
   commands[5 + c] = 10
   commands[6 + c] = 0
-  j = run()
-  //show()
-  return j
+  return run()
 }
 
 fn dropItem(num: u64)(c: u32, d: u32, j: u32, e: u64) -> u32 {
@@ -136,7 +134,6 @@ fn dropItem(num: u64)(c: u32, d: u32, j: u32, e: u64) -> u32 {
   commands[5 + c] = 10
   commands[6 + c] = 0
   j = run()
-  //show()
   return j
 }
 
@@ -223,7 +220,7 @@ fn moveTo(id: u32)(
   start: u32, end: u32, s: u32, h: u32, idx: u32,
   t: u32, next: u32, v: u32
 ) {
-  memory.fill(seen, 0, 0, memory.byteSize(seen))
+  memory.clear(seen)
   queue2[0] = cid
   end++
   while (start < end) {
@@ -274,7 +271,7 @@ export fn part1boring()(
   roomId = 2
   cid = 1
   end = 0
-  memory.fill(roomData, 0, 0, memory.byteSize(roomData))
+  memory.clear(roomData)
   commands[0] = 0
   run()
 
@@ -313,7 +310,7 @@ export fn part1boring()(
     }
   }
 
-  // Part 3: grab all safe items and head to security entrance, then drop it
+  // Part 3: grab all safe items and head to security entrance, then drop all items
   for (i = 0; i < count; i++) {
     moveTo(safe[i])
     takeItem(i64.load(roomData, safe[i] * 12))
@@ -343,7 +340,7 @@ export fn part1boring()(
       if ((i & k) == k) { dropItem(i64.load(roomData, safe[j] * 12)) }
     }
   }
-  return 0
+  unreachable()
 }
 `;
 
