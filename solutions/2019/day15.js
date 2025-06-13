@@ -21,14 +21,14 @@ seen2 = memory<u16>(1)
 fn get()() -> s64 {
   if (stage == 0) {
     stage = 1
-    return i64.extend_i32_u(in)
+    return s64(in)
   }
   stage = 0
   return 1347376211 // STOP
 }
 
 fn set(v: s64)() -> u32 {
-  output = i32.wrap_i64(v)
+  output = u32(v)
   return 0
 }
 

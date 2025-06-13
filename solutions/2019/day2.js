@@ -20,7 +20,7 @@ export fn part1()() -> u32 {
   program[1] = 12
   program[2] = 2
   evalIntcode(0, 0, get, set)
-  return i32.wrap_i64(program[0])
+  return u32(program[0])
 }
 
 export fn part2()(i: u64, j: u64) -> u32 {
@@ -34,7 +34,7 @@ export fn part2()(i: u64, j: u64) -> u32 {
       program[2] = sint(j)
       evalIntcode(0, 0, get, set)
       if (program[0] == 19690720) {
-        return i32.wrap_i64(100 * i + j)
+        return i32(100 * i + j)
       }
     }
   }

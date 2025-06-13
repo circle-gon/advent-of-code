@@ -12,12 +12,12 @@ let output = u32(0)
 
 fn get()() -> s64 {
   idx++
-  return i64.extend_i32_u(springscript[idx - 1])
+  return s64(springscript[idx - 1])
 }
 
 fn set(v: s64)() -> u32 {
   if (v > 256) {
-    output = i32.wrap_i64(v)
+    output = u32(v)
   }
   return 0
 }

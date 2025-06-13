@@ -23,7 +23,7 @@ fn get()() -> s64 {
 }
 
 fn set(v: s64)() -> u32 {
-  out = i32.wrap_i64(uint(v))
+  out = u32(v)
   return 0
 }
 
@@ -31,8 +31,8 @@ fn getOutput(ph: u32, sig: u32)() -> u32 {
   memory.copy(program, temp, 0, 600, range)
   // Part 2 also uses time
   time = 0
-  signal = i64.extend_i32_u(sig)
-  phase = i64.extend_i32_u(ph)
+  signal = i64(sig)
+  phase = i64(ph)
   evalIntcode(0, 0, get, set)
   return out
 }
@@ -60,7 +60,7 @@ fn getSuspend()() -> s64 {
 }
 
 fn runAmplified(idx: u32, val: u32)(base: u32, fake: u32, fake2: s32) -> u32 {
-  phase = i64.extend_i32_u(val)
+  phase = i64(val)
   time = 0
   base = idx * (range + 1)
   memory.copy(program, state, 0, i64.size * base + i32.size, i64.size * range)

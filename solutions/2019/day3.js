@@ -116,11 +116,7 @@ export fn part1()(
       else if (type == 2) { y++ }
       else if (type == 3) { y-- }
       if (get(getIndex(x, y)) == 1) {
-        tmpdst = 0
-        if (x < 0) { tmpdst -= uint(x) }
-        else { tmpdst += uint(x) }
-        if (y < 0) { tmpdst -= uint(y) }
-        else { tmpdst += uint(y) }
+        tmpdst = abs(x) + abs(y)
         if (tmpdst < distance) { distance = tmpdst }
       }
     }

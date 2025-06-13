@@ -120,10 +120,10 @@ fn solve(count: u64, ccount: u64)(offset: u64, increment: u64, idx: u32, v: u64,
   increment = 1
   while (true) {
     if (instrs[idx] == 0) {
-      v = i64.extend_i32_s(instrs[idx + 1])
+      v = u64(instrs[idx + 1])
       offset = (offset + mulmod(increment, sint(v) < 0 ? v + ccount : v, ccount)) % ccount
     } else if (instrs[idx] == 1) {
-      increment = mulmod(increment, inv(i64.extend_i32_u(instrs[idx + 1]), ccount), ccount)
+      increment = mulmod(increment, inv(u64(instrs[idx + 1]), ccount), ccount)
     } else if (instrs[idx] == 2) {
       increment = ccount - increment
       offset = (offset + increment) % ccount

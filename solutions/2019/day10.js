@@ -59,7 +59,7 @@ export fn part1()() -> u32 {
 }
 
 fn dist(x: u32, y: u32, dx: u32, dy: u32)() -> u32 {
-  return (x < dx ? dx - x : x - dx) + (y < dy ? dy - y : y - dy)
+  return abs(sint(x - dx)) + abs(sint(y - dy))
 }
 
 // atan2 approximation from https://gist.github.com/volkansalma/2972237

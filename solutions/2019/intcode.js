@@ -12,7 +12,7 @@ fn parse()(idx: u32, val: u32, accum: s64, outIdx: u32, neg: u32) -> u32 {
   while (input[idx] != 0) {
     val = input[idx]
     if (inRange(val)) {
-      accum = 10 * accum + sint(i64.extend_i32_u(val - 48))
+      accum = 10 * accum + s64(val - 48)
     } else if (val == 45) {
       neg = true
     } else {
@@ -44,8 +44,8 @@ fn getMode(mode: u32, pos: u32)() -> u32 {
 
 fn valFromMode(val: s64, mode: u32, rel: s32)() -> s64 {
   if (mode == 1) { return val }
-  if (mode == 2) { return program[uint(i32.wrap_i64(val) + rel)] }
-  return program[uint(i32.wrap_i64(val))]
+  if (mode == 2) { return program[u32(val) + uint(rel)] }
+  return program[u32(val)]
 }
 
 fn writeFromMode(addr: s64, val: s64, mode: u32, rel: s32)() {
@@ -53,9 +53,9 @@ fn writeFromMode(addr: s64, val: s64, mode: u32, rel: s32)() {
     unreachable()
   }
   if (mode == 2) {
-    program[uint(i32.wrap_i64(addr) + rel)] = val
+    program[u32(addr) + uint(rel)] = val
   } else {
-    program[uint(i32.wrap_i64(addr))] = val
+    program[u32(addr)] = val
   }
 }
 
@@ -72,8 +72,8 @@ fn evalIntcode(
   tmp: s64
 ) -> u32, s32 {
   while (true) {
-    instr = i32.wrap_i64(uint(program[ip] % 100))
-    mode = i32.wrap_i64(uint(program[ip] / 100))
+    instr = i32(uint(program[ip] % 100))
+    mode = i32(uint(program[ip] / 100))
     if (instr == 1) {
       val1 = valFromMode(program[ip + 1], getMode(mode, 0), rel)
       val2 = valFromMode(program[ip + 2], getMode(mode, 1), rel)
@@ -101,13 +101,13 @@ fn evalIntcode(
       }
     } else if (instr == 5) {
       if (valFromMode(program[ip + 1], getMode(mode, 0), rel) != 0) {
-        ip = i32.wrap_i64(uint(valFromMode(program[ip + 2], getMode(mode, 1), rel)))
+        ip = i32(uint(valFromMode(program[ip + 2], getMode(mode, 1), rel)))
       } else {
         ip += 3
       }
     } else if (instr == 6) {
       if (valFromMode(program[ip + 1], getMode(mode, 0), rel) == 0) {
-        ip = i32.wrap_i64(uint(valFromMode(program[ip + 2], getMode(mode, 1), rel)))
+        ip = i32(uint(valFromMode(program[ip + 2], getMode(mode, 1), rel)))
       } else {
         ip += 3
       }
@@ -126,7 +126,7 @@ fn evalIntcode(
         rel)
       ip += 4
     } else if (instr == 9) {
-      rel += i32.wrap_i64(valFromMode(program[ip + 1], getMode(mode, 0), rel))
+      rel += i32(valFromMode(program[ip + 1], getMode(mode, 0), rel))
       ip += 2
     } else if (instr == 99) { return 1347376211, 1347376211 } // STOP
     else { unreachable() }

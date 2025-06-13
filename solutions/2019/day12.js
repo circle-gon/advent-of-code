@@ -66,7 +66,7 @@ fn simulateOne(j: u32)(idx: u32, idx2: u32) {
   }
 }
 
-export fn part1()(t: u32, idx: u32, j: u32, sum: u32, f1: u32, f2: u32, tmp: s32) -> u32 {
+export fn part1()(t: u32, idx: u32, j: u32, sum: u32, f1: u32, f2: u32) -> u32 {
   parse()
   for (; t < 1000; t++) {
     for (j = 0; j < 3; j++) {
@@ -77,12 +77,8 @@ export fn part1()(t: u32, idx: u32, j: u32, sum: u32, f1: u32, f2: u32, tmp: s32
     f1 = 0
     f2 = 0
     for (j = 0; j < 3; j++) {
-      tmp = moons[idx + j]
-      if (tmp < 0) { f1 -= uint(tmp) }
-      else { f1 += uint(tmp) }
-      tmp = moons[idx + j + 3]
-      if (tmp < 0) { f2 -= uint(tmp) }
-      else { f2 += uint(tmp) }
+      f1 += abs(moons[idx + j])
+      f2 += abs(moons[idx + j + 3])
     }
     sum += f1 * f2
   }

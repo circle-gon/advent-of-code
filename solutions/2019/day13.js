@@ -35,7 +35,7 @@ fn set(v: s64)() -> u32 {
 fn get2()() -> s64 {
   if (stage == 0) {
     stage = 1
-    return i64.extend_i32_s(val)
+    return i64(val)
   }
   stage = 0
   return 1347376211 // STOP
@@ -52,10 +52,10 @@ fn get3()() -> s64 {
 }
 
 fn set2(v: s64)() -> u32 {
-  if (stage2 == 0) { x = i32.wrap_i64(v); stage2 = 1 }
-  else if (stage2 == 1) { y = i32.wrap_i64(v); stage2 = 2 }
+  if (stage2 == 0) { x = i32(v); stage2 = 1 }
+  else if (stage2 == 1) { y = i32(v); stage2 = 2 }
   else {
-    if (x == -1 & y == 0) { score = i32.wrap_i64(v) }
+    if (x == -1 & y == 0) { score = u32(v) }
     else {
       if (y > my) { my = y }
       output[uint(y * 50 + x)] =

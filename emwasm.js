@@ -13,13 +13,11 @@ Typed function reference goodies
 
 Unimplemented semanatics (easier)
 - Branch hinting
-- min/max/abs functions for integers
-- easy conversion from i32 to i64 and vice versa
+- min/max functions for integers
 - better code references in error messages
 - multiple error messages at one time
 - Start functions
 - Compile-time constants
-- Large number notation
 - Optimization of memory.size / memory.byteSize with non-grown memories
 - JS-like let/const variables that basically automagically create a local with initializer
 - Structs (possibly only memory, possibly others)
@@ -267,27 +265,62 @@ function lex(text) {
               });
             } else {
               const start = idx;
-              let integer = "";
-              let fractional = "";
+              let str = "";
+              let exp = false;
               let decimal = false;
-              const negative = char === "-";
-              if (negative) idx++;
-              while (DIGITS.includes(text[idx]) || text[idx] === ".") {
+              let hasFrac = false;
+              if (char === "-") {
+                str += "-";
+                idx++;
+              }
+              while (
+                DIGITS.includes(text[idx]) ||
+                text[idx] === "." ||
+                (text[idx] === "e" && DIGITS.includes(text[idx + 1]))
+              ) {
                 const char = text[idx];
                 if (char === ".") {
+                  if (exp)
+                    error(text, idx, idx + 1, "Exponents must be integers");
                   if (decimal)
                     error(text, idx, idx + 1, "Unexpected character");
                   decimal = true;
-                } else if (decimal) fractional += text[idx];
-                else integer += text[idx];
+                  str += ".";
+                } else if (char === "e") {
+                  if (exp)
+                    error(
+                      text,
+                      idx,
+                      idx + 1,
+                      "Only one exponent may be included",
+                    );
+                  // Don't allow .e as a number literal
+                  if (decimal && !hasFrac)
+                    error(text, idx, idx + 1, "Invalid number literal");
+                  str += "e";
+                  if (text[idx + 1] === "-") {
+                    str += "-";
+                    idx++;
+                  }
+                  exp = true;
+                } else {
+                  if (decimal) hasFrac = true;
+                  str += text[idx];
+                }
                 idx++;
               }
+              const val = formatToReal({ str }, "f64");
               tokens.push({
                 token: TOKENS.NUMBER,
                 newline,
-                integer,
-                fractional,
-                negative,
+                str,
+                isDecimal:
+                  // This gets literals like 0.00e0 wrong but since 0.00 is still
+                  // correct I think it doesn't matter a whole lot
+                  !Number.isInteger(val) || toProperLiteral(str) === false,
+                isNegative: val < 0,
+                // This also treats -0 as 0
+                isZero: val === 0,
                 start,
                 end: idx,
               });
@@ -391,6 +424,10 @@ const OPCODES = Object.freeze({
   __proto__: null,
   i32: {
     __proto__: null,
+    opcode: null,
+    params: [null],
+    output: [null],
+
     // Memory load/store
     load: load(0x28, "i32"),
     load8_s: load(0x2c, "i32"),
@@ -448,6 +485,10 @@ const OPCODES = Object.freeze({
   },
   i64: {
     __proto__: null,
+    opcode: null,
+    params: [null],
+    output: [null],
+
     // Memory load/store
     load: load(0x29, "i64"),
     load8_s: load(0x30, "i64"),
@@ -774,6 +815,36 @@ const OPCODES = Object.freeze({
     params: [null],
     output: [null],
   },
+  abs: {
+    __proto__: null,
+    opcode: null,
+    params: [null],
+    output: [null],
+  },
+  u32: {
+    __proto__: null,
+    opcode: null,
+    params: [null],
+    output: [null],
+  },
+  s32: {
+    __proto__: null,
+    opcode: null,
+    params: [null],
+    output: [null],
+  },
+  u64: {
+    __proto__: null,
+    opcode: null,
+    params: [null],
+    output: [null],
+  },
+  s64: {
+    __proto__: null,
+    opcode: null,
+    params: [null],
+    output: [null],
+  },
 });
 const CONSTANTS = Object.freeze({
   __proto__: null,
@@ -845,7 +916,7 @@ const AST = Object.freeze({
 
 function looseInteger(val) {
   if (val === null) return val;
-  return Number(val.integer);
+  return Number(val.str);
 }
 
 function getOpcode(level1, level2) {
@@ -947,9 +1018,9 @@ class Parser {
   }
 
   assertInteger(token, unsigned) {
-    if (token.fractional.length > 0)
+    if (token.isDecimal)
       this.errorToken(token, "Integer literals can not have decimals");
-    if (unsigned && token.negative)
+    if (unsigned && token.isNegative)
       this.errorToken(token, "Unsigned integers can not be negative");
   }
 
@@ -1076,8 +1147,10 @@ class Parser {
         writable,
         imported: false,
         type: t,
-        integer: val.integer,
-        fractional: val.fractional,
+        isDecimal: val.isDecimal,
+        isNegative: val.isNegative,
+        isZero: val.isZero,
+        str: val.str,
         ...toStartEnd(name, end),
       };
     }
@@ -1685,9 +1758,10 @@ class Parser {
         if (tk1) {
           return this.compactAssignmentRaw(ident, "add", AST.BINARY, {
             node: AST.NUMBER,
-            integer: "1",
-            fractional: "",
-            negative: false,
+            isDecimal: false,
+            isNegative: false,
+            isZero: false,
+            str: "1",
             ...toStartEnd(ident, tk1),
           });
         }
@@ -1695,9 +1769,10 @@ class Parser {
         if (tk2) {
           return this.compactAssignmentRaw(ident, "sub", AST.BINARY, {
             node: AST.NUMBER,
-            integer: "1",
-            fractional: "",
-            negative: false,
+            isDecimal: false,
+            isNegative: false,
+            isZero: false,
+            str: "1",
             ...toStartEnd(ident, tk2),
           });
         }
@@ -1760,13 +1835,12 @@ class Parser {
             const constant = CONSTANTS[level1.literal]?.[level2];
             if (constant === undefined)
               this.errorToken(toStartEnd(level1, level2t), "Invalid constant");
-            const cs = constant.toString();
-            const negative = cs.startsWith("-");
             level1 = {
               node: AST.NUMBER,
-              integer: negative ? cs.slice(1) : cs,
-              fractional: "",
-              negative,
+              isDecimal: false,
+              isNegative: constant < 0,
+              isZero: constant === 0,
+              str: constant.toString(),
               ...toStartEnd(level1, level2t),
             };
           }
@@ -1789,9 +1863,10 @@ class Parser {
         if (number) {
           return {
             node: AST.NUMBER,
-            integer: number.integer,
-            fractional: number.fractional,
-            negative: number.negative,
+            isDecimal: number.isDecimal,
+            isNegative: number.isNegative,
+            isZero: number.isZero,
+            str: number.str,
             ...toStartEnd(number, number),
           };
         }
@@ -1802,17 +1877,19 @@ class Parser {
           if (id === "true")
             return {
               node: AST.NUMBER,
-              integer: "1",
-              fractional: "",
-              negative: false,
+              isDecimal: false,
+              isNegative: false,
+              isZero: false,
+              str: "1",
               ...toStartEnd(identifier, identifier),
             };
           if (id === "false")
             return {
               node: AST.NUMBER,
-              integer: "0",
-              fractional: "",
-              negative: false,
+              isDecimal: false,
+              isNegative: false,
+              isZero: true,
+              str: "0",
               ...toStartEnd(identifier, identifier),
             };
           return {
@@ -2144,11 +2221,25 @@ function encode(type, num) {
   }
 }
 
+function toProperLiteral(str) {
+  const eidx = str.indexOf("e");
+  if (eidx !== -1) {
+    const exp = Number(str.slice(eidx + 1));
+    const dot = str.indexOf(".");
+    const right = dot === -1 ? 0 : eidx - dot - 1;
+    const fout =
+      dot === -1
+        ? str.slice(0, eidx)
+        : str.slice(0, dot) + str.slice(dot + 1, eidx);
+    if (exp < right) return false;
+    return fout + "0".repeat(exp - right);
+  }
+  return str;
+}
+
 function formatToReal(val, hint) {
-  const text = val.integer + (val.fractional ? "." + val.fractional : "");
-  let v = hint === "i64" ? BigInt(text) : Number(text);
-  if (val.negative) v = -v;
-  return v;
+  if (hint !== "i64") return Number(val.str);
+  return BigInt(toProperLiteral(val.str));
 }
 
 function utf8(str) {
@@ -2577,7 +2668,7 @@ class VerifyCompiler {
         }
         this.errorToken(
           toStartEnd(was, was),
-          `Got types ${typeToString(was)} but expected ${typeToString(should)}`,
+          `Got type ${typeToString(was)} but expected ${typeToString(should)}`,
         );
       }
     }
@@ -2628,7 +2719,7 @@ class VerifyCompiler {
     if (types.length !== 1)
       this.errorToken(
         toStartEnd(types[0], types.at(-1)),
-        "Expected 1 value, but got 0 values",
+        `Expected 1 value, but got ${types.length} values`,
       );
     const type = types[0];
     if ((type.type !== "number" || type.isDecimal) && type.type !== "int")
@@ -2638,25 +2729,11 @@ class VerifyCompiler {
       );
   }
 
-  typeIsFloatLike(types) {
-    if (types.length !== 1)
-      this.errorToken(
-        toStartEnd(types[0], types.at(-1)),
-        "Expected 1 value, but got 0 values",
-      );
-    const type = types[0];
-    if (type.type !== "number" && type.type !== "float")
-      this.errorToken(
-        type,
-        `Expected an number or float but got ${typeToString(type)}`,
-      );
-  }
-
   typeIsNumberLike(types) {
     if (types.length !== 1)
       this.errorToken(
         toStartEnd(types[0], types.at(-1)),
-        "Expected 1 value, but got 0 values",
+        `Expected 1 value, but got ${types.length} values`,
       );
     const type = types[0];
     if (type.type !== "number" && type.type !== "int" && type.type !== "float")
@@ -2752,17 +2829,18 @@ class VerifyCompiler {
 
   getType(node) {
     switch (node.node) {
-      case AST.NUMBER:
+      case AST.NUMBER: {
         return [
           {
             type: "number",
-            isDecimal: node.fractional.length > 0,
-            isNegative: node.negative,
-            integer: node.integer,
-            fractional: node.fractional,
+            isDecimal: node.isDecimal,
+            isNegative: node.isNegative,
+            isZero: node.isZero,
+            str: node.str,
             ...toStartEnd(node, node),
           },
         ];
+      }
       case AST.IDENTIFIER:
         return [
           {
@@ -2896,9 +2974,10 @@ class VerifyCompiler {
           return [
             {
               type: "number",
-              integer: "3",
-              fractional: "",
               isDecimal: false,
+              isNegative: false,
+              isZero: false,
+              str: "1",
               ...toStartEnd(node, node),
             },
           ];
@@ -2922,13 +3001,11 @@ class VerifyCompiler {
           let bb = b[0];
           if (
             ((aa.type === "number" &&
-              aa.integer === "0" &&
-              !aa.isDecimal &&
+              aa.isZero &&
               bb.type === "int" &&
               bb.signed === 0) ||
               (bb.type === "number" &&
-                bb.integer === "0" &&
-                !bb.isDecimal &&
+                bb.isZero &&
                 aa.type === "int" &&
                 aa.signed === 0)) &&
             node.type !== "ne" &&
@@ -2967,7 +3044,7 @@ class VerifyCompiler {
               );
           }
           return [
-            { type: "int", signed: 2, size: 32, ...toStartEnd(node, node) },
+            { type: "int", signed: 0, size: 32, ...toStartEnd(node, node) },
           ];
         }
         const specific = moreSpecific(a[0], b[0]);
@@ -2975,9 +3052,10 @@ class VerifyCompiler {
           return [
             {
               type: "number",
-              integer: "3",
-              fractional: "",
               isDecimal: a[0].isDecimal || b[0].isDecimal,
+              isNegative: a[0].isNegative || b[0].isNegative,
+              isZero: a[0].isZero && b[0].isZero,
+              str: "1",
               ...toStartEnd(node, node),
             },
           ];
@@ -2995,7 +3073,7 @@ class VerifyCompiler {
         return [
           {
             type: "int",
-            signed: 2,
+            signed: 0,
             size: 32, // NOT uses eqz which always returns i32
             ...toStartEnd(node, node),
           },
@@ -3007,7 +3085,7 @@ class VerifyCompiler {
         return [
           {
             type: "int",
-            signed: 2,
+            signed: type[0].signed,
             size: type[0].size,
             ...toStartEnd(node, node),
           },
@@ -3020,9 +3098,10 @@ class VerifyCompiler {
           return [
             {
               type: "number",
-              integer: type[0].integer,
-              fractional: type[0].fractional,
               isDecimal: type[0].isDecimal,
+              isNegative: type[0].isNegative,
+              isZero: type[0].isZero,
+              str: type[0].str,
               ...toStartEnd(node, node),
             },
           ];
@@ -3091,9 +3170,10 @@ class VerifyCompiler {
             return [
               {
                 type: "number",
-                integer: "3",
-                fractional: "",
                 isDecimal: a.isDecimal || b.isDecimal,
+                isNegative: a.isNegative || b.isNegative,
+                isZero: a.isZero && b.isZero,
+                str: "1",
                 ...toStartEnd(node, node),
               },
             ];
@@ -3137,9 +3217,10 @@ class VerifyCompiler {
               return [
                 {
                   type: "number",
-                  integer: "3",
-                  fractional: "",
                   isDecimal: false,
+                  isNegative: a.isNegative || b.isNegative,
+                  isZero: a.isZero && b.isZero,
+                  str: "1",
                   ...toStartEnd(node, node),
                 },
               ];
@@ -3171,9 +3252,10 @@ class VerifyCompiler {
             return [
               {
                 type: "number",
-                integer: "3",
-                fractional: "",
                 isDecimal: true,
+                isNegative: a[0].isNegative || b[0].isNegative,
+                isZero: a[0].isZero && b[0].isZero,
+                str: "1",
                 ...toStartEnd(node, node),
               },
             ];
@@ -3206,6 +3288,7 @@ class VerifyCompiler {
               {
                 ...type,
                 isNegative: to === 1,
+                ...toStartEnd(node, node),
               },
             ];
           return [
@@ -3213,6 +3296,114 @@ class VerifyCompiler {
               type: "int",
               size: type.size,
               signed: to,
+              ...toStartEnd(node, node),
+            },
+          ];
+        }
+
+        if (node.level1.literal === "abs") {
+          const type = this.resolveVariable(this.getType(node.params[0]))[0];
+          this.shouldMatchTypes(
+            [
+              {
+                type: "int",
+                size: type.size ?? 64,
+                signed: 1,
+              },
+            ],
+            [type],
+          );
+          if (type.type === "number")
+            return [
+              {
+                ...type,
+                isNegative: false,
+                ...toStartEnd(node, node),
+              },
+            ];
+          return [
+            {
+              type: "int",
+              size: type.size,
+              signed: 0,
+              ...toStartEnd(node, node),
+            },
+          ];
+        }
+
+        if (
+          (node.level1.literal === "i32" ||
+            node.level1.literal === "u32" ||
+            node.level1.literal === "s32") &&
+          node.level2 === null
+        ) {
+          const type = this.resolveVariable(this.getType(node.params[0]))[0];
+          this.shouldMatchTypes(
+            [
+              {
+                type: "int",
+                size: 64,
+                signed:
+                  node.level1.literal === "i32"
+                    ? 2
+                    : node.level1.literal === "u32"
+                      ? 1
+                      : 0,
+              },
+            ],
+            [type],
+          );
+          if (type.type === "number")
+            this.errorToken(type, "Numbers don't need an integer conversion");
+          return [
+            {
+              type: "int",
+              size: 32,
+              signed:
+                node.level1.literal === "i32"
+                  ? type.signed
+                  : node.level1.literal === "u32"
+                    ? 0
+                    : 1,
+              ...toStartEnd(node, node),
+            },
+          ];
+        }
+
+        if (
+          (node.level1.literal === "i64" ||
+            node.level1.literal === "u64" ||
+            node.level1.literal === "s64") &&
+          node.level2 === null
+        ) {
+          const type = this.resolveVariable(this.getType(node.params[0]))[0];
+          this.shouldMatchTypes(
+            [
+              {
+                type: "int",
+                size: 32,
+                signed:
+                  node.level1.literal === "i64"
+                    ? 2
+                    : node.level1.literal === "u64"
+                      ? 1
+                      : 0,
+              },
+            ],
+            [type],
+          );
+          if (type.type === "number")
+            this.errorToken(type, "Numbers don't need an integer conversion");
+          return [
+            {
+              type: "int",
+              size: 64,
+              signed:
+                node.level1.literal === "i64"
+                  ? type.signed
+                  : node.level1.literal === "u64"
+                    ? 0
+                    : 1,
               ...toStartEnd(node, node),
             },
           ];
@@ -3430,6 +3621,7 @@ class VerifyCompiler {
         case AST.BINARY:
           init = this.verifyLocalInitialization([line.left, line.right], init);
           break;
+        case AST.FULL_NOT:
         case AST.NOT:
         case AST.NEGATION:
           init = this.verifyLocalInitialization([line.body], init);
@@ -3450,10 +3642,9 @@ class VerifyCompiler {
               this.verifyLocalInitialization([line.level1], init);
             }
           } else {
-            const params = this.flatValuesResolvable(line.params);
             for (let i = 0; i < opt.params.length; i++) {
               const expected = opt.params[i];
-              const given = params[i];
+              const given = line.params[i];
 
               if (expected === null) continue;
 
@@ -3483,7 +3674,10 @@ class VerifyCompiler {
               }
             }
           }
+          break;
         }
+        default:
+          throw new Error("bad code");
       }
     }
 
@@ -3991,6 +4185,67 @@ class VerifyCompiler {
           return this.compileExpression(node.params[0], hint);
         }
 
+        if (node.level1.literal === "abs") {
+          if (hint.type === "void") return { code: [], len: 0 };
+          const type = this.resolveVariable(this.getType(node.params[0]))[0];
+          const rtype = toRawType(type.type === "number" ? hint : type);
+          const num = type.type.size === 64 ? 63n : 31;
+          return {
+            code: [
+              ...this.compileExpression(node.params[0], hint).code,
+              OPCODES.local.tee.opcode,
+              ...leb128u32(this.boolRegisterIndex),
+              OPCODES.local.get.opcode,
+              ...leb128u32(this.boolRegisterIndex),
+              NUM_CONST[rtype],
+              ...encode(rtype, num),
+              OPCODES[rtype].shr_s.opcode,
+              OPCODES[rtype].add.opcode,
+              OPCODES.local.get.opcode,
+              ...leb128u32(this.boolRegisterIndex),
+              NUM_CONST[rtype],
+              ...encode(rtype, num),
+              OPCODES[rtype].shr_s.opcode,
+              OPCODES[rtype].xor.opcode,
+            ],
+            len: 1,
+          };
+        }
+
+        if (
+          (node.level1.literal === "i32" ||
+            node.level1.literal === "u32" ||
+            node.level1.literal === "s32") &&
+          node.level2 === null
+        ) {
+          if (hint.type === "void") return { code: [], len: 0 };
+          return {
+            code: [
+              ...this.compileExpression(node.params[0], hint).code,
+              OPCODES.i32.wrap_i64.opcode,
+            ],
+            len: 1,
+          };
+        }
+
+        if (
+          (node.level1.literal === "i64" ||
+            node.level1.literal === "u64" ||
+            node.level1.literal === "s64") &&
+          node.level2 === null
+        ) {
+          if (hint.type === "void") return { code: [], len: 0 };
+          const type = this.resolveVariable(this.getType(node.params[0]))[0];
+          const signed = type.signed === 0 ? "u" : "s";
+          return {
+            code: [
+              ...this.compileExpression(node.params[0], hint).code,
+              OPCODES.i64[`extend_i32_${signed}`].opcode,
+            ],
+            len: 1,
+          };
+        }
+
         const out = [];
         const opcode = getOpcode(node.level1, node.level2);
         if (opcode === undefined) {
@@ -4348,6 +4603,9 @@ async function optimize(wasm) {
   const binaryen = (
     await import("https://cdn.jsdelivr.net/npm/binaryen@123.0.0")
   ).default;
+  // These are the highest optimization levels
+  binaryen.setOptimizeLevel(4);
+  binaryen.setShrinkLevel(2);
   const module = binaryen.readBinary(wasm);
   module.setFeatures(binaryen.Features.All);
   module.optimize();
@@ -4356,10 +4614,17 @@ async function optimize(wasm) {
   return binary;
 }
 
-function compileCode(text, map) {
-  return optimize(compileRaw(text, map));
+async function compileCode(text, map) {
+  // Optimize twice because it seems to be better than once
+  // but optimizing thrice seems to be worse
+  return optimize(await optimize(compileRaw(text, map)));
 }
 
+let size = 0;
 export async function compile(emwasm, deps, map) {
-  return compileWasm(await compileCode(emwasm, map), deps);
+  const binary = await compileCode(emwasm, map);
+  console.log(
+    `binary is ${binary.length} bytes, now ${(size += binary.length)} total bytes`,
+  );
+  return compileWasm(binary, deps);
 }

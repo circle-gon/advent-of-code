@@ -19,13 +19,13 @@ fn hash(x: s32, y: s32)() -> u32 {
 }
 
 fn get()() -> s64 {
-  return i64.extend_i32_u(drawn[hash(x, y)] & 1)
+  return s64(drawn[hash(x, y)] & 1)
 }
 
 fn set(v: s64)() -> u32 {
   if (instr == 0) {
     if ((drawn[hash(x, y)] & 2) == 0) { count++ }
-    drawn[hash(x, y)] = 2 | uint(i32.wrap_i64(v))
+    drawn[hash(x, y)] = 2 | u32(v)
     instr = 1
   } else {
     if (v == 1) { dir++ }

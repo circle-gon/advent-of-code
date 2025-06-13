@@ -29,9 +29,9 @@ fn set(v: s64)(t: u32) -> u32 {
         t = 1
       }
     }
-    chars[index] = i32.wrap_i64(v)
+    chars[index] = u32(v)
   } else {
-    output = i32.wrap_i64(v)
+    output = u32(v)
   }
   index++
   if (index > maxindex) { maxindex = index }
@@ -247,7 +247,7 @@ fn get2()() -> s64 {
     getRoutine()
   }
   textIdx++
-  return i64.extend_i32_u(text[textIdx - 1])
+  return s64(text[textIdx - 1])
 }
 
 export fn run()() -> u32 {

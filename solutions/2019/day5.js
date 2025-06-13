@@ -17,7 +17,7 @@ fn get2()() -> s64 {
 
 fn set(val: s64)() -> u32 {
   if (val != 0) { nz++ }
-  out = i32.wrap_i64(val)
+  out = u32(val)
   return 0
 }
 

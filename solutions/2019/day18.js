@@ -118,6 +118,7 @@ fn set(key: u32, val: u32)(idx: u32, base: u32, addr: u32) {
   unreachable()
 }
 
+// Literal one-to-one translation of the Heap code in /externals.js
 fn cmp(a: u32, b: u32)() -> u32 {
   return queue[3 * a + 1] > queue[3 * b + 1]
 }

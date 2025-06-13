@@ -26,11 +26,11 @@ fn get()(val: u32) -> s64 {
   val = commands[idx]
   idx++
   if (val == 0) { return 1347376211 }
-  return i64.extend_i32_u(val)
+  return s64(val)
 }
 
 fn set(char: s64)() -> u32 {
-  output[outIdx] = i32.wrap_i64(char)
+  output[outIdx] = u32(char)
   outIdx++
   return 0
 }
@@ -98,7 +98,7 @@ fn takeItem(num: u64)(c: u32, d: u32, j: u32, e: u64) -> u32 {
     e = num % 27
     if (e == 26) { e = 32 }
     else { e += 97 }
-    commands[5 + c] = i32.wrap_i64(e)
+    commands[5 + c] = i32(e)
     num /= 27
     c++
   }
@@ -122,7 +122,7 @@ fn dropItem(num: u64)(c: u32, d: u32, j: u32, e: u64) -> u32 {
     e = num % 27
     if (e == 26) { e = 32 }
     else { e += 97 }
-    commands[5 + c] = i32.wrap_i64(e)
+    commands[5 + c] = i32(e)
     num /= 27
     c++
   }
@@ -188,7 +188,7 @@ fn getDirs()(
         if (code == 32) { code = 26 }
         if (code >= 97) { code -= 97 }
         // 27 because the space
-        item = 27 * item + i64.extend_i32_u(code)
+        item = 27 * item + i64(code)
         idx++
       }
     }

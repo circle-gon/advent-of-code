@@ -88,10 +88,10 @@ fn computeReq(count: u64)(
     amt = items[top * 2] - items[top * 2 + 1]
     if (sint(amt) <= 0 | top == ore) { continue }
     addr = top * 21
-    base = i64.extend_i32_u(reactions[addr])
+    base = i64(reactions[addr])
     req = (amt + base - 1) / base
     for (idx = 1; idx < 21; idx += 2) {
-      items[reactions[addr + idx + 1] * 2] += i64.extend_i32_u(reactions[addr + idx]) * req
+      items[reactions[addr + idx + 1] * 2] += i64(reactions[addr + idx]) * req
       stack[height] = reactions[addr + idx + 1]
       height++
     }
@@ -103,25 +103,25 @@ fn computeReq(count: u64)(
 export fn part1()() -> u32 {
   memory.clear(reactions)
   parse()
-  return i32.wrap_i64(computeReq(1))
+  return i32(computeReq(1))
 }
 
 export fn part2()(low: u64, high: u64, mid: u64) -> u32 {
   memory.clear(reactions)
   parse()
  
-  low = 1000000000000000000 / computeReq(1000000)
+  low = 1e18 / computeReq(1e6)
   high = max()
 
   while (low < high) {
     mid = low + (high - low + 1) / 2
-    if (computeReq(mid) <= 1000000000000) {
+    if (computeReq(mid) <= 1e12) {
       low = mid
     } else {
       high = mid - 1 
     }
   }
-  return i32.wrap_i64(low)
+  return i32(low)
 }
 
 fn max()(
@@ -150,7 +150,7 @@ fn max()(
     }
     items2[top] = 0
   }
-  return i64.trunc_f64_u(generic.floor(1000000000000 / items2[ore]))
+  return i64.trunc_f64_u(generic.floor(1e12 / items2[ore]))
 }
 `;
 

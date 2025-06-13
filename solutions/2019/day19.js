@@ -13,14 +13,14 @@ temp = memory(1)
 fn get()() -> s64 {
   if (t == 0) {
     t = 1
-    return i64.extend_i32_u(xv)
+    return s64(xv)
   }
   t = 0
-  return i64.extend_i32_u(yv)
+  return s64(yv)
 }
 
 fn set(v: s64)() -> u32 {
-  ov = i32.wrap_i64(v)
+  ov = u32(v)
   return 0
 }
 
