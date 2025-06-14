@@ -4614,17 +4614,15 @@ async function optimize(wasm) {
   return binary;
 }
 
+// Optimize twice because it seems to be better than once
+// but optimizing thrice seems to be worse
+const OPTIMIZE_COUNT = 2;
 async function compileCode(text, map) {
-  // Optimize twice because it seems to be better than once
-  // but optimizing thrice seems to be worse
-  return optimize(await optimize(compileRaw(text, map)));
+  let result = compileRaw(text, map);
+  for (let i = 0; i < OPTIMIZE_COUNT; i++) result = await optimize(result);
+  return result;
 }
 
-let size = 0;
 export async function compile(emwasm, deps, map) {
-  const binary = await compileCode(emwasm, map);
-  console.log(
-    `binary is ${binary.length} bytes, now ${(size += binary.length)} total bytes`,
-  );
-  return compileWasm(binary, deps);
+  return compileWasm(await compileCode(emwasm, map), deps);
 }
