@@ -1,0 +1,4 @@
+function a(r){const n=[];for(const s of r.split(`
+
+`)){const t=s.replaceAll(`
+`," ").split(" "),c=Object.fromEntries(t.map(e=>e.split(":")));n.push(c)}return n}const h=["byr","iyr","eyr","hgt","hcl","ecl","pid"];function y(r){const n=a(r);let s=0;for(const t of n){const c=new Set(Object.keys(t));h.every(e=>c.has(e))&&s++}return s}function u(r){const n=a(r);let s=0;for(const t of n){const c=new Set(Object.keys(t));if(h.every(e=>c.has(e))){const e=Number(t.byr),l=Number(t.iyr),p=Number(t.eyr),i=Number(t.hgt.slice(0,-2));let o=!1;t.hgt.endsWith("cm")?o=i>=150&&i<=193:t.hgt.endsWith("in")&&(o=i>=59&&i<=76),e>=1920&&e<=2002&&l>=2010&&l<=2020&&p>=2020&&p<=2030&&t.hcl[0]==="#"&&t.hcl.length===7&&t.hcl.slice(1).split("").every(f=>"0123456789abcdef".includes(f))&&["amb","blu","brn","gry","grn","hzl","oth"].includes(t.ecl)&&!isNaN(t.pid)&&t.pid.length===9&&o&&s++}}return s}const b=[y,u];export{b as default};

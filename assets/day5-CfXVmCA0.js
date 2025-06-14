@@ -1,0 +1,2 @@
+function f(c){return c.split(`
+`).map(n=>n.split("").map(s=>s==="B"||s==="R"))}function e(c,n,s){for(const t of s){const o=Math.floor((c+n)/2);t?c=o+1:n=o}return n}function a(c){const n=f(c);let s=0;for(const t of n){const o=e(0,127,t.slice(0,7)),i=e(0,7,t.slice(7,10)),r=o*8+i;r>s&&(s=r)}return s}function l(c){const n=f(c),s=[];for(const t of n){const o=e(0,127,t.slice(0,7)),i=e(0,7,t.slice(7,10)),r=o*8+i;s.push(r)}s.sort((t,o)=>t-o);for(let t=1;t<s.length;t++){const o=s[t-1]+1;if(o!==s[t])return o}return"Is your input malformed?"}const p=[a,l];export{p as default};

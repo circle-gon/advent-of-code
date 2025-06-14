@@ -1,0 +1,2 @@
+function i(o){const n=[];for(const t of o.split(`
+`)){const[s,u,r]=t.split(" "),[c,e]=s.split("-").map(f=>Number(f));n.push([c,e,u[0],r])}return n}function a(o,n){let t=0;for(const s of o)s===n&&t++;return t}function p(o){const n=i(o);let t=0;for(const[s,u,r,c]of n){const e=a(c,r);e>=s&&e<=u&&t++}return t}function l(o){const n=i(o);let t=0;for(const[s,u,r,c]of n){const e=c[s-1]===r,f=c[u-1]===r;e^f&&t++}return t}const m=[p,l];export{m as default};

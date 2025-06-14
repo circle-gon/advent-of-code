@@ -1,0 +1,2 @@
+function s(r){const n=[];for(const t of r.split(`
+`)){const[e,u]=t.split(" ");n.push([e,Number(u)])}return n}function o(r){let n=0,t=0;const e=new Set;for(;n<r.length;){if(e.has(n))return[0,t];e.add(n),r[n][0]==="jmp"?n+=r[n][1]:(r[n][0]==="acc"&&(t+=r[n][1]),n++)}return[1,t]}function i(r){const n=s(r);return o(n)[1]}function f(r){const n=s(r);for(const t of n){if(t[0]==="jmp"){t[0]="nop";const e=o(n);if(e[0])return e[1];t[0]="jmp"}if(t[0]==="nop"){t[0]="jmp";const e=o(n);if(e[0])return e[1];t[0]="nop"}}return"Is your input malformed?"}const c=[i,f];export{c as default};

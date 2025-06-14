@@ -1,0 +1,2 @@
+function u(r){const t=r.split(`
+`).map(n=>Number(n));return t.sort((n,s)=>n-s),t.unshift(0),t.push(t.at(-1)+3),t}function f(r){const t=u(r);let n=0,s=0;for(let e=1;e<t.length;e++){const o=t[e]-t[e-1];o===1?n++:o===3&&s++}return n*s}function a(r){const t=u(r);let n=0,s=1;for(let e=1;e<t.length;e++)t[e-1]+1===t[e]?n++:(n=Math.max(n-1,0),s*=2**n-(n>=3?1:0),n=0);return s}const i=[f,a];export{i as default};
