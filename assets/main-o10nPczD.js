@@ -1,0 +1,2 @@
+import{s as c,f as p}from"./index-DQLiBMR0.js";const u=""+new URL("worker-DTQK711F.js",import.meta.url).href,f=c(u);function i(n){const r=[];for(const t of n.split(`
+`)){const o=[];for(const e of t)o.push(Number(e));r.push(o)}return r}function s(n,r,t,o,e){return f([i(n),r,t],e,o)}function a(n){let r=0;const t=()=>{n(`(${p(r++*1e5)} iterations done)`)};return t(),t}function m(n,r){return s(n,0,3,a(r),0)}function w(n,r){return s(n,4,10,a(r),1)}const d=[m,w];export{d as default};
