@@ -62,17 +62,16 @@ export const AOC = Object.freeze({
 
 let wabt;
 function getWabt() {
-  return new Promise((r) => {
-    if (wabt === undefined) {
+  if (!wabt)
+    wabt = new Promise((r) => {
       const script = document.createElement("script");
       script.src = "https://cdn.jsdelivr.net/npm/wabt@1.0.36/index.js";
       script.addEventListener("load", async () => {
-        wabt = await WabtModule();
-        r(wabt);
+        r(await WabtModule());
       });
       document.body.append(script);
-    } else r(wabt);
-  });
+    });
+  return wabt;
 }
 
 export async function compileWasm(wasm, deps) {
