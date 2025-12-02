@@ -56,7 +56,10 @@ export function formatTime(offset) {
 }
 
 export const AOC = Object.freeze({
-  days: 25,
+  getDays(year) {
+    if (Number(year) >= 2025) return 12;
+    return 25;
+  },
   parts: 2,
 });
 

@@ -30,7 +30,7 @@ function createDefault() {
   for (const year of keys) {
     toSave.yearData[year] = {
       day: 0,
-      dayData: Array(AOC.days)
+      dayData: Array(AOC.getDays(year))
         .fill()
         .map(() => ({
           input: "",
@@ -63,7 +63,7 @@ function load() {
 
 function loadYear() {
   daySelector.textContent = "";
-  for (let i = 1; i <= AOC.days; i++) {
+  for (let i = 1; i <= AOC.getDays(toSave.year); i++) {
     const select = document.createElement("option");
     const d = data[toSave.year][i - 1];
     const label = d.special ? "slow" : d.interactive ? "interactive" : "";
@@ -72,6 +72,7 @@ function loadYear() {
   }
 
   daySelector.selectedIndex = getDay();
+  setupTable();
   loadDay();
 }
 
@@ -115,16 +116,21 @@ function wait() {
   return new Promise((r) => setTimeout(r, 0));
 }
 
-const tableElements = Array(AOC.days * AOC.parts)
-  .fill()
-  .map(() => []);
+let tableElements;
 
 const SCALE = 2;
 function setupTable() {
+  tableElements = Array(AOC.getDays(toSave.year) * AOC.parts)
+    .fill()
+    .map(() => []);
+  tableContents.textContent = "";
   multiTable.style.display = "none";
-  for (let i = 0; i < Math.ceil(AOC.days / SCALE); i++) {
+  for (let i = 0; i < Math.ceil(AOC.getDays(toSave.year) / SCALE); i++) {
     const row = document.createElement("tr");
-    const d = Math.max(Math.min(AOC.days - SCALE * i, SCALE), 0);
+    const d = Math.max(
+      Math.min(AOC.getDays(toSave.year) - SCALE * i, SCALE),
+      0,
+    );
     for (let l = 0; l < d; l++) {
       const ele = document.createElement("td");
       const day = SCALE * i + l;
@@ -144,7 +150,7 @@ function setupTable() {
 }
 
 function clearTable() {
-  for (let i = 0; i < AOC.days; i++) {
+  for (let i = 0; i < AOC.getDays(toSave.year); i++) {
     for (let j = 0; j < AOC.parts; j++) {
       const thing = tableElements[i * AOC.parts + j];
       for (const t of thing) t.textContent = "";
@@ -372,7 +378,7 @@ function main() {
     const globalStart = performance.now();
     const waiting = [];
     let failed = false;
-    for (let i = 0; i < AOC.days; i++) {
+    for (let i = 0; i < AOC.getDays(toSave.year); i++) {
       const input = toSave.yearData[toSave.year].dayData[i].input;
       const sols = (await getSolution(i)) ?? [];
       for (let j = 0; j < AOC.parts; j++) {
@@ -479,7 +485,7 @@ function main() {
     const checking = [];
     const waiting = [];
 
-    for (let i = 0; i < AOC.days; i++) {
+    for (let i = 0; i < AOC.getDays(toSave.year); i++) {
       const inputs = data[toSave.year][i].examples;
       const sols = (await getSolution(i)) ?? [];
       for (const [j, solver] of sols.entries()) {
@@ -573,7 +579,6 @@ function main() {
   });
 
   // init
-  setupTable();
   load();
 }
 
