@@ -4,7 +4,6 @@ import intcode from "./intcode.js";
 
 const code = `
 ${intcode}
-log = import js.log(func(u32))
 fives = data<active>(temp, 0)
 temp = memory<u8>(1)
 state = memory<u32>(1)
