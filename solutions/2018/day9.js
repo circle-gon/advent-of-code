@@ -1,4 +1,4 @@
-import { LinkedList } from "/externals.js";
+import { LinkedListNode } from "/externals.js";
 
 function parse(input) {
   const blank = input.split(" ");
@@ -6,19 +6,18 @@ function parse(input) {
 }
 
 function simulate(players, end) {
-  const board = new LinkedList([0]);
   const scores = Array(players).fill(0);
-  let current = board.root;
+  let current = LinkedListNode.root(0);
 
   for (let i = 1; i <= end; i++) {
-    if (i % 23 !== 0) current = board.insert(i, current.after);
+    if (i % 23 !== 0) current = current.after.add(new LinkedListNode(i));
     else {
       const turn = (i - 1) % players;
       const back = current.behind(7);
 
       scores[turn] += i + back.value;
-      board.remove(back);
       current = back.after;
+      back.remove();
     }
   }
 
