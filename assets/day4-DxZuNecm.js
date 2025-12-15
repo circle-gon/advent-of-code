@@ -1,1 +1,0 @@
-import{m as o}from"./externals-BKfMX2ml.js";function n(t,e){const i="0".repeat(e);let r=0;for(;;){if(o(t+r.toString()).startsWith(i))return r;r++}}function a(t){return n(t,5)}function u(t){return n(t,6)}const s=[a,u];export{s as default};
